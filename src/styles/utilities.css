@@ -1,0 +1,18 @@
+@layer utilities {
+  .scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scroll {
+    @apply overflow-hidden fixed w-full;
+  }
+
+  .pageContainer {
+    @apply w-full max-w-[430px] min-h-screen mx-auto bg-black;
+  }
+}
