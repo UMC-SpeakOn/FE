@@ -1,4 +1,4 @@
-import type { FavItem } from '@/types/my-role/favs';
+import type { FavItem } from '@/types/my-role/favs.type';
 
 const favsData: FavItem[] = [
   {

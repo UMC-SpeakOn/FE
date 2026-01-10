@@ -1,5 +1,5 @@
 import Delete from '@/assets/images/icons/delete.svg';
-import type { FavItem } from '@/types/my-role/favs';
+import type { FavItem } from '@/types/my-role/favs.type';
 
 interface ItemProps {
   item: FavItem;
