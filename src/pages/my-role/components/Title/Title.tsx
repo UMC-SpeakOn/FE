@@ -5,7 +5,7 @@ type TitleProps = {
 
 const Title = ({ title, description }: TitleProps) => {
   return (
-    <div className="w-full flex items-center gap-4">
+    <div className="w-full flex items-center gap-4 pr-[1.462rem]">
       <p className="whitespace-nowrap font-bold text-[2.2rem] text-black leading-none">
         {title}
       </p>
