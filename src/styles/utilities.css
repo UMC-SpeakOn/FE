@@ -13,6 +13,10 @@
   }
 
   .pageContainer {
-    @apply w-full max-w-[430px] min-h-screen mx-auto bg-black;
+    @apply w-full flex flex-col max-w-[430px] h-dvh mx-auto overflow-y-auto bg-purple-500;
+  }
+
+  .font-unbounded {
+    font-family: var(--font-family-unbounded);
   }
 }
