@@ -4,7 +4,7 @@ import Footer from '@/components/Footer/Footer';
 
 const RootLayout = () => {
   return (
-    <div className="pageContainer">
+    <div className="pageContainer scroll">
       <Header />
       <main className="flex-1">
         <Outlet />
