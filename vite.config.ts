@@ -4,7 +4,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -12,8 +12,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
       devOptions: {
-        enabled: true,
+        enabled: mode === 'development',
+        type: 'module',
       },
+
       includeAssets: [
         'icons/favicon.ico',
         'icons/apple-touch-icon.png',
@@ -55,4 +57,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
-});
+}));
