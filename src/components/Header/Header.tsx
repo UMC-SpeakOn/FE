@@ -19,7 +19,7 @@ const Header = () => {
           />
         </div>
 
-        <button className="absolute w-[1.8rem] h-[1.6rem] right-[1.7rem] flex flex-col justify-between">
+        <button className="absolute w-[1.8rem] h-[1.6rem] left-[1.7rem] flex flex-col justify-between">
           <div className="w-full h-1 bg-white rounded-full" />
           <div className="w-full h-1 bg-white rounded-full" />
           <div className="w-full h-1 bg-white rounded-full" />
