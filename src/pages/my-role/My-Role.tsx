@@ -12,7 +12,7 @@ const MyRole = () => {
   };
 
   return (
-    <div className="w-full h-full mt-[0.878rem] pt-[2.688rem] pl-[1.462rem] pb-[6.334rem] flex flex-col gap-[2.962rem] rounded-t-[3rem] bg-white">
+    <div className="white-pageContainer">
       <Favs />
       <Bar />
       <Add onSubmit={handleAddRole} />

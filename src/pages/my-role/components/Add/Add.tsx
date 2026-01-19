@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Title from '../Title/Title';
+import Title from '../../../../components/Title/Title';
 import StepSection from './Step/StepSection';
 import ListStep1 from './Step/Step1/ListStep1';
 import ListStep2 from './Step/Step2/ListStep2';

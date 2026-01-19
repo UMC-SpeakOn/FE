@@ -1,4 +1,4 @@
-import Title from '../Title/Title';
+import Title from '@/components/Title/Title';
 import favsData from '@/mocks/favsData';
 import NotFavs from './NotFavs/NotFavs';
 import ListFavs from './ListFavs';

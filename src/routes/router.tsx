@@ -7,7 +7,7 @@ import RootLayout from '@/layouts/RootLayout';
 import HomePage from '@/pages/home/Home';
 import MyRolePage from '@/pages/my-role/My-Role';
 import MySpeakPage from '@/pages/my-speak/My-Speak';
-import MySpeakSettingPage from '@/pages/my-speak/Setting';
+import MySpeakSettingPage from '@/pages/my-speak/Setting/Setting';
 
 const router = createBrowserRouter([
   {

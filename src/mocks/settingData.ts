@@ -1,6 +1,6 @@
-import type { FavItem } from '@/types/my-role/favs.type';
+import type { AiItem, GoalItem } from '@/types/my-speak/setting.type';
 
-const favsData: FavItem[] = [
+export const aiData: AiItem[] = [
   {
     id: 1,
     name: 'Emily',
@@ -39,4 +39,7 @@ const favsData: FavItem[] = [
   },
 ];
 
-export default favsData;
+export const goalData: GoalItem[] = [
+  { id: 1, label: '질문 5개 · 빠르게 연습' },
+  { id: 2, label: '질문 10개 · 충분히 연습' },
+];

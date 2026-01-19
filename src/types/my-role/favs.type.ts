@@ -5,4 +5,5 @@ export interface FavItem {
   situation: string;
   city: string;
   age: number;
+  imageUrl: string;
 }
