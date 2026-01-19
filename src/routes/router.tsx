@@ -3,7 +3,6 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import Spinner from '@/components/Spinner/Spinner';
 import RootLayout from '@/layouts/RootLayout';
-
 import HomePage from '@/pages/home/Home';
 import MyRolePage from '@/pages/my-role/My-Role';
 import MySpeakPage from '@/pages/my-speak/My-Speak';

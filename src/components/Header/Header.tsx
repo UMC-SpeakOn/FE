@@ -1,5 +1,6 @@
-import NavIcon from '@/assets/images/icons/nav.svg';
 import { useLocation } from 'react-router-dom';
+
+import NavIcon from '@/assets/images/icons/nav.svg';
 import { getHeaderLabel } from '@/utils/header/getHeaderLabel';
 
 const Header = () => {

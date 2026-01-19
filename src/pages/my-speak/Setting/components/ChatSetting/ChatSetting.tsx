@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import StepSection from './Step/StepSection';
+
+import useNavigation from '@/hooks/useNavigation';
+
 import ListStep1 from './Step/Step1/ListStep1';
 import ListStep2 from './Step/Step2/ListStep2';
-import useNavigation from '@/hooks/useNavigation';
+import StepSection from './Step/StepSection';
 
 const ChatSetting = () => {
   const { navigateTo } = useNavigation();

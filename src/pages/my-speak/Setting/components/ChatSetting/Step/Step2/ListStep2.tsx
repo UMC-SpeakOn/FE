@@ -1,4 +1,5 @@
 import { goalData } from '@/mocks/settingData';
+
 import Title from '../../Title/Title';
 import ItemStep2 from './ItemStep2';
 

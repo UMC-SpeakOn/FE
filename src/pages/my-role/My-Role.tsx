@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import Favs from './components/Favs/Favs';
-import Bar from './components/Bar/Bar';
+
 import Add from './components/Add/Add';
+import Bar from './components/Bar/Bar';
+import Favs from './components/Favs/Favs';
 import Modal from './components/Modal/Modal';
 
 const MyRole = () => {

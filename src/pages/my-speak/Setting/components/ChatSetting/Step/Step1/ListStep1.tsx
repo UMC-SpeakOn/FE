@@ -1,5 +1,6 @@
-import ItemStep1 from './ItemStep1';
 import { aiData } from '@/mocks/settingData';
+
+import ItemStep1 from './ItemStep1';
 
 interface ListStep1Props {
   selectedId: number | null;

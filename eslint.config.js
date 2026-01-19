@@ -7,9 +7,10 @@ import prettier from 'eslint-config-prettier';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'dev-dist', 'build'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
+
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -22,12 +23,14 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
-      'simple-import-sort/imports': 'warn',
-      'simple-import-sort/exports': 'warn',
+
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
 
       'no-unused-vars': 'off',
     },

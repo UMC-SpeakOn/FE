@@ -1,9 +1,10 @@
 import { useState } from 'react';
+
 import Title from '../../../../components/Title/Title';
-import StepSection from './Step/StepSection';
 import ListStep1 from './Step/Step1/ListStep1';
 import ListStep2 from './Step/Step2/ListStep2';
 import ListStep3 from './Step/Step3/ListStep3';
+import StepSection from './Step/StepSection';
 
 interface AddProps {
   onSubmit: () => void;

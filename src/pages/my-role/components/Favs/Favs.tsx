@@ -1,7 +1,8 @@
 import Title from '@/components/Title/Title';
 import favsData from '@/mocks/favsData';
-import NotFavs from './NotFavs/NotFavs';
+
 import ListFavs from './ListFavs';
+import NotFavs from './NotFavs/NotFavs';
 
 const Favs = () => {
   const hasFavs = favsData.length > 0;
