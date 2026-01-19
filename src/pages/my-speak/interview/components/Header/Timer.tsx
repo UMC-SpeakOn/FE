@@ -9,19 +9,21 @@
  * - 경과 시간 표시 (MM:SS 형식)
  * - 반투명 배경 + 블러 효과 (가독성)
  * - Unbounded 폰트 사용 (숫자 가독성)
+ * - 상위 컴포넌트로부터 formattedTime을 props로 전달받음
  *
- * @todo
- * - Phase 3에서 useInterviewTimer 훅 연결 예정
- * - 시작/일시정지/재개 기능 구현 필요
+ * @param {TimerProps} props - 컴포넌트 props
  *
  * @related
  * - docs/my-speak.md (섹션 8-4. 세션 내부 최대 시간 15분)
- * - hooks/useInterviewTimer.ts (Phase 3에서 구현)
+ * - hooks/useInterviewTimer.ts
  */
-const Timer = () => {
-  // TODO: Phase 3에서 useInterviewTimer 훅 연결
-  const formattedTime = '00:00';
 
+interface TimerProps {
+  /** 포맷된 시간 문자열 (MM:SS) */
+  formattedTime: string;
+}
+
+const Timer = ({ formattedTime }: TimerProps) => {
   return (
     <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full">
       {/* 시계 아이콘 */}

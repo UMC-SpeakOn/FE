@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import ControlBar from './components/Controls/ControlBar';
 import SpeakButton from './components/Controls/SpeakButton';
@@ -6,6 +6,7 @@ import InterviewHeader from './components/Header/InterviewHeader';
 import InterviewerVideoPIP from './components/VideoSection/InterviewerVideoPIP';
 import SubtitleOverlay from './components/VideoSection/SubtitleOverlay';
 import UserVideoStream from './components/VideoSection/UserVideoStream';
+import { useInterviewTimer } from './hooks/useInterviewTimer';
 
 /**
  * InterviewPage - My Speak 학습 화면 (In-session)
@@ -20,6 +21,7 @@ import UserVideoStream from './components/VideoSection/UserVideoStream';
  * - 실시간 음성 인식 자막 오버레이
  * - 말하기 버튼 (준비/말하는중/완료 상태)
  * - 하단 컨트롤 바 (마무리, 일시정지, 자막 토글, 채팅)
+ * - 경과 시간 타이머 (자동 시작, 일시정지/재개 지원)
  *
  * @related
  * - Issue: https://github.com/UMC-SpeakOn/FE/issues/14
@@ -33,10 +35,39 @@ const InterviewPage = () => {
   // 일시정지 상태 (기본값: 진행 중)
   const [isPaused, setIsPaused] = useState(false);
 
+  // 타이머 훅 (Phase 3)
+  const { formattedTime, start, pause, resume } = useInterviewTimer();
+
+  // 컴포넌트 마운트 시 타이머 자동 시작
+  useEffect(() => {
+    start();
+  }, []);
+
+  /**
+   * 일시정지/재개 핸들러
+   * - 일시정지 상태를 토글하고 타이머도 함께 제어
+   */
+  const handlePauseToggle = () => {
+    if (isPaused) {
+      // 재개: 타이머 재개
+      resume();
+      setIsPaused(false);
+    } else {
+      // 일시정지: 타이머 일시정지
+      pause();
+      setIsPaused(true);
+    }
+  };
+
   return (
     <div className="pageContainer relative h-screen overflow-hidden bg-gray-900">
       {/* 상단 헤더: 질문 번호, 상태, 타이머 */}
-      <InterviewHeader />
+      <InterviewHeader
+        formattedTime={formattedTime}
+        currentQuestion={1}
+        totalQuestions={5}
+        status={isPaused ? '일시정지' : '면접 진행 중'}
+      />
 
       {/* 메인 비디오 영역 */}
       <div className="relative w-full h-full">
@@ -66,7 +97,7 @@ const InterviewPage = () => {
         showSubtitles={showSubtitles}
         onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
         isPaused={isPaused}
-        onPause={() => setIsPaused(!isPaused)}
+        onPause={handlePauseToggle}
         onFinish={() => {
           // TODO: 피드백 페이지로 이동 (Post-session)
           console.log('Interview finished');
