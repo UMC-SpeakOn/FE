@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react';
 import ccIcon from '@/assets/images/icons/cc.svg';
 import chatingIcon from '@/assets/images/icons/chating.svg';
 import continueIcon from '@/assets/images/icons/continue.svg';
+import stopIcon from '@/assets/images/icons/stop.svg';
 import finishIcon from '@/assets/images/icons/finish.svg';
 import loopIcon from '@/assets/images/icons/loop.svg';
 import speakIcon from '@/assets/images/icons/speak.svg';
 import talkingIcon from '@/assets/images/icons/talking.svg';
 import { personsData } from '@/mocks/addData';
 
+import ControlButton from './components/Controls/ControlButton';
 import SubtitleOverlay from './components/VideoSection/SubtitleOverlay';
 import UserVideoStream from './components/VideoSection/UserVideoStream';
 import { useInterviewTimer } from './hooks/useInterviewTimer';
@@ -101,24 +103,24 @@ const InterviewPage = () => {
   };
 
   return (
-    <div className="pageContainer relative flex flex-col h-screen bg-purple-500 overflow-hidden">
+    <div className="relative flex flex-col  bg-purple-500 overflow-hidden">
       {/* 상단 헤더: SpeakOn 로고 + 면접명 */}
-      <header className="flex flex-col items-center pt-2 pb-1.5 px-4 shrink-0">
-        <h1 className="text-white text-base font-bold font-unbounded">
+      <header className="flex flex-col items-center pt-2 pb-1.5 px-4 gap-10 my-5">
+        <h1 className="text-white text-4xl font-unbounded">
           SpeakOn
         </h1>
-        <p className="text-white text-[10px]">{interviewer.city} 면접 연습</p>
+        <p className="text-white text-xl">{interviewer.city} 면접 연습</p>
       </header>
 
       {/* 메인 컨텐츠 영역 */}
-      <div className="flex-1 flex flex-col px-2.5 pb-2 min-h-0">
+      <div className="flex flex-col px-6 pb-10">
         {/* 비디오 카드 영역 */}
-        <div className="relative flex-1 bg-white rounded-2xl overflow-hidden min-h-0">
+        <div className="relative h-[48vh] bg-white rounded-2xl overflow-hidden border border-white">
           {/* 사용자 웹캠 스트림 */}
           <UserVideoStream />
 
           {/* AI 면접관 PIP - 왼쪽 상단 오버레이 (이미지) */}
-          <div className="absolute top-2 left-2 w-14 h-16 rounded-lg overflow-hidden shadow-lg">
+          <div className="absolute top-4 left-4 w-45 h-60 rounded-2xl overflow-hidden shadow-lg border border-white">
             <img
               src={interviewer.imageUrl}
               alt={interviewer.name}
@@ -127,17 +129,24 @@ const InterviewPage = () => {
           </div>
 
           {/* 타이머 + CC 버튼 - 우측 상단 */}
-          <div className="absolute top-2 right-2 flex items-center gap-1">
+          <div className="absolute top-2 right-2 flex items-center gap-2">
             {/* CC 자막 토글 버튼 */}
             <button
               onClick={() => setShowSubtitles(!showSubtitles)}
-              className="w-7 h-7 rounded-full bg-black/50 flex items-center justify-center"
+              className={`w-10 h-10 rounded-full    flex items-center justify-center ${showSubtitles ? 'bg-violet-500' : 'bg-neutral-900 opacity-30'}`}
             >
-              <img src={ccIcon} alt="자막" className="w-3 h-1.5" />
+              <img src={ccIcon} alt="자막" />
+            </button>
+            {/* 새로고침 버튼*/}
+            <button
+              onClick={handleRestart}
+              className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center"
+            >
+              <img src={loopIcon} alt="재시작" />
             </button>
             {/* 타이머 */}
-            <div className="flex items-center gap-0.5 bg-black/50 px-1.5 py-0.5 rounded">
-              <span className="text-white text-[10px] font-medium">
+            <div className="flex items-center gap-0.5 bg-black/50 px-1.5 py-0.5 rounded-full">
+              <span className="text-white p-2 text-lg ">
                 {formattedTime}
               </span>
             </div>
@@ -146,7 +155,7 @@ const InterviewPage = () => {
           {/* 일시정지 오버레이 */}
           {isPaused && (
             <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-              <p className="text-white text-sm font-medium">
+              <p className="text-white text-2xl font-bold">
                 학습을 잠시 멈췄습니다
               </p>
             </div>
@@ -161,82 +170,51 @@ const InterviewPage = () => {
         </div>
 
         {/* 말하기 버튼 영역 */}
-        <div className="flex items-center justify-center py-2 shrink-0">
+        <div className="flex items-center justify-center py-4">
           <button
             onClick={handleSpeak}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 transition-colors"
+            className="w-full  h-21 bg-indigo-600 hover:bg-indigo-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
             disabled={isPaused}
           >
             <img
               src={speakState === 'speaking' ? talkingIcon : speakIcon}
               alt="말하기"
-              className="w-4 h-4"
             />
-            <span className="text-white text-xs font-medium">말하기</span>
+            {speakState !== 'speaking' && (
+              <span className="text-white text-xl font-semibold">
+                말하기
+              </span>
+            )}
           </button>
         </div>
 
-        {/* 하단 컨트롤 버튼 4개 */}
-        <div className="flex items-center justify-center gap-4 pb-1.5 shrink-0">
-          {/* 재생하기 버튼 */}
-          <button
+        {/* 하단 컨트롤 버튼 3개 */}
+        <div className="flex items-center justify-between px-13 pt-4 ">
+          <ControlButton
+            icon={finishIcon}
+            label="마무리하기"
             onClick={() => {
               /* TODO: 재생 기능 */
             }}
-            className="flex flex-col items-center gap-0.5"
-          >
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md">
-              <img src={continueIcon} alt="재생" className="w-5 h-5" />
-            </div>
-            <span className="text-white text-[9px]">재생하기</span>
-          </button>
+            iconSize="w-5 h-5"
+          />
 
-          {/* 일시정지 버튼 */}
-          <button
+          <ControlButton
+            icon={isPaused ? continueIcon : stopIcon}
+            label={isPaused ? '이어서하기' : '일시멈춤'}
             onClick={handlePauseToggle}
-            className="flex flex-col items-center gap-0.5"
-          >
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md">
-              <img src={finishIcon} alt="일시정지" className="w-3.5 h-3.5" />
-            </div>
-            <span className="text-white text-[9px]">일시정지</span>
-          </button>
+          />
 
-          {/* 재시 버튼 */}
-          <button
-            onClick={handleRestart}
-            className="flex flex-col items-center gap-0.5"
-          >
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md">
-              <img src={loopIcon} alt="재시" className="w-3.5 h-3.5" />
-            </div>
-            <span className="text-white text-[9px]">재시</span>
-          </button>
-
-          {/* 채팅 버튼 */}
-          <button
+          <ControlButton
+            icon={chatingIcon}
+            label="채팅"
             onClick={() => {
               /* TODO: 채팅 기능 */
             }}
-            className="flex flex-col items-center gap-0.5"
-          >
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md">
-              <img src={chatingIcon} alt="채팅" className="w-4 h-4" />
-            </div>
-            <span className="text-white text-[9px]">채팅</span>
-          </button>
+          />
         </div>
       </div>
 
-      {/* 하단 푸터 */}
-      <footer className="flex flex-col items-center py-1.5 bg-white shrink-0">
-        <h2 className="text-purple-500 text-xs font-bold font-unbounded">
-          SpeakOn
-        </h2>
-        <p className="text-gray-400 text-[9px]">
-          Terms and Conditions · Privacy Policy
-        </p>
-      </footer>
     </div>
   );
 };

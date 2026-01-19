@@ -26,9 +26,9 @@ const SubtitleOverlay = () => {
     'Thank you for coming in today.\nCould you start by telling me a bit about yourself?';
 
   return (
-    <div className="w-full bg-purple-500/90 px-4 py-3">
+    <div className="w-full  px-4 py-3 h-28 bg-gradient-to-b from-neutral-900/0 to-neutral-900 rounded-bl-[10px] rounded-br-[10px]">
       {/* 자막 텍스트 */}
-      <p className="text-white text-center text-sm leading-relaxed whitespace-pre-line">
+      <p className="text-white text-center text-xl leading-relaxed whitespace-pre-line">
         {subtitle}
       </p>
     </div>
