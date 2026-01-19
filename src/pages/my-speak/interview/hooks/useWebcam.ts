@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
  */
 interface UseWebcamReturn {
   /** 비디오 엘리먼트 참조 */
-  videoRef: React.RefObject<HTMLVideoElement>;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   /** MediaStream 객체 (웹캠 스트림) */
   stream: MediaStream | null;
   /** 에러 메시지 (권한 거부, 기기 없음 등) */

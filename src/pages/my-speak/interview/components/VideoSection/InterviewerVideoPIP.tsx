@@ -1,48 +1,38 @@
 /**
- * InterviewerVideoPIP - AI 면접관 영상 Picture-in-Picture
+ * InterviewerVideoPIP - AI 면접관 이미지 Picture-in-Picture
  *
  * @description
- * AI 면접관의 영상 또는 아바타를 PIP 형태로 표시하는 컴포넌트입니다.
+ * AI 면접관의 이미지를 PIP 형태로 표시하는 컴포넌트입니다.
  * Figma 디자인에 따라 왼쪽 상단에 작은 오버레이로 배치됩니다.
+ * 비디오가 아닌 정적 이미지로 표시됩니다.
  *
  * @features
- * - 작은 크기 (w-20 h-28, 약 80x112px)
+ * - 작은 크기 (w-16 h-20, 약 64x80px)
  * - 라운드 모서리
- * - shadow 효과로 입체감
- * - 플레이스홀더 아바타 표시
+ * - object-cover로 비율 유지
+ * - 플레이스홀더 이미지 표시
  *
  * @todo
- * - AI 면접관 실제 영상/이미지 연동
- * - 음소거/볼륨 컨트롤 추가
+ * - AI 면접관 실제 프로필 이미지 연동
+ * - 세션 데이터에서 면접관 이미지 URL 가져오기
  *
  * @related
  * - Figma: figma/200 PWA_My Speak.png (왼쪽 상단 PIP)
  * - docs/my-speak.md (섹션 6-3. UI 요소 - AI 상대방 화면)
  */
 const InterviewerVideoPIP = () => {
-  // TODO: 실제 면접관 비디오 또는 아바타 이미지 연동
+  // TODO: 세션 데이터에서 면접관 이미지 URL 가져오기
+  // const { session } = useInterviewSession();
+  // const interviewerImage = session?.interviewer.avatarUrl;
 
   return (
-    <div className="w-full h-full rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
-      {/* 플레이스홀더 아바타 (실제 AI 영상으로 교체 예정) */}
-      <div className="text-center">
-        {/* 사용자 아이콘 */}
-        <div className="w-12 h-12 mx-auto rounded-full bg-purple-600 flex items-center justify-center">
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        </div>
-      </div>
+    <div className="w-full h-full">
+      {/* 면접관 이미지 (플레이스홀더) */}
+      <img
+        src="https://via.placeholder.com/64x80/6366f1/ffffff?text=AI"
+        alt="AI 면접관"
+        className="w-full h-full object-cover"
+      />
     </div>
   );
 };
