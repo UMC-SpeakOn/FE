@@ -1,4 +1,4 @@
-import { personsData } from '@/mocks/addData';
+import { aiData } from '@/mocks/settingData';
 
 import ItemStep1 from './ItemStep1';
 
@@ -10,12 +10,12 @@ interface ListStep1Props {
 const ListStep1 = ({ selectedId, onSelect }: ListStep1Props) => {
   return (
     <div className="w-full max-w-full flex flex-nowrap gap-[1.2rem] overflow-x-auto overflow-y-hidden scroll">
-      {personsData.map((person) => (
+      {aiData.map((item) => (
         <ItemStep1
-          key={person.id}
-          person={person}
-          isSelected={selectedId === person.id}
-          onClick={() => onSelect(person.id)}
+          key={item.id}
+          item={item}
+          isSelected={selectedId === item.id}
+          onClick={() => onSelect(item.id)}
         />
       ))}
     </div>

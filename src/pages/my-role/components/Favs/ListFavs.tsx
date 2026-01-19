@@ -1,5 +1,6 @@
-import ItemFavs from './ItemFavs';
 import type { FavItem } from '@/types/my-role/favs.type';
+
+import ItemFavs from './ItemFavs';
 
 interface ListProps {
   data: FavItem[];

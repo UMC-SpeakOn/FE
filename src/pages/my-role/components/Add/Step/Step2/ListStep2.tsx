@@ -1,4 +1,5 @@
 import { jobsData } from '@/mocks/addData';
+
 import ListCommon from '../Common/ListCommon';
 
 interface ListStep2Props {

@@ -1,6 +1,6 @@
 import type {
-  PersonItem,
   JobItem,
+  PersonItem,
   SituationItem,
 } from '@/types/my-role/add.type';
 

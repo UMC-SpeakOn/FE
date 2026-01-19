@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import type { AddStepSectionProps } from '@/types/my-role/add.type';
+import type { SettingStepSectionProps } from '@/types/my-speak/setting.type';
 
 const StepSection = ({
   stepNumber,
@@ -9,7 +9,7 @@ const StepSection = ({
   isLast,
   hideNumber,
   children,
-}: AddStepSectionProps) => {
+}: SettingStepSectionProps) => {
   if (hideNumber) {
     return (
       <section className="flex gap-[0.876rem] items-center mr-[1.462rem]">

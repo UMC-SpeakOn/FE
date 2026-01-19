@@ -3,9 +3,10 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import Spinner from '@/components/Spinner/Spinner';
 import RootLayout from '@/layouts/RootLayout';
-
 import HomePage from '@/pages/home/Home';
 import MyRolePage from '@/pages/my-role/My-Role';
+import MySpeakPage from '@/pages/my-speak/My-Speak';
+import MySpeakSettingPage from '@/pages/my-speak/Setting/Setting';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,14 @@ const router = createBrowserRouter([
       {
         path: 'my-role',
         element: <MyRolePage />,
+      },
+      {
+        path: 'my-speak',
+        element: <MySpeakPage />,
+      },
+      {
+        path: 'my-speak/setting',
+        element: <MySpeakSettingPage />,
       },
     ],
   },
