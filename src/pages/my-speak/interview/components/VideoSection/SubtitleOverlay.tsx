@@ -1,39 +1,36 @@
 /**
- * SubtitleOverlay - 실시간 자막 오버레이
+ * SubtitleOverlay - 면접관 질문/AI 응답 자막 오버레이
  *
  * @description
- * 사용자의 음성을 실시간으로 인식하여 텍스트로 변환 후 표시하는 컴포넌트입니다.
- * Web Speech API를 사용하여 STT(Speech-to-Text) 기능을 제공합니다.
+ * 비디오 하단에 보라색 배경 바 형태로 면접관의 질문이나 AI 응답을 표시합니다.
+ * Figma 디자인에 따라 반투명 보라색 배경에 흰색 텍스트를 표시합니다.
  *
  * @features
- * - 실시간 음성 인식 자막 표시
- * - 반투명 배경 + 블러 효과 (가독성)
- * - 하단 중앙 배치
- * - 토글 가능 (ControlBar의 자막 버튼)
+ * - 면접관 질문 표시
+ * - AI 응답 표시 (선택 사항)
+ * - 보라색 반투명 배경 바
+ * - 중앙 정렬 텍스트
  *
  * @todo
- * - Phase 5에서 useSpeechRecognition 훅 연결 예정
- * - Web Speech API 통합
- * - 자막 히스토리 관리 (최근 N개 문장)
+ * - Phase 5에서 실제 질문 데이터 연동
+ * - AI 응답 표시 로직 구현
+ * - 자막 애니메이션 효과
  *
  * @related
- * - hooks/useSpeechRecognition.ts (Phase 5에서 구현)
- * - docs/my-speak.md (섹션 6-1. 음성 기반 대화)
- * - docs/issue14-implementation-solution.md (SubtitleOverlay 섹션)
+ * - Figma: figma/200 PWA_My Speak (1).png, (3).png, (4).png
+ * - docs/my-speak.md (섹션 6. In-session Experience)
  */
 const SubtitleOverlay = () => {
-  // TODO: Phase 5에서 useSpeechRecognition 훅 연결
-  const subtitle = '여기에 실시간 자막이 표시됩니다...';
+  // TODO: Phase 5에서 실제 질문 데이터 연동
+  const subtitle =
+    'Thank you for coming in today.\nCould you start by telling me a bit about yourself?';
 
   return (
-    <div className="flex justify-center">
-      {/* 자막 컨테이너 */}
-      <div className="max-w-md bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg">
-        {/* 자막 텍스트 */}
-        <p className="text-white text-center text-sm leading-relaxed">
-          {subtitle}
-        </p>
-      </div>
+    <div className="w-full bg-purple-500/90 px-4 py-3">
+      {/* 자막 텍스트 */}
+      <p className="text-white text-center text-sm leading-relaxed whitespace-pre-line">
+        {subtitle}
+      </p>
     </div>
   );
 };

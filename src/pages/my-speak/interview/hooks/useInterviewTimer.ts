@@ -120,7 +120,7 @@ export const useInterviewTimer = (
    * - 최대 15분(900초) 제한
    */
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isRunning) {
       interval = setInterval(() => {
