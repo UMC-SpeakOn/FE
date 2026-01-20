@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import ccIcon from '@/assets/images/icons/cc.svg';
+import useNavigation from '@/hooks/useNavigation';
 import chatingIcon from '@/assets/images/icons/chating.svg';
 import continueIcon from '@/assets/images/icons/continue.svg';
 import finishIcon from '@/assets/images/icons/finish.svg';
@@ -37,6 +38,8 @@ import { useInterviewTimer } from './hooks/useInterviewTimer';
  * - Route: /my-speak/interview
  */
 const InterviewPage = () => {
+  const { navigateTo } = useNavigation();
+
   // 자막 표시 여부 상태 (기본값: 표시)
   const [showSubtitles, setShowSubtitles] = useState(true);
 
@@ -208,9 +211,7 @@ const InterviewPage = () => {
           <ControlButton
             icon={chatingIcon}
             label="채팅"
-            onClick={() => {
-              /* TODO: 채팅 기능 */
-            }}
+            onClick={() => navigateTo('/my-speak/interview-chat')}
           />
         </div>
       </div>
