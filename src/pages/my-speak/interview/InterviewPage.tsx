@@ -60,8 +60,8 @@ const InterviewPage = () => {
     startListening,
     stopListening,
     audioLevel,
-    transcript,
-    error: speechError,
+    // transcript,
+    // error: speechError,
   } = useSpeechRecognition();
 
   // 컴포넌트 마운트 시 타이머 시작
