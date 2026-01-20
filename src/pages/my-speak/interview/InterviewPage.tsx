@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import ccIcon from '@/assets/images/icons/cc.svg';
 import chatingIcon from '@/assets/images/icons/chating.svg';
 import continueIcon from '@/assets/images/icons/continue.svg';
-import stopIcon from '@/assets/images/icons/stop.svg';
 import finishIcon from '@/assets/images/icons/finish.svg';
 import loopIcon from '@/assets/images/icons/loop.svg';
 import speakIcon from '@/assets/images/icons/speak.svg';
+import stopIcon from '@/assets/images/icons/stop.svg';
 import talkingIcon from '@/assets/images/icons/talking.svg';
 import { personsData } from '@/mocks/addData';
 
