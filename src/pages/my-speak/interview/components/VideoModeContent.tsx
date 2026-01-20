@@ -13,6 +13,7 @@ interface VideoModeContentProps {
   onToggleSubtitles: () => void;
   onRestart: () => void;
   isPaused: boolean;
+  finishStep: "idle" | "notification" | "ai_message" | "loading";
 }
 
 /**
@@ -28,6 +29,7 @@ const VideoModeContent = ({
   onToggleSubtitles,
   onRestart,
   isPaused,
+  finishStep,
 }: VideoModeContentProps) => {
   return (
     <div className="relative h-[48vh] bg-white rounded-2xl overflow-hidden border border-white">
@@ -61,8 +63,17 @@ const VideoModeContent = ({
         </div>
       )}
 
+      {/* Step 1: 알림 오버레이 (부분 화면) */}
+      {finishStep === "notification" && (
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center px-6">
+          <p className="text-white text-2xl font-bold text-center">
+            AI의 마무리 멘트가 한 턴 추가됩니다.
+          </p>
+        </div>
+      )}
+
       {/* 자막 오버레이 */}
-      {showSubtitles && !isPaused && (
+      {showSubtitles && !isPaused && finishStep === "idle" && (
         <div className="absolute bottom-0 left-0 right-0">
           <SubtitleOverlay />
         </div>

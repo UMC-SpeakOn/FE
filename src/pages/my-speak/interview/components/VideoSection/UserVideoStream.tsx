@@ -32,7 +32,7 @@ const UserVideoStream = () => {
   // 컴포넌트 마운트 시 자동으로 웹캠 시작
   useEffect(() => {
     startWebcam();
-  }, []);
+  }, [startWebcam]);
 
   // 에러 상태: 카메라 권한 거부, 기기 없음 등
   if (error) {
@@ -98,15 +98,20 @@ const UserVideoStream = () => {
       className="w-full h-full object-cover"
       style={{
         transform: 'scaleX(-1)', // 좌우 반전 (셀카 모드)
+        backgroundColor: '#000', // 디버깅: 검은 배경으로 비디오 영역 확인
       }}
       onLoadedMetadata={(e) => {
-        console.log('Video metadata loaded', {
+        console.log('[UserVideoStream] Video metadata loaded', {
           videoWidth: e.currentTarget.videoWidth,
           videoHeight: e.currentTarget.videoHeight,
+          readyState: e.currentTarget.readyState,
+          srcObject: e.currentTarget.srcObject,
         });
       }}
-      onPlay={() => console.log('Video playing')}
-      onError={(e) => console.error('Video error:', e)}
+      onPlay={() => console.log('[UserVideoStream] Video playing')}
+      onError={(e) => console.error('[UserVideoStream] Video error:', e)}
+      onCanPlay={() => console.log('[UserVideoStream] Video can play')}
+      onLoadStart={() => console.log('[UserVideoStream] Video load start')}
     />
   );
 };

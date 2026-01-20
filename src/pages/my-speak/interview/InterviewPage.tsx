@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 
 import useNavigation from "@/hooks/useNavigation";
+import navIcon from "@/assets/images/icons/nav.svg";
 import { personsData } from "@/mocks/addData";
 
 import ChatModeContent from "./components/ChatModeContent";
-import AudioOverlay from "./components/ChatSection/AudioOverlay";
-import FinishingOverlay from "./components/ChatSection/FinishingOverlay";
 import ControlButtons from "./components/ControlButtons";
 import SpeakButton from "./components/SpeakButton";
 import VideoModeContent from "./components/VideoModeContent";
 import { useChat } from "./hooks/useChat";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
-import type { ChatMessage } from "./types/chat.type";
 
 /**
  * InterviewPage - My Speak 면접 실전 연습 페이지 (통합)
@@ -37,11 +35,8 @@ const InterviewPage = () => {
   // 뷰 모드 상태 (video | chat)
   const [viewMode, setViewMode] = useState<"video" | "chat">("video");
 
-  // 마무리 진행 상태
-  const [isFinishing, setIsFinishing] = useState(false);
-
   // 자막 표시 여부 (영상 모드에서만 사용)
-  const [showSubtitles, setShowSubtitles] = useState(true);
+  const [showSubtitles, setShowSubtitles] = useState(false);
 
   // 일시정지 상태
   const [isPaused, setIsPaused] = useState(false);
@@ -51,11 +46,10 @@ const InterviewPage = () => {
     "ready" | "speaking" | "done"
   >("ready");
 
-  // 오디오 오버레이 상태
-  const [audioOverlay, setAudioOverlay] = useState<{
-    isOpen: boolean;
-    message: ChatMessage | null;
-  }>({ isOpen: false, message: null });
+  // 마무리 플로우 상태
+  const [finishStep, setFinishStep] = useState<
+    "idle" | "notification" | "ai_message" | "loading"
+  >("idle");
 
   // 면접관 데이터
   const interviewer = personsData[0];
@@ -71,7 +65,7 @@ const InterviewPage = () => {
     startListening,
     stopListening,
     audioLevel,
-    // transcript,
+    transcript,
     // error: speechError,
   } = useSpeechRecognition();
 
@@ -108,6 +102,7 @@ const InterviewPage = () => {
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
    * - 음성 인식 시작/중지 통합
+   * - 채팅 모드에서 말하기 완료 시 transcript를 메시지로 전송
    */
   const handleSpeak = () => {
     if (speakState === 'ready') {
@@ -116,6 +111,11 @@ const InterviewPage = () => {
     } else if (speakState === 'speaking') {
       setSpeakState('done');
       stopListening();
+
+      // 채팅 모드이고 transcript가 있으면 자동 전송
+      if (viewMode === 'chat' && transcript.trim()) {
+        sendMessage(transcript.trim());
+      }
     } else {
       setSpeakState("ready");
     }
@@ -129,31 +129,34 @@ const InterviewPage = () => {
   };
 
   /**
-   * 오디오 재생 핸들러
-   */
-  const handlePlayAudio = (message: ChatMessage) => {
-    setAudioOverlay({ isOpen: true, message });
-  };
-
-  /**
    * 마무리하기 핸들러
+   * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 로딩 스피너(2초) → 결과 페이지
    */
   const handleFinish = () => {
-    // 채팅 모드로 전환
-    setViewMode("chat");
+    // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
+    setFinishStep("notification");
 
-    // AI 마무리 멘트 추가
-    addFinishMessage();
-
-    // 1.5초 후 로딩 오버레이 표시 (멘트 확인 시간)
     setTimeout(() => {
-      setIsFinishing(true);
+      // Step 2: AI 마무리 멘트 출력
+      if (viewMode === "video") {
+        // 영상 모드: TTS 음성만 재생 (텍스트 없음)
+        setFinishStep("ai_message");
+      } else {
+        // 채팅 모드: 채팅에 멘트 추가
+        addFinishMessage();
+        setFinishStep("ai_message");
+      }
 
-      // 추가 2초 후 결과 페이지로 이동
       setTimeout(() => {
-        navigateTo("/my-speak/interview/result");
-      }, 2000);
-    }, 1500);
+        // Step 3: 결과 로딩 스피너
+        setFinishStep("loading");
+
+        setTimeout(() => {
+          // Step 4: 결과 화면 이동
+          navigateTo("/my-speak/interview/result");
+        }, 2000); // 로딩 2초
+      }, 3000); // AI 멘트 3초
+    }, 1000); // 알림 1초
   };
 
   return (
@@ -174,14 +177,15 @@ const InterviewPage = () => {
             onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
             onRestart={handleRestart}
             isPaused={isPaused}
+            finishStep={finishStep}
           />
         ) : (
           <ChatModeContent
-            formattedTime={formattedTime}
             messages={messages}
             isLoading={isLoading}
-            onPlayAudio={handlePlayAudio}
+            onPlayAudio={() => {}}
             onSendMessage={sendMessage}
+            finishStep={finishStep}
           />
         )}
 
@@ -199,17 +203,21 @@ const InterviewPage = () => {
           onPauseToggle={handlePauseToggle}
           onToggleMode={handleToggleMode}
         />
-
-        {/* 오디오 오버레이 */}
-        <AudioOverlay
-          isOpen={audioOverlay.isOpen}
-          onClose={() => setAudioOverlay({ isOpen: false, message: null })}
-          message={audioOverlay.message?.content || ""}
-        />
-
-        {/* 마무리 로딩 오버레이 */}
-        <FinishingOverlay isOpen={isFinishing} />
       </div>
+
+      {/* 전체 화면 로딩 오버레이 */}
+      {finishStep === "loading" && (
+        <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center px-6 gap-6 z-50">
+          <img
+            src={navIcon}
+            alt="loading"
+            className="w-16 h-16 animate-spin"
+          />
+          <p className="text-white text-xl font-bold text-center">
+            결과를 불러오는 중...
+          </p>
+        </div>
+      )}
     </div>
   );
 };
