@@ -95,14 +95,36 @@ export const useWebcam = (): UseWebcamReturn => {
 
       // video 엘리먼트에 스트림 연결
       if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+        const videoElement = videoRef.current;
+        videoElement.srcObject = mediaStream;
+
+        // 메타데이터 로드 대기 (타임아웃 포함)
+        await new Promise<void>((resolve) => {
+          if (videoElement.readyState >= 1) {
+            // 이미 메타데이터가 로드된 경우
+            resolve();
+          } else {
+            videoElement.onloadedmetadata = () => {
+              resolve();
+            };
+            // 3초 타임아웃
+            setTimeout(() => resolve(), 3000);
+          }
+        });
 
         // 브라우저 autoplay 정책/재생 타이밍 문제 해결
-        // 권한을 거절했다가 다시 허용한 경우 영상이 출력되지 않을 수 있음
         try {
-          await videoRef.current.play();
+          await videoElement.play();
         } catch (playError) {
           console.warn('Video play failed:', playError);
+          // 재시도
+          setTimeout(async () => {
+            try {
+              await videoElement.play();
+            } catch (retryError) {
+              console.error('Video play retry failed:', retryError);
+            }
+          }, 100);
         }
       }
     } catch (err) {

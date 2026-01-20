@@ -96,6 +96,17 @@ const UserVideoStream = () => {
       playsInline
       muted
       className="w-full h-full object-cover"
+      style={{
+        transform: 'scaleX(-1)', // 좌우 반전 (셀카 모드)
+      }}
+      onLoadedMetadata={(e) => {
+        console.log('Video metadata loaded', {
+          videoWidth: e.currentTarget.videoWidth,
+          videoHeight: e.currentTarget.videoHeight,
+        });
+      }}
+      onPlay={() => console.log('Video playing')}
+      onError={(e) => console.error('Video error:', e)}
     />
   );
 };
