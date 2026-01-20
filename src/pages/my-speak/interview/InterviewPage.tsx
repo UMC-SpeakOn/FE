@@ -1,24 +1,14 @@
 import { useEffect, useState } from "react";
 
-import cameraIcon from "@/assets/images/icons/camera.svg";
-import chatingIcon from "@/assets/images/icons/chating.svg";
-import continueIcon from "@/assets/images/icons/continue.svg";
-import finishIcon from "@/assets/images/icons/finish.svg";
-import speakIcon from "@/assets/images/icons/speak.svg";
-import stopIcon from "@/assets/images/icons/stop.svg";
-import talkingIcon from "@/assets/images/icons/talking.svg";
 import useNavigation from "@/hooks/useNavigation";
 import { personsData } from "@/mocks/addData";
 
+import ChatModeContent from "./components/ChatModeContent";
 import AudioOverlay from "./components/ChatSection/AudioOverlay";
-import ChatInput from "./components/ChatSection/ChatInput";
 import FinishingOverlay from "./components/ChatSection/FinishingOverlay";
-import MessageList from "./components/ChatSection/MessageList";
-import ControlButton from "./components/Controls/ControlButton";
-import SoundWaveAnimation from "./components/Controls/SoundWaveAnimation";
-import InterviewTimer from "./components/VideoSection/InterviewTimer";
-import SubtitleOverlay from "./components/VideoSection/SubtitleOverlay";
-import UserVideoStream from "./components/VideoSection/UserVideoStream";
+import ControlButtons from "./components/ControlButtons";
+import SpeakButton from "./components/SpeakButton";
+import VideoModeContent from "./components/VideoModeContent";
 import { useChat } from "./hooks/useChat";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
@@ -177,126 +167,38 @@ const InterviewPage = () => {
       {/* 메인 컨텐츠 영역 */}
       <div className="flex flex-col px-6 pb-10">
         {viewMode === "video" ? (
-          <>
-            {/* 비디오 모드 */}
-            <div className="relative h-[48vh] bg-white rounded-2xl overflow-hidden border border-white">
-              {/* 사용자 웹캠 */}
-              <UserVideoStream />
-
-              {/* AI 면접관 PIP */}
-              <div className="absolute top-4 left-4 w-45 h-60 rounded-2xl overflow-hidden shadow-lg border border-white">
-                <img
-                  src={interviewer.imageUrl}
-                  alt={interviewer.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* 타이머 + CC 버튼 */}
-              <InterviewTimer
-                formattedTime={formattedTime}
-                showSubtitles={showSubtitles}
-                onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
-                onRestart={handleRestart}
-                variant="video"
-              />
-
-              {/* 일시정지 오버레이 */}
-              {isPaused && (
-                <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                  <p className="text-white text-2xl font-bold">
-                    학습을 잠시 멈췄습니다
-                  </p>
-                </div>
-              )}
-
-              {/* 자막 오버레이 */}
-              {showSubtitles && !isPaused && (
-                <div className="absolute bottom-0 left-0 right-0">
-                  <SubtitleOverlay />
-                </div>
-              )}
-            </div>
-
-            {/* 말하기 버튼 */}
-            <div className="flex items-center justify-center py-4">
-              <button
-                onClick={handleSpeak}
-                className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
-                disabled={isPaused}
-              >
-                <img
-                  src={speakState === "speaking" ? talkingIcon : speakIcon}
-                  alt="말하기"
-                />
-                {speakState !== "speaking" && (
-                  <span className="text-white text-xl font-semibold">
-                    말하기
-                  </span>
-                )}
-              </button>
-            </div>
-          </>
+          <VideoModeContent
+            interviewer={interviewer}
+            formattedTime={formattedTime}
+            showSubtitles={showSubtitles}
+            onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
+            onRestart={handleRestart}
+            isPaused={isPaused}
+          />
         ) : (
-          <>
-            {/* 채팅 모드 */}
-            <div className="relative h-[48vh] bg-white rounded-2xl overflow-hidden flex flex-col">
-              {/* 타이머 표시 (채팅 모드) */}
-              <InterviewTimer
-                formattedTime={formattedTime}
-                variant="chat"
-              />
-
-              <MessageList
-                messages={messages}
-                onPlayAudio={handlePlayAudio}
-              />
-              <ChatInput onSend={sendMessage} disabled={isLoading} />
-            </div>
-
-            {/* 말하기 버튼 영역 */}
-            <div className="flex items-center justify-center py-4">
-              <button
-                onClick={handleSpeak}
-                className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
-                disabled={isPaused}
-              >
-                {speakState === 'speaking' ? (
-                  <SoundWaveAnimation isActive={audioLevel > 10} />
-                ) : (
-                  <>
-                    <img src={speakIcon} alt="말하기" />
-                    <span className="text-white text-xl font-semibold">
-                      말하기
-                    </span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* 하단 컨트롤 버튼 */}
-            <div className="flex items-center justify-between px-13 pt-4">
-              <ControlButton
-                icon={finishIcon}
-                label="마무리하기"
-                onClick={handleFinish}
-                iconSize="w-5 h-5"
-              />
-
-              <ControlButton
-                icon={isPaused ? continueIcon : stopIcon}
-                label={isPaused ? "이어서하기" : "일시멈춤"}
-                onClick={handlePauseToggle}
-              />
-
-              <ControlButton
-                icon={viewMode === "video" ? chatingIcon : cameraIcon}
-                label={viewMode === "video" ? "채팅" : "카메라"}
-                onClick={handleToggleMode}
-              />
-            </div>
-          </>
+          <ChatModeContent
+            formattedTime={formattedTime}
+            messages={messages}
+            isLoading={isLoading}
+            onPlayAudio={handlePlayAudio}
+            onSendMessage={sendMessage}
+          />
         )}
+
+        <SpeakButton
+          speakState={speakState}
+          audioLevel={audioLevel}
+          isPaused={isPaused}
+          onClick={handleSpeak}
+        />
+
+        <ControlButtons
+          viewMode={viewMode}
+          isPaused={isPaused}
+          onFinish={handleFinish}
+          onPauseToggle={handlePauseToggle}
+          onToggleMode={handleToggleMode}
+        />
 
         {/* 오디오 오버레이 */}
         <AudioOverlay
