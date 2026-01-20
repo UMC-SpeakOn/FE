@@ -1,4 +1,4 @@
-import type { ChatMessage } from "../types/chat.type";
+import type { ChatMessage } from "../../types/chat.type";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -24,10 +24,11 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
   return (
     <div className={`flex ${isAI ? "justify-start" : "justify-end"} mb-4`}>
       <div
-        className={`max-w-[70%] px-4 py-3 rounded-2xl ${isAI
+        className={`max-w-[70%] px-4 py-3 rounded-2xl ${
+          isAI
             ? "bg-purple-600 text-white rounded-tl-none"
             : "bg-gray-200 text-gray-900 rounded-tr-none"
-          }`}
+        }`}
       >
         <p className="text-base leading-relaxed whitespace-pre-wrap">
           {message.content}
@@ -35,8 +36,9 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
 
         {/* 타임스탬프 */}
         <p
-          className={`text-xs mt-1 ${isAI ? "text-purple-100" : "text-gray-500"
-            }`}
+          className={`text-xs mt-1 ${
+            isAI ? "text-purple-100" : "text-gray-500"
+          }`}
         >
           {message.timestamp.toLocaleTimeString("ko-KR", {
             hour: "2-digit",
