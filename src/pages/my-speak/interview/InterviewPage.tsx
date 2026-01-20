@@ -15,11 +15,13 @@ import ChatInput from "./components/ChatSection/ChatInput";
 import FinishingOverlay from "./components/ChatSection/FinishingOverlay";
 import MessageList from "./components/ChatSection/MessageList";
 import ControlButton from "./components/Controls/ControlButton";
+import SoundWaveAnimation from "./components/Controls/SoundWaveAnimation";
 import InterviewTimer from "./components/VideoSection/InterviewTimer";
 import SubtitleOverlay from "./components/VideoSection/SubtitleOverlay";
 import UserVideoStream from "./components/VideoSection/UserVideoStream";
 import { useChat } from "./hooks/useChat";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
+import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
 import type { ChatMessage } from "./types/chat.type";
 
 /**
@@ -74,6 +76,15 @@ const InterviewPage = () => {
   // 채팅 훅
   const { messages, isLoading, sendMessage, addFinishMessage } = useChat();
 
+  // 음성 인식 훅
+  const {
+    startListening,
+    stopListening,
+    audioLevel,
+    // transcript,
+    // error: speechError,
+  } = useSpeechRecognition();
+
   // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     start();
@@ -104,15 +115,17 @@ const InterviewPage = () => {
   };
 
   /**
-   * 말하기 버튼 핸들러 (영상 모드)
+   * 말하기 버튼 핸들러
+   * - ready → speaking → done 순환
+   * - 음성 인식 시작/중지 통합
    */
   const handleSpeak = () => {
-    if (speakState === "ready") {
-      setSpeakState("speaking");
-      // TODO: 음성 인식 시작
-    } else if (speakState === "speaking") {
-      setSpeakState("done");
-      // TODO: 음성 인식 중지
+    if (speakState === 'ready') {
+      setSpeakState('speaking');
+      startListening();
+    } else if (speakState === 'speaking') {
+      setSpeakState('done');
+      stopListening();
     } else {
       setSpeakState("ready");
     }
@@ -209,7 +222,7 @@ const InterviewPage = () => {
             <div className="flex items-center justify-center py-4">
               <button
                 onClick={handleSpeak}
-                className="w-full h-21 bg-indigo-600 hover:bg-indigo-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
+                className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
                 disabled={isPaused}
               >
                 <img
@@ -241,59 +254,60 @@ const InterviewPage = () => {
               <ChatInput onSend={sendMessage} disabled={isLoading} />
             </div>
 
-            {/* 채팅 모드 말하기 버튼 */}
+            {/* 말하기 버튼 영역 */}
             <div className="flex items-center justify-center py-4">
               <button
                 onClick={handleSpeak}
-                className="w-full h-21 bg-indigo-600 hover:bg-indigo-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
+                className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
                 disabled={isPaused}
               >
-                <img
-                  src={speakState === "speaking" ? talkingIcon : speakIcon}
-                  alt="말하기"
-                />
-                {speakState !== "speaking" && (
-                  <span className="text-white text-xl font-semibold">
-                    말하기
-                  </span>
+                {speakState === 'speaking' ? (
+                  <SoundWaveAnimation isActive={audioLevel > 10} />
+                ) : (
+                  <>
+                    <img src={speakIcon} alt="말하기" />
+                    <span className="text-white text-xl font-semibold">
+                      말하기
+                    </span>
+                  </>
                 )}
               </button>
+            </div>
+
+            {/* 하단 컨트롤 버튼 */}
+            <div className="flex items-center justify-between px-13 pt-4">
+              <ControlButton
+                icon={finishIcon}
+                label="마무리하기"
+                onClick={handleFinish}
+                iconSize="w-5 h-5"
+              />
+
+              <ControlButton
+                icon={isPaused ? continueIcon : stopIcon}
+                label={isPaused ? "이어서하기" : "일시멈춤"}
+                onClick={handlePauseToggle}
+              />
+
+              <ControlButton
+                icon={viewMode === "video" ? chatingIcon : cameraIcon}
+                label={viewMode === "video" ? "채팅" : "카메라"}
+                onClick={handleToggleMode}
+              />
             </div>
           </>
         )}
 
-        {/* 하단 컨트롤 버튼 */}
-        <div className="flex items-center justify-between px-13 pt-4">
-          <ControlButton
-            icon={finishIcon}
-            label="마무리하기"
-            onClick={handleFinish}
-            iconSize="w-5 h-5"
-          />
+        {/* 오디오 오버레이 */}
+        <AudioOverlay
+          isOpen={audioOverlay.isOpen}
+          onClose={() => setAudioOverlay({ isOpen: false, message: null })}
+          message={audioOverlay.message?.content || ""}
+        />
 
-          <ControlButton
-            icon={isPaused ? continueIcon : stopIcon}
-            label={isPaused ? "이어서하기" : "일시멈춤"}
-            onClick={handlePauseToggle}
-          />
-
-          <ControlButton
-            icon={viewMode === "video" ? chatingIcon : cameraIcon}
-            label={viewMode === "video" ? "채팅" : "카메라"}
-            onClick={handleToggleMode}
-          />
-        </div>
+        {/* 마무리 로딩 오버레이 */}
+        <FinishingOverlay isOpen={isFinishing} />
       </div>
-
-      {/* 오디오 오버레이 */}
-      <AudioOverlay
-        isOpen={audioOverlay.isOpen}
-        onClose={() => setAudioOverlay({ isOpen: false, message: null })}
-        message={audioOverlay.message?.content || ""}
-      />
-
-      {/* 마무리 로딩 오버레이 */}
-      <FinishingOverlay isOpen={isFinishing} />
     </div>
   );
 };
