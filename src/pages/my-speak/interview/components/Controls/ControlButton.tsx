@@ -18,7 +18,7 @@ const ControlButton = ({
 }: ControlButtonProps) => {
     return (
         <button onClick={onClick} className="flex flex-col items-center gap-3">
-            <div className="h-23 w-23 rounded-full bg-white flex items-center justify-center ">
+            <div className="h-23 w-23 rounded-full bg-white flex items-center justify-center">
                 <img src={icon} alt={label} />
             </div>
             <span className="text-base text-white">{label}</span>

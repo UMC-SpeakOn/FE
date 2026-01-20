@@ -31,6 +31,7 @@ interface UseWebcamReturn {
  * - 1280x720 해상도, 전면 카메라 우선
  * - 오디오 스트림 포함
  * - 컴포넌트 언마운트 시 자동 정리
+ * - 브라우저 autoplay 정책 대응 (명시적 play 호출)
  *
  * @permissions
  * - 카메라 권한 필요 (브라우저 팝업)
@@ -73,6 +74,7 @@ export const useWebcam = (): UseWebcamReturn => {
    * - getUserMedia API 호출
    * - 카메라 권한 요청
    * - 스트림을 video 엘리먼트에 연결
+   * - 브라우저 autoplay 정책 대응
    */
   const startWebcam = async () => {
     setIsLoading(true);
@@ -82,11 +84,11 @@ export const useWebcam = (): UseWebcamReturn => {
       // MediaStream API: 카메라 + 마이크 스트림 요청
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 1280 }, // 이상적인 해상도
+          width: { ideal: 1280 },
           height: { ideal: 720 },
-          facingMode: 'user', // 전면 카메라 (셀카 모드)
+          facingMode: 'user',
         },
-        audio: true, // 마이크 포함
+        audio: true,
       });
 
       setStream(mediaStream);
@@ -94,6 +96,14 @@ export const useWebcam = (): UseWebcamReturn => {
       // video 엘리먼트에 스트림 연결
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+
+        // 브라우저 autoplay 정책/재생 타이밍 문제 해결
+        // 권한을 거절했다가 다시 허용한 경우 영상이 출력되지 않을 수 있음
+        try {
+          await videoRef.current.play();
+        } catch (playError) {
+          console.warn('Video play failed:', playError);
+        }
       }
     } catch (err) {
       // 에러 타입별 사용자 친화적 메시지 생성
@@ -122,12 +132,10 @@ export const useWebcam = (): UseWebcamReturn => {
    */
   const stopWebcam = () => {
     if (stream) {
-      // 모든 트랙 중지 (카메라, 마이크)
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
     }
 
-    // video 엘리먼트 정리
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }

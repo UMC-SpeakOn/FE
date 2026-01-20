@@ -3,17 +3,18 @@ import { useEffect, useState } from 'react';
 import ccIcon from '@/assets/images/icons/cc.svg';
 import chatingIcon from '@/assets/images/icons/chating.svg';
 import continueIcon from '@/assets/images/icons/continue.svg';
-import stopIcon from '@/assets/images/icons/stop.svg';
 import finishIcon from '@/assets/images/icons/finish.svg';
 import loopIcon from '@/assets/images/icons/loop.svg';
 import speakIcon from '@/assets/images/icons/speak.svg';
-import talkingIcon from '@/assets/images/icons/talking.svg';
+import stopIcon from '@/assets/images/icons/stop.svg';
 import { personsData } from '@/mocks/addData';
 
 import ControlButton from './components/Controls/ControlButton';
+import SoundWaveAnimation from './components/Controls/SoundWaveAnimation';
 import SubtitleOverlay from './components/VideoSection/SubtitleOverlay';
 import UserVideoStream from './components/VideoSection/UserVideoStream';
 import { useInterviewTimer } from './hooks/useInterviewTimer';
+import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 
 /**
  * InterviewPage - My Speak 면접 실전 연습 페이지 (In-session)
@@ -54,6 +55,15 @@ const InterviewPage = () => {
   // 타이머 훅
   const { formattedTime, start, pause, resume, reset } = useInterviewTimer();
 
+  // 음성 인식 훅
+  const {
+    startListening,
+    stopListening,
+    audioLevel,
+    transcript,
+    error: speechError,
+  } = useSpeechRecognition();
+
   // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     start();
@@ -89,14 +99,15 @@ const InterviewPage = () => {
   /**
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
+   * - 음성 인식 시작/중지 통합
    */
   const handleSpeak = () => {
     if (speakState === 'ready') {
       setSpeakState('speaking');
-      // TODO: 음성 인식 시작
+      startListening();
     } else if (speakState === 'speaking') {
       setSpeakState('done');
-      // TODO: 음성 인식 중지
+      stopListening();
     } else {
       setSpeakState('ready');
     }
@@ -133,7 +144,7 @@ const InterviewPage = () => {
             {/* CC 자막 토글 버튼 */}
             <button
               onClick={() => setShowSubtitles(!showSubtitles)}
-              className={`w-10 h-10 rounded-full    flex items-center justify-center ${showSubtitles ? 'bg-violet-500' : 'bg-neutral-900 opacity-30'}`}
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${showSubtitles ? 'bg-purple-500' : 'bg-neutral-900 opacity-30'}`}
             >
               <img src={ccIcon} alt="자막" />
             </button>
@@ -173,17 +184,18 @@ const InterviewPage = () => {
         <div className="flex items-center justify-center py-4">
           <button
             onClick={handleSpeak}
-            className="w-full  h-21 bg-indigo-600 hover:bg-indigo-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
+            className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
             disabled={isPaused}
           >
-            <img
-              src={speakState === 'speaking' ? talkingIcon : speakIcon}
-              alt="말하기"
-            />
-            {speakState !== 'speaking' && (
-              <span className="text-white text-xl font-semibold">
-                말하기
-              </span>
+            {speakState === 'speaking' ? (
+              <SoundWaveAnimation isActive={audioLevel > 10} />
+            ) : (
+              <>
+                <img src={speakIcon} alt="말하기" />
+                <span className="text-white text-xl font-semibold">
+                  말하기
+                </span>
+              </>
             )}
           </button>
         </div>

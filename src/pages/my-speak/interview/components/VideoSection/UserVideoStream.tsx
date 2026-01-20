@@ -81,7 +81,7 @@ const UserVideoStream = () => {
     return (
       <div className="w-full h-full bg-gray-900 flex items-center justify-center">
         <div className="text-center text-white">
-          <Spinner size={60} color="#a855f7" />
+          <Spinner size={60} color="var(--color-purple-400)" />
           <p className="mt-4 text-gray-300">카메라 연결 중...</p>
         </div>
       </div>
@@ -92,10 +92,10 @@ const UserVideoStream = () => {
   return (
     <video
       ref={videoRef}
-      autoPlay // 자동 재생
-      playsInline // iOS 전체화면 방지
-      muted // 에코 방지 (자신의 목소리 음소거)
-      className="w-full h-full object-cover" // 전체 화면 커버
+      autoPlay
+      playsInline
+      muted
+      className="w-full h-full object-cover"
     />
   );
 };
