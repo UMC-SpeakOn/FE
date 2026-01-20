@@ -30,7 +30,7 @@ const MessageList = ({ messages, onPlayAudio }: MessageListProps) => {
   }, [messages]);
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 scroll">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-8 scroll">
       {messages.length === 0 ? (
         <div className="flex items-center justify-center h-full">
           <p className="text-gray-400 text-center">메시지가 없습니다.</p>

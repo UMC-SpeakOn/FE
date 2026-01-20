@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import sandMessageIcon from "@/assets/images/icons/sand-message.svg";
+
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
@@ -36,22 +38,23 @@ const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
   };
 
   return (
-    <div className="flex items-end gap-2 px-4 py-3 bg-white border-t border-gray-200">
+    <div className="flex items-end gap-3 px-4 py-3 bg-white">
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="메시지를 입력하세요..."
         disabled={disabled}
-        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:border-purple-500 max-h-24"
+        className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:bg-gray-200 max-h-24 text-gray-900"
         rows={1}
       />
       <button
         onClick={handleSend}
         disabled={!message.trim() || disabled}
-        className="px-4 py-2 bg-purple-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
+        className="flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="전송"
       >
-        전송
+        <img src={sandMessageIcon} alt="전송" className="w-10 h-10" />
       </button>
     </div>
   );
