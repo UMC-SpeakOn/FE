@@ -76,13 +76,20 @@ const InterviewPage = () => {
     start();
   }, []);
 
+  /**
+   * 모든 마무리 플로우 타임아웃 정리
+   */
+  const clearAllFinishTimeouts = () => {
+    finishTimeoutRefs.current.forEach((timeoutId) => {
+      clearTimeout(timeoutId);
+    });
+    finishTimeoutRefs.current = [];
+  };
+
   // 컴포넌트 언마운트 시 마무리 플로우 타임아웃 정리
   useEffect(() => {
     return () => {
-      finishTimeoutRefs.current.forEach((timeoutId) => {
-        clearTimeout(timeoutId);
-      });
-      finishTimeoutRefs.current = [];
+      clearAllFinishTimeouts();
     };
   }, []);
 
@@ -170,10 +177,7 @@ const InterviewPage = () => {
    */
   const handleFinish = () => {
     // 기존 타임아웃 정리
-    finishTimeoutRefs.current.forEach((timeoutId) => {
-      clearTimeout(timeoutId);
-    });
-    finishTimeoutRefs.current = [];
+    clearAllFinishTimeouts();
 
     // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
     setFinishStep("notification");
