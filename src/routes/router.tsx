@@ -5,6 +5,7 @@ import Spinner from '@/components/Spinner/Spinner';
 import RootLayout from '@/layouts/RootLayout';
 import HomePage from '@/pages/home/Home';
 import MyRolePage from '@/pages/my-role/My-Role';
+import MySpeakResultPage from '@/pages/my-speak/result/Result';
 import MySpeakSettingPage from '@/pages/my-speak/setting/Setting';
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: 'my-speak/setting',
         element: <MySpeakSettingPage />,
+      },
+      {
+        path: 'my-speak/result',
+        element: <MySpeakResultPage />,
       },
     ],
   },
