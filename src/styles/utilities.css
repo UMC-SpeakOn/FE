@@ -13,11 +13,21 @@
   }
 
   .pageContainer {
-    @apply w-full flex flex-col max-w-[430px] h-dvh mx-auto overflow-y-auto bg-purple-500;
+    @apply w-full flex flex-col max-w-[430px] mx-auto overflow-y-auto bg-purple-500;
+    min-height: 100dvh;
+  }
+
+  .screenSection {
+    @apply flex flex-col;
+    min-height: 100dvh;
+  }
+
+  .mainSection {
+    @apply flex flex-col flex-1 min-h-0;
   }
 
   .white-pageContainer {
-    @apply w-full h-full mt-[0.878rem] pt-[2.688rem] pl-[1.462rem] pb-[6.334rem] flex flex-col gap-[2.962rem] rounded-t-[3rem] bg-white;
+    @apply w-full flex-1 min-h-full mt-[0.878rem] pt-[2.688rem] pl-[1.462rem] pb-[6.334rem] flex flex-col gap-[2.962rem] rounded-t-[3rem] bg-white;
   }
 
   .font-unbounded {

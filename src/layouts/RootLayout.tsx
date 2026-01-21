@@ -6,10 +6,13 @@ import Header from '@/components/Header/Header';
 const RootLayout = () => {
   return (
     <div className="pageContainer scroll">
-      <Header />
-      <main className="flex-1">
-        <Outlet />
-      </main>
+      <div className="screenSection">
+        <Header />
+        <main className="mainSection">
+          <Outlet />
+        </main>
+      </div>
+
       <Footer />
     </div>
   );
