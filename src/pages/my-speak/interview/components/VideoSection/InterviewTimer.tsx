@@ -31,7 +31,7 @@ const InterviewTimer = ({
   const isVideoMode = variant === "video";
 
   return (
-    <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+    <div className="absolute top-4 right-6 flex items-center gap-2 z-10">
       {/* CC 자막 토글 버튼 (영상 모드만) */}
       {isVideoMode && onToggleSubtitles && (
         <button
@@ -54,8 +54,8 @@ const InterviewTimer = ({
       )}
 
       {/* 타이머 */}
-      <div className="flex items-center px-3 py-1.5 rounded-full bg-black/50">
-        <span className="text-white text-lg leading-10 tabular-nums min-w-[4.5rem] text-center">
+      <div className="flex items-center px-2 py-1.5 rounded-full bg-black/50">
+        <span className="text-white text-xl leading-10 tabular-nums min-w-[4rem] text-center">
           {formattedTime}
         </span>
       </div>

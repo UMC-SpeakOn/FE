@@ -27,7 +27,7 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
 
   return (
     <div
-      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-3 px-4`}
+      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-8 px-4`}
     >
       <div className={`flex ${isAI ? "flex-row" : "flex-row-reverse"} gap-2 max-w-[80%]`}>
         {/* AI 튜터 프로필 이미지 (AI 메시지만) */}
