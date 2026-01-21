@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import useNavigation from "@/hooks/useNavigation";
 import navIcon from "@/assets/images/icons/nav.svg";
+import useNavigation from "@/hooks/useNavigation";
 import { personsData } from "@/mocks/addData";
 
 import ChatModeContent from "./components/ChatModeContent";
@@ -50,6 +50,9 @@ const InterviewPage = () => {
   // 마무리 플로우 상태
   const [finishStep, setFinishStep] = useState<FinishStep>("idle");
 
+  // 마무리 플로우 타임아웃 ID refs (메모리 누수 방지)
+  const finishTimeoutRefs = useRef<number[]>([]);
+
   // 면접관 데이터
   const interviewer = personsData[0];
 
@@ -71,6 +74,16 @@ const InterviewPage = () => {
   // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     start();
+  }, []);
+
+  // 컴포넌트 언마운트 시 마무리 플로우 타임아웃 정리
+  useEffect(() => {
+    return () => {
+      finishTimeoutRefs.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      finishTimeoutRefs.current = [];
+    };
   }, []);
 
   /**
@@ -156,17 +169,26 @@ const InterviewPage = () => {
    * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 로딩 스피너(2초) → 결과 페이지
    */
   const handleFinish = () => {
+    // 기존 타임아웃 정리
+    finishTimeoutRefs.current.forEach((timeoutId) => {
+      clearTimeout(timeoutId);
+    });
+    finishTimeoutRefs.current = [];
+
     // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
     setFinishStep("notification");
 
     // Step 2: AI 마무리 멘트 출력 (1초 후)
-    setTimeout(playFinishMessage, 1000);
+    const timeout1 = setTimeout(playFinishMessage, 1000);
+    finishTimeoutRefs.current.push(timeout1);
 
     // Step 3: 결과 로딩 스피너 (4초 후: 알림 1초 + 멘트 3초)
-    setTimeout(showLoadingSpinner, 4000);
+    const timeout2 = setTimeout(showLoadingSpinner, 4000);
+    finishTimeoutRefs.current.push(timeout2);
 
     // Step 4: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
-    setTimeout(navigateToResult, 6000);
+    const timeout3 = setTimeout(navigateToResult, 6000);
+    finishTimeoutRefs.current.push(timeout3);
   };
 
   return (
