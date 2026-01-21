@@ -7,6 +7,7 @@ import HomePage from '@/pages/home/Home';
 import MyRolePage from '@/pages/my-role/My-Role';
 import MySpeakPage from '@/pages/my-speak/My-Speak';
 import MySpeakSettingPage from '@/pages/my-speak/Setting/Setting';
+import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: 'my-speak/setting',
         element: <MySpeakSettingPage />,
+      },
+      {
+        path: 'my-speak/interview',
+        element: <InterviewPage />,
       },
     ],
   },
