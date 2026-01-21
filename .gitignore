@@ -25,3 +25,9 @@ dev-dist
 *.sln
 *.sw?
 .env
+
+.claude
+docs
+CLAUDE.md
+figma
+docs
