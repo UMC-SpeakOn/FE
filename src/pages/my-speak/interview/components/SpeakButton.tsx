@@ -27,7 +27,7 @@ const SpeakButton = ({
     <div className="flex items-center justify-center py-4">
       <button
         onClick={onClick}
-        className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
+        className="w-full h-21 bg-purple-700 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
         disabled={isPaused}
       >
         {speakState === "speaking" ? (

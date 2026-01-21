@@ -36,9 +36,8 @@ const InterviewTimer = ({
       {isVideoMode && onToggleSubtitles && (
         <button
           onClick={onToggleSubtitles}
-          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            showSubtitles ? "bg-violet-500" : "bg-neutral-900 opacity-30"
-          }`}
+          className={`w-10 h-10 rounded-full flex items-center justify-center ${showSubtitles ? "bg-violet-500" : "bg-neutral-900 opacity-30"
+            }`}
         >
           <img src={ccIcon} alt="자막" />
         </button>
@@ -55,8 +54,8 @@ const InterviewTimer = ({
       )}
 
       {/* 타이머 */}
-      <div className="flex items-center gap-0.5 px-3 py-1.5 rounded-full bg-black/50">
-        <span className="text-white text-lg p-2">
+      <div className="flex items-center px-3 py-1.5 rounded-full bg-black/50">
+        <span className="text-white text-lg leading-10 tabular-nums min-w-[4.5rem] text-center">
           {formattedTime}
         </span>
       </div>

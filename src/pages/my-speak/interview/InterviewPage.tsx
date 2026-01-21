@@ -192,8 +192,9 @@ const InterviewPage = () => {
         ) : (
           <ChatModeContent
             messages={messages}
+            formattedTime={formattedTime}
             isLoading={isLoading}
-            onPlayAudio={() => {}}
+            onPlayAudio={() => { }}
             onSendMessage={sendMessage}
             finishStep={finishStep}
           />

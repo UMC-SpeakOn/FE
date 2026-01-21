@@ -35,7 +35,7 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
           <img
             src={interviewer.imageUrl}
             alt={interviewer.name}
-            className="w-10 h-10 rounded-full flex-shrink-0 mt-1"
+            className="w-12 h-12 rounded-full flex-shrink-0"
           />
         )}
 
@@ -44,12 +44,13 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
         >
           {/* 말풍선 */}
           <div
-            className={`px-4 py-3 rounded-2xl ${isAI ? "bg-purple-500 text-white" : "bg-gray-100 text-gray-900"
+            className={`px-4 py-3 rounded-xl text-gray-900 ${isAI ? "bg-purple-200 " : "bg-gray-100"
               }`}
           >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            <p className="text-xl font-medium leading-relaxed whitespace-pre-wrap break-all">
               {message.content}
             </p>
+
           </div>
 
           {/* 타임스탬프 */}

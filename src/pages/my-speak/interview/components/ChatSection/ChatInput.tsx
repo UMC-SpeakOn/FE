@@ -43,9 +43,9 @@ const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="메시지를 입력하세요..."
+        placeholder="입력하세요"
         disabled={disabled}
-        className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:bg-gray-200 max-h-24 text-gray-900"
+        className="flex-1 px-8 py-4 bg-gray-100 rounded-full resize-none focus:outline-none focus:bg-gray-200 max-h-24 text-2xl text-gray-900 break-all overflow-y-auto"
         rows={1}
       />
       <button
@@ -54,7 +54,7 @@ const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
         className="flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="전송"
       >
-        <img src={sandMessageIcon} alt="전송" className="w-10 h-10" />
+        <img src={sandMessageIcon} alt="전송" />
       </button>
     </div>
   );
