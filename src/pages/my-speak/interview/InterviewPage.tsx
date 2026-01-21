@@ -11,6 +11,7 @@ import VideoModeContent from "./components/VideoModeContent";
 import { useChat } from "./hooks/useChat";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
+import type { FinishStep } from "./types/finish.type";
 
 /**
  * InterviewPage - My Speak 면접 실전 연습 페이지 (통합)
@@ -47,9 +48,7 @@ const InterviewPage = () => {
   >("ready");
 
   // 마무리 플로우 상태
-  const [finishStep, setFinishStep] = useState<
-    "idle" | "notification" | "ai_message" | "loading"
-  >("idle");
+  const [finishStep, setFinishStep] = useState<FinishStep>("idle");
 
   // 면접관 데이터
   const interviewer = personsData[0];
@@ -129,6 +128,30 @@ const InterviewPage = () => {
   };
 
   /**
+   * Step 2: AI 마무리 멘트 출력
+   */
+  const playFinishMessage = () => {
+    if (viewMode === "chat") {
+      addFinishMessage();
+    }
+    setFinishStep("ai_message");
+  };
+
+  /**
+   * Step 3: 결과 로딩 스피너 표시
+   */
+  const showLoadingSpinner = () => {
+    setFinishStep("loading");
+  };
+
+  /**
+   * Step 4: 결과 페이지로 이동
+   */
+  const navigateToResult = () => {
+    navigateTo("/my-speak/interview/result");
+  };
+
+  /**
    * 마무리하기 핸들러
    * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 로딩 스피너(2초) → 결과 페이지
    */
@@ -136,27 +159,14 @@ const InterviewPage = () => {
     // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
     setFinishStep("notification");
 
-    setTimeout(() => {
-      // Step 2: AI 마무리 멘트 출력
-      if (viewMode === "video") {
-        // 영상 모드: TTS 음성만 재생 (텍스트 없음)
-        setFinishStep("ai_message");
-      } else {
-        // 채팅 모드: 채팅에 멘트 추가
-        addFinishMessage();
-        setFinishStep("ai_message");
-      }
+    // Step 2: AI 마무리 멘트 출력 (1초 후)
+    setTimeout(playFinishMessage, 1000);
 
-      setTimeout(() => {
-        // Step 3: 결과 로딩 스피너
-        setFinishStep("loading");
+    // Step 3: 결과 로딩 스피너 (4초 후: 알림 1초 + 멘트 3초)
+    setTimeout(showLoadingSpinner, 4000);
 
-        setTimeout(() => {
-          // Step 4: 결과 화면 이동
-          navigateTo("/my-speak/interview/result");
-        }, 2000); // 로딩 2초
-      }, 3000); // AI 멘트 3초
-    }, 1000); // 알림 1초
+    // Step 4: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
+    setTimeout(navigateToResult, 6000);
   };
 
   return (

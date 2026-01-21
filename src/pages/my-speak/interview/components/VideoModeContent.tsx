@@ -1,4 +1,6 @@
+import type { FinishStep } from "../types/finish.type";
 import InterviewTimer from "./VideoSection/InterviewTimer";
+import NotificationOverlay from "./NotificationOverlay";
 import SubtitleOverlay from "./VideoSection/SubtitleOverlay";
 import UserVideoStream from "./VideoSection/UserVideoStream";
 
@@ -13,7 +15,7 @@ interface VideoModeContentProps {
   onToggleSubtitles: () => void;
   onRestart: () => void;
   isPaused: boolean;
-  finishStep: "idle" | "notification" | "ai_message" | "loading";
+  finishStep: FinishStep;
 }
 
 /**
@@ -64,13 +66,7 @@ const VideoModeContent = ({
       )}
 
       {/* Step 1: 알림 오버레이 (부분 화면) */}
-      {finishStep === "notification" && (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center px-6">
-          <p className="text-white text-2xl font-bold text-center">
-            AI의 마무리 멘트가 한 턴 추가됩니다.
-          </p>
-        </div>
-      )}
+      {finishStep === "notification" && <NotificationOverlay />}
 
       {/* 자막 오버레이 */}
       {showSubtitles && !isPaused && finishStep === "idle" && (
