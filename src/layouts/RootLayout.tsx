@@ -1,14 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import Footer from '@/components/Footer/Footer';
 import Header from '@/components/Header/Header';
 
 const RootLayout = () => {
+  const location = useLocation();
+  const hideHeader = location.pathname === '/my-speak/interview';
+
   return (
     <div className="pageContainer">
       <div className="scrollArea scroll">
         <div className="screenSection">
-          <Header />
+          {!hideHeader && <Header />}
           <main className="mainSection">
             <Outlet />
           </main>
