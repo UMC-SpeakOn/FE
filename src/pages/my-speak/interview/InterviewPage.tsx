@@ -51,7 +51,7 @@ const InterviewPage = () => {
   const [finishStep, setFinishStep] = useState<FinishStep>("idle");
 
   // 마무리 플로우 타임아웃 ID refs (메모리 누수 방지)
-  const finishTimeoutRefs = useRef<number[]>([]);
+  const finishTimeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // 면접관 데이터
   const interviewer = personsData[0];
