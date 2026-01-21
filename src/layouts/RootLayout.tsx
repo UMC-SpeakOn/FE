@@ -8,12 +8,16 @@ const RootLayout = () => {
   const hideHeader = location.pathname === '/my-speak/interview';
 
   return (
-    <div className="pageContainer scroll">
-      {!hideHeader && <Header />}
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
+    <div className="pageContainer">
+      <div className="scrollArea scroll">
+        <div className="screenSection">
+          {!hideHeader && <Header />}
+          <main className="mainSection">
+            <Outlet />
+          </main>
+        </div>
+        <Footer />
+      </div>
     </div>
   );
 };

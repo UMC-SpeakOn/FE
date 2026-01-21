@@ -13,11 +13,25 @@
   }
 
   .pageContainer {
-    @apply w-full flex flex-col max-w-[430px] h-dvh mx-auto overflow-y-auto bg-purple-500;
+    @apply mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-purple-500;
+  }
+
+  .scrollArea {
+    @apply flex-1 overflow-y-auto min-h-0;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .screenSection {
+    @apply flex min-h-[100dvh] flex-col;
+  }
+
+  .mainSection {
+    @apply flex flex-col flex-1 min-h-0;
   }
 
   .white-pageContainer {
-    @apply w-full h-full mt-[0.878rem] pt-[2.688rem] pl-[1.462rem] pb-[6.334rem] flex flex-col gap-[2.962rem] rounded-t-[3rem] bg-white;
+    @apply w-full flex-1 min-h-0 mt-[0.878rem] pt-[2.688rem] pl-[1.462rem] pb-[6.334rem] flex flex-col gap-[2.962rem] rounded-t-[3rem] bg-white;
   }
 
   .font-unbounded {
