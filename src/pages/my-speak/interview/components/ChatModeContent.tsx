@@ -31,7 +31,6 @@ const ChatModeContent = ({
   formattedTime,
   onSendMessage,
   finishStep,
-  transcript,
   inputValue,
   onInputChange,
   clearTranscript,
