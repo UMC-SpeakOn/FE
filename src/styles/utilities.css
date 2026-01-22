@@ -1,3 +1,6 @@
+@reference "tailwindcss";
+@reference "./theme.css";
+
 @layer utilities {
   .scroll {
     -ms-overflow-style: none;
