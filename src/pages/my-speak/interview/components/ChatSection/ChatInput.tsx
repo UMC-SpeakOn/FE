@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import sandMessageIcon from "@/assets/images/icons/sand-message.svg";
+
+import "@/styles/utilities.css";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -22,9 +24,11 @@ interface ChatInputProps {
  * - 키보드 단축키 (Enter: 전송, Shift+Enter: 줄바꿈)
  * - 빈 메시지 전송 방지
  * - Controlled/Uncontrolled 모드 지원
+ * - 동적 높이 조정 (내용에 따라 자동으로 늘어남)
  */
 const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalOnChange }: ChatInputProps) => {
   const [internalMessage, setInternalMessage] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Controlled mode: 외부에서 value와 onChange 제공
   // Uncontrolled mode: 내부 상태 사용
@@ -32,10 +36,22 @@ const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalO
   const message = isControlled ? externalValue : internalMessage;
   const setMessage = isControlled ? externalOnChange! : setInternalMessage;
 
+  // 텍스트 변경 시 textarea 높이 자동 조정
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [message]);
+
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage("");
+      // 전송 후 높이 초기화
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     }
   };
 
@@ -49,12 +65,13 @@ const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalO
   return (
     <div className="flex items-end gap-3 px-4 py-3 bg-white">
       <textarea
+        ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="입력하세요"
         disabled={disabled}
-        className="flex-1 px-8 py-4 bg-gray-100 rounded-full resize-none focus:outline-none focus:bg-gray-200 max-h-24 text-2xl text-gray-900 break-all overflow-y-auto"
+        className="flex-1 px-8 py-4 bg-gray-100 rounded-3xl resize-none focus:outline-none focus:bg-gray-200 max-h-40 text-2xl text-gray-900 break-all overflow-y-auto no-scroll"
         rows={1}
       />
       <button

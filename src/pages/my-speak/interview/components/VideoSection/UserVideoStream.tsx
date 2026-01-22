@@ -23,6 +23,7 @@ interface UserVideoStreamProps {
  * - position='main': 전체 화면 표시
  * - position='pip': 좌상단 작은 화면 표시
  * - 스왑 애니메이션 지원
+ * - GPU 가속 렌더링 최적화 (Issue #26)
  *
  * @permissions
  * - 웹캠 권한 필요 (navigator.mediaDevices.getUserMedia)
@@ -30,6 +31,7 @@ interface UserVideoStreamProps {
  *
  * @related
  * - hooks/useWebcam.ts - 웹캠 스트림 관리 커스텀 훅
+ * - Issue #26: 배포 환경 웹캠 이슈 해결
  */
 const UserVideoStream = ({ position }: UserVideoStreamProps) => {
   const isPIP = position === 'pip';
@@ -48,10 +50,9 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
           bg-gray-900 flex items-center justify-center
           rounded-2xl overflow-hidden shadow-lg border border-white
           transition-all duration-500 ease-in-out
-          ${
-            isPIP
-              ? 'absolute top-4 left-4 w-45 h-60 z-20'
-              : 'absolute inset-0 w-full h-full z-10'
+          ${isPIP
+            ? 'absolute top-4 left-4 w-45 h-60 z-[5]'
+            : 'absolute inset-0 w-full h-full z-[2]'
           }
         `}
       >
@@ -101,10 +102,9 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
           bg-gray-900 flex items-center justify-center
           rounded-2xl overflow-hidden shadow-lg border border-white
           transition-all duration-500 ease-in-out
-          ${
-            isPIP
-              ? 'absolute top-4 left-4 w-45 h-60 z-20'
-              : 'absolute inset-0 w-full h-full z-10'
+          ${isPIP
+            ? 'absolute top-4 left-4 w-45 h-60 z-[5]'
+            : 'absolute inset-0 w-full h-full z-[2]'
           }
         `}
       >
@@ -127,15 +127,19 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
         object-cover
         rounded-2xl overflow-hidden shadow-lg border border-white
         transition-all duration-500 ease-in-out
-        ${
-          isPIP
-            ? 'absolute top-4 left-4 w-45 h-60 z-20'
-            : 'absolute inset-0 w-full h-full z-10'
+        transform-gpu
+        ${isPIP
+          ? 'absolute top-4 left-4 w-45 h-60 z-[5]'
+          : 'absolute inset-0 w-full h-full z-[2]'
         }
       `}
       style={{
-        transform: 'scaleX(-1)', // 좌우 반전 (셀카 모드)
-        backgroundColor: '#000', // 디버깅: 검은 배경으로 비디오 영역 확인
+        transform: 'scaleX(-1) translateZ(0)',
+        backgroundColor: '#000',
+        willChange: 'transform',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        WebkitTransform: 'scaleX(-1) translateZ(0)',
       }}
       onLoadedMetadata={(e) => {
         console.log('[UserVideoStream] Video metadata loaded', {
