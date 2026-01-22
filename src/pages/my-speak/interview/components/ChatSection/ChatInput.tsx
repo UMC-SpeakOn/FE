@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 
 import sandMessageIcon from "@/assets/images/icons/sand-message.svg";
 
-import "../utilities.css";
+import "@/styles/utilities.css";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
