@@ -1,6 +1,6 @@
-import type { HeaderItem } from '@/types/header/header.type';
+import type { NavbarItem } from '@/types/navbar/navbar.type';
 
-export const HEADER_ITEMS: HeaderItem[] = [
+export const NAVBAR_ITEMS: NavbarItem[] = [
   {
     label: 'My Role',
     match: (pathname) => pathname.startsWith('/my-role'),
