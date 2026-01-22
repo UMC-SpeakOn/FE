@@ -12,6 +12,7 @@ interface ChatModeContentProps {
   formattedTime: string;
   onSendMessage: (message: string) => void;
   finishStep: FinishStep;
+  transcript?: string;
   inputValue?: string;
   onInputChange?: (value: string) => void;
   clearTranscript?: () => void;
