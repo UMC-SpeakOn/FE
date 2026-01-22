@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import useNavigation from "@/hooks/useNavigation";
 import navIcon from "@/assets/images/icons/nav.svg";
@@ -51,6 +51,9 @@ const InterviewPage = () => {
   // 마무리 플로우 상태
   const [finishStep, setFinishStep] = useState<FinishStep>("idle");
 
+  // 채팅 입력 상태 (음성 인식 텍스트 표시용)
+  const [chatInput, setChatInput] = useState("");
+
   // 면접관 데이터
   const interviewer = personsData[0];
 
@@ -64,6 +67,7 @@ const InterviewPage = () => {
   const {
     startListening,
     stopListening,
+    clearTranscript,
     audioLevel,
     transcript,
     // error: speechError,
@@ -72,10 +76,23 @@ const InterviewPage = () => {
   // 비디오 스왑 훅
   const { isUserInMain, swapLayout } = useVideoSwap();
 
+  // 최신 AI 메시지 (자막용)
+  const latestAIMessage = useMemo(() => {
+    const aiMessages = messages.filter(m => m.type === 'AI');
+    return aiMessages.length > 0 ? aiMessages[aiMessages.length - 1].content : undefined;
+  }, [messages]);
+
   // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     start();
   }, []);
+
+  // 음성 인식 transcript를 chatInput에 실시간 반영
+  useEffect(() => {
+    if (viewMode === 'chat' && transcript) {
+      setChatInput(transcript);
+    }
+  }, [transcript, viewMode]);
 
   /**
    * 일시정지/재개 핸들러
@@ -101,20 +118,27 @@ const InterviewPage = () => {
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
    * - 음성 인식 시작/중지 통합
-   * - 채팅 모드에서 말하기 완료 시 transcript를 메시지로 전송
+   * - 카메라 모드: 말하기 완료 시 즉시 메시지 전송
+   * - 채팅 모드: 말하기 완료 시 입력창에만 입력 (사용자가 전송 버튼으로 컨트롤)
    */
   const handleSpeak = () => {
     if (speakState === 'ready') {
       setSpeakState('speaking');
+      setChatInput(''); // 입력 필드 초기화
       startListening();
     } else if (speakState === 'speaking') {
       setSpeakState('done');
-      stopListening();
 
-      // 채팅 모드이고 transcript가 있으면 자동 전송
-      if (viewMode === 'chat' && transcript.trim()) {
+      // 카메라 모드일 경우 transcript를 직접 사용하여 즉시 전송
+      if (viewMode === 'video' && transcript.trim()) {
         sendMessage(transcript.trim());
+        setChatInput(''); // 전송 후 입력 필드 초기화
+        clearTranscript(); // transcript도 초기화
       }
+
+      // 음성 인식 중지
+      // 채팅 모드일 경우 chatInput은 유지되어 사용자가 전송 버튼으로 컨트롤
+      stopListening();
     } else {
       setSpeakState("ready");
     }
@@ -122,9 +146,12 @@ const InterviewPage = () => {
 
   /**
    * 모드 전환 핸들러 (채팅 ↔ 영상)
+   * 모드 전환 시 입력 상태 초기화
    */
   const handleToggleMode = () => {
     setViewMode((prev) => (prev === "video" ? "chat" : "video"));
+    setChatInput(''); // 입력창 초기화
+    clearTranscript(); // transcript 초기화
   };
 
   /**
@@ -194,6 +221,7 @@ const InterviewPage = () => {
               isPaused={isPaused}
               finishStep={finishStep}
               isUserInMain={isUserInMain}
+              subtitleText={latestAIMessage}
             />
           </div>
 
@@ -210,6 +238,10 @@ const InterviewPage = () => {
               onPlayAudio={() => { }}
               onSendMessage={sendMessage}
               finishStep={finishStep}
+              transcript={transcript}
+              inputValue={chatInput}
+              onInputChange={setChatInput}
+              clearTranscript={clearTranscript}
             />
           </div>
         </div>

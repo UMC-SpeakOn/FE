@@ -17,6 +17,7 @@ interface VideoModeContentProps {
   isPaused: boolean;
   finishStep: FinishStep;
   isUserInMain: boolean;
+  subtitleText?: string;
 }
 
 /**
@@ -35,6 +36,7 @@ const VideoModeContent = ({
   isPaused,
   finishStep,
   isUserInMain,
+  subtitleText,
 }: VideoModeContentProps) => {
   // 스타일 클래스 정의
   const mainStyle = "absolute inset-0 w-full h-full z-0";
@@ -93,7 +95,7 @@ const VideoModeContent = ({
           }
         `}
       >
-        <SubtitleOverlay />
+        <SubtitleOverlay text={subtitleText} />
       </div>
     </div>
   );

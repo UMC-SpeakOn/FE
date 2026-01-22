@@ -43,6 +43,8 @@ interface UseSpeechRecognitionReturn {
   startListening: () => void;
   /** 음성 인식 중지 */
   stopListening: () => void;
+  /** transcript 초기화 */
+  clearTranscript: () => void;
   /** 현재 인식 중인지 여부 */
   isListening: boolean;
   /** 인식된 텍스트 */
@@ -87,6 +89,9 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
   const [transcript, setTranscript] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // 누적된 최종 결과를 저장 (interim 업데이트 시 기준점)
+  const finalTranscriptRef = useRef('');
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -147,38 +152,67 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
       return;
     }
 
+    // 이전 transcript 초기화
+    setTranscript('');
+    finalTranscriptRef.current = '';
+
     // 음성 인식 인스턴스 생성
     const recognition = new SpeechRecognition();
     recognition.lang = 'ko-KR';
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    // 인식 결과 처리
+    // 인식 결과 처리 (실시간 반응을 위해 interim results도 처리)
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let finalTranscript = '';
+      let interimTranscript = '';
+      let newFinalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcriptPiece = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcriptPiece;
+          newFinalTranscript += transcriptPiece;
+        } else {
+          interimTranscript += transcriptPiece;
         }
       }
 
-      if (finalTranscript) {
-        setTranscript((prev) => prev + ' ' + finalTranscript);
+      // Final 결과가 있으면 누적 저장
+      if (newFinalTranscript) {
+        finalTranscriptRef.current = (finalTranscriptRef.current + ' ' + newFinalTranscript).trim();
       }
+
+      // 즉시 업데이트: 누적된 final + 현재 interim
+      const combined = (finalTranscriptRef.current + ' ' + interimTranscript).trim();
+      setTranscript(combined);
     };
 
     // 에러 처리
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error:', event.error);
+
+      // 치명적이지 않은 에러는 무시하고 계속 진행
       if (event.error === 'no-speech') {
-        // 음성이 감지되지 않으면 자동 재시작
-        recognitionRef.current?.start();
-      } else {
-        setError('음성 인식 중 오류가 발생했습니다.');
-        setIsListening(false);
+        // 음성이 감지되지 않음 - 자동 재시작
+        console.log('[SpeechRecognition] No speech detected, continuing...');
+        return;
       }
+
+      if (event.error === 'aborted') {
+        // 사용자가 중단함 - 정상 종료
+        console.log('[SpeechRecognition] Aborted by user');
+        return;
+      }
+
+      if (event.error === 'network') {
+        // 네트워크 오류 - 재시작 시도
+        console.log('[SpeechRecognition] Network error, will retry on next start');
+        setIsListening(false);
+        return;
+      }
+
+      // 그 외 치명적 에러
+      setError(`음성 인식 오류: ${event.error}`);
+      setIsListening(false);
     };
 
     // 인식 종료 처리 (자동 재시작)
@@ -219,6 +253,15 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
 
     setIsListening(false);
     setAudioLevel(0);
+    // transcript는 유지 (채팅 모드에서 사용자가 전송 컨트롤)
+  }, []);
+
+  /**
+   * transcript 명시적 초기화 (카메라 모드에서 전송 후 호출)
+   */
+  const clearTranscript = useCallback(() => {
+    setTranscript('');
+    finalTranscriptRef.current = '';
   }, []);
 
   // 컴포넌트 언마운트 시 정리
@@ -231,6 +274,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
   return {
     startListening,
     stopListening,
+    clearTranscript,
     isListening,
     transcript,
     audioLevel,
