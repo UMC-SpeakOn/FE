@@ -1,4 +1,4 @@
-export type HeaderItem = {
+export type NavbarItem = {
   label: string;
   match: (pathname: string) => boolean;
 };
