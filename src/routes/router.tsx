@@ -5,9 +5,10 @@ import Spinner from '@/components/Spinner/Spinner';
 import RootLayout from '@/layouts/RootLayout';
 import HomePage from '@/pages/home/Home';
 import MyRolePage from '@/pages/my-role/My-Role';
+import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
+import InterviewResultPage from '@/pages/my-speak/interview/InterviewResultPage';
 import MySpeakResultPage from '@/pages/my-speak/result/Result';
 import MySpeakSettingPage from '@/pages/my-speak/setting/Setting';
-import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 
 const router = createBrowserRouter([
   {
@@ -31,12 +32,16 @@ const router = createBrowserRouter([
         element: <MySpeakSettingPage />,
       },
       {
+        path: 'my-speak/interview',
+        element: <InterviewPage />,
+      },
+      {
         path: 'my-speak/result',
         element: <MySpeakResultPage />,
       },
       {
-        path: 'my-speak/interview',
-        element: <InterviewPage />,
+        path: 'my-speak/interview/result',
+        element: <InterviewResultPage />,
       },
     ],
   },

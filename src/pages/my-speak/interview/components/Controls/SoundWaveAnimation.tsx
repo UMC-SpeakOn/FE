@@ -29,8 +29,8 @@ const SoundWaveAnimation = ({ isActive = true }: SoundWaveAnimationProps) => {
             height: isActive
               ? `${Math.max(8, 24 - Math.abs(7 - i) * 2)}px`
               : '4px', // 비활성 시 작은 점으로 표시
-            // 애니메이션 딜레이를 랜덤하게 주어 자연스러운 파동 효과 연출
-            animationDelay: `${Math.random() * 0.5}s`,
+            // 애니메이션 딜레이를 인덱스 기반으로 주어 자연스러운 파동 효과 연출
+            animationDelay: `${(i * 0.05) % 0.5}s`,
             opacity: isActive ? 0.8 : 0.4,
             transition: 'all 0.3s ease', // 부드러운 전환 추가
           }}

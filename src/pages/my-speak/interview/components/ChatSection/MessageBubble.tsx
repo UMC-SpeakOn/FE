@@ -27,7 +27,7 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
 
   return (
     <div
-      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-3 px-4y`}
+      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-8 px-4`}
     >
       <div className={`flex ${isAI ? "flex-row" : "flex-row-reverse"} gap-2 max-w-[80%]`}>
         {/* AI 튜터 프로필 이미지 (AI 메시지만) */}
@@ -35,7 +35,7 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
           <img
             src={interviewer.imageUrl}
             alt={interviewer.name}
-            className="w-10 h-10 rounded-full flex-shrink-0 mt-1"
+            className="w-12 h-12 rounded-full flex-shrink-0"
           />
         )}
 
@@ -44,21 +44,22 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
         >
           {/* 말풍선 */}
           <div
-            className={`px-4 py-3 rounded-2xl ${isAI ? "bg-purple-500 text-white" : "bg-gray-100 text-gray-900"
+            className={`px-4 py-3 rounded-xl text-gray-900 ${isAI ? "bg-purple-200 " : "bg-gray-100"
               }`}
           >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            <p className="text-xl font-medium leading-relaxed whitespace-pre-wrap break-all">
               {message.content}
             </p>
+
           </div>
 
           {/* 타임스탬프 */}
-          <p className="text-xs mt-1 text-gray-400">
+          {/* <p className="text-xs mt-1 text-gray-400">
             {message.timestamp.toLocaleTimeString("ko-KR", {
               hour: "2-digit",
               minute: "2-digit",
             })}
-          </p>
+          </p> */}
 
           {/* 오디오 아이콘 (선택 사항) */}
           {message.audioUrl && (
