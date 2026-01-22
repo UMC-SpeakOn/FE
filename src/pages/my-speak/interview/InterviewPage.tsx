@@ -11,6 +11,7 @@ import VideoModeContent from "./components/VideoModeContent";
 import { useChat } from "./hooks/useChat";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
+import { useVideoSwap } from "./hooks/useVideoSwap";
 import type { FinishStep } from "./types/finish.type";
 
 /**
@@ -68,6 +69,9 @@ const InterviewPage = () => {
     // error: speechError,
   } = useSpeechRecognition();
 
+  // 비디오 스왑 훅
+  const { isUserInMain, swapLayout } = useVideoSwap();
+
   // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     start();
@@ -87,14 +91,10 @@ const InterviewPage = () => {
   };
 
   /**
-   * 재시작 핸들러
+   * 화면 스왑 핸들러
    */
-  const handleRestart = () => {
-    reset();
-    start();
-    setIsPaused(false);
-    setSpeakState("ready");
-    setViewMode("video");
+  const handleSwap = () => {
+    swapLayout();
   };
 
   /**
@@ -185,9 +185,10 @@ const InterviewPage = () => {
             formattedTime={formattedTime}
             showSubtitles={showSubtitles}
             onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
-            onRestart={handleRestart}
+            onSwap={handleSwap}
             isPaused={isPaused}
             finishStep={finishStep}
+            isUserInMain={isUserInMain}
           />
         ) : (
           <ChatModeContent
