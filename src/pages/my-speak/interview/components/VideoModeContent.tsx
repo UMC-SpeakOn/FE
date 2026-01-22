@@ -67,23 +67,34 @@ const VideoModeContent = ({
       />
 
       {/* 일시정지 오버레이 */}
-      {isPaused && (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-30">
-          <p className="text-white text-2xl font-bold">
-            학습을 잠시 멈췄습니다
-          </p>
-        </div>
-      )}
+      <div
+        className={`
+          absolute inset-0 bg-black/70 flex items-center justify-center z-30
+          transition-opacity duration-300 ease-in-out
+          ${isPaused ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        `}
+      >
+        <p className="text-white text-2xl font-bold">
+          학습을 잠시 멈췄습니다
+        </p>
+      </div>
 
       {/* Step 1: 알림 오버레이 (부분 화면) */}
       {finishStep === "notification" && <NotificationOverlay />}
 
       {/* 자막 오버레이 */}
-      {showSubtitles && !isPaused && finishStep === "idle" && (
-        <div className="absolute bottom-0 left-0 right-0 z-20">
-          <SubtitleOverlay />
-        </div>
-      )}
+      <div
+        className={`
+          absolute left-0 right-0 z-20
+          transition-all duration-400 ease-out
+          ${showSubtitles && !isPaused && finishStep === "idle"
+            ? "bottom-0 opacity-100"
+            : "-bottom-20 opacity-0 pointer-events-none"
+          }
+        `}
+      >
+        <SubtitleOverlay />
+      </div>
     </div>
   );
 };

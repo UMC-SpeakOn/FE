@@ -148,7 +148,7 @@ const InterviewPage = () => {
    * Step 4: 결과 페이지로 이동
    */
   const navigateToResult = () => {
-    navigateTo("/my-speak/interview/result");
+    navigateTo("/my-speak/result");
   };
 
   /**
@@ -170,7 +170,7 @@ const InterviewPage = () => {
   };
 
   return (
-    <div className="relative flex flex-col bg-purple-500 overflow-hidden">
+    <div className="relative flex flex-col w-full h-full flex-1 bg-purple-500 overflow-hidden">
       {/* 상단 헤더 */}
       <header className="flex flex-col items-center pt-2 pb-1.5 px-4 gap-10 my-5">
         <h1 className="text-white text-4xl font-unbounded">SpeakOn</h1>
@@ -179,27 +179,41 @@ const InterviewPage = () => {
 
       {/* 메인 컨텐츠 영역 */}
       <div className="flex flex-col px-6 pb-10">
-        {viewMode === "video" ? (
-          <VideoModeContent
-            interviewer={interviewer}
-            formattedTime={formattedTime}
-            showSubtitles={showSubtitles}
-            onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
-            onSwap={handleSwap}
-            isPaused={isPaused}
-            finishStep={finishStep}
-            isUserInMain={isUserInMain}
-          />
-        ) : (
-          <ChatModeContent
-            messages={messages}
-            formattedTime={formattedTime}
-            isLoading={isLoading}
-            onPlayAudio={() => { }}
-            onSendMessage={sendMessage}
-            finishStep={finishStep}
-          />
-        )}
+        <div className="relative">
+          <div
+            className={`
+              transition-opacity duration-300 ease-in-out
+              ${viewMode === "video" ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}
+            `}
+          >
+            <VideoModeContent
+              interviewer={interviewer}
+              formattedTime={formattedTime}
+              showSubtitles={showSubtitles}
+              onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
+              onSwap={handleSwap}
+              isPaused={isPaused}
+              finishStep={finishStep}
+              isUserInMain={isUserInMain}
+            />
+          </div>
+
+          <div
+            className={`
+              transition-opacity duration-300 ease-in-out
+              ${viewMode === "chat" ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}
+            `}
+          >
+            <ChatModeContent
+              messages={messages}
+              formattedTime={formattedTime}
+              isLoading={isLoading}
+              onPlayAudio={() => { }}
+              onSendMessage={sendMessage}
+              finishStep={finishStep}
+            />
+          </div>
+        </div>
 
         <SpeakButton
           speakState={speakState}
@@ -217,9 +231,15 @@ const InterviewPage = () => {
         />
       </div>
 
-      {/* 전체 화면 로딩 오버레이 */}
-      {finishStep === "loading" && (
-        <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center px-6 gap-6 z-50">
+      {/* 웹앱 영역 로딩 오버레이 (Footer 포함) */}
+      <div
+        className={`
+          fixed inset-0 flex items-center justify-center z-50
+          transition-opacity duration-300 ease-in-out
+          ${finishStep === "loading" ? "opacity-100" : "opacity-0 pointer-events-none"}
+        `}
+      >
+        <div className="max-w-[430px] w-full h-full bg-black/70 flex flex-col items-center justify-center px-6 gap-6">
           <img
             src={navIcon}
             alt="loading"
@@ -229,7 +249,7 @@ const InterviewPage = () => {
             결과를 불러오는 중...
           </p>
         </div>
-      )}
+      </div>
     </div>
   );
 };
