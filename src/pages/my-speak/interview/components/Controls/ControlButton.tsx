@@ -21,7 +21,7 @@ const ControlButton = ({
             <div className="h-23 w-23 rounded-full bg-white flex items-center justify-center">
                 <img src={icon} alt={label} />
             </div>
-            <span className="text-base text-white">{label}</span>
+            <span className="text-lg text-white">{label}</span>
         </button>
     );
 };

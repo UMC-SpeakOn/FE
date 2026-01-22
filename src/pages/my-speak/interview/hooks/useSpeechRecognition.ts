@@ -1,8 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
+ * Window 객체 확장 (브라우저 호환성)
+ */
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
+/**
  * SpeechRecognition 타입 정의 (브라우저 호환성)
  */
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -66,7 +88,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
   const [audioLevel, setAudioLevel] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -74,7 +96,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
   /**
    * 오디오 볼륨 레벨 측정
    */
-  const measureAudioLevel = useCallback(() => {
+  const measureAudioLevel = useCallback(function measure() {
     if (!analyserRef.current) return;
 
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
@@ -86,7 +108,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
 
     setAudioLevel(normalizedLevel);
 
-    animationFrameRef.current = requestAnimationFrame(measureAudioLevel);
+    animationFrameRef.current = requestAnimationFrame(measure);
   }, []);
 
   /**
@@ -97,7 +119,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       audioContextRef.current = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+        window.webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 256;
 
@@ -117,8 +139,8 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
   const startListening = useCallback(() => {
     // 브라우저 호환성 체크
     const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setError('이 브라우저는 음성 인식을 지원하지 않습니다.');
@@ -126,13 +148,13 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
     }
 
     // 음성 인식 인스턴스 생성
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.lang = 'ko-KR';
-    recognitionRef.current.continuous = true;
-    recognitionRef.current.interimResults = true;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ko-KR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
 
     // 인식 결과 처리
-    recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -148,7 +170,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
     };
 
     // 에러 처리
-    recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error:', event.error);
       if (event.error === 'no-speech') {
         // 음성이 감지되지 않으면 자동 재시작
@@ -160,14 +182,15 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
     };
 
     // 인식 종료 처리 (자동 재시작)
-    recognitionRef.current.onend = () => {
+    recognition.onend = () => {
       if (isListening) {
         recognitionRef.current?.start();
       }
     };
 
     // 인식 시작
-    recognitionRef.current.start();
+    recognition.start();
+    recognitionRef.current = recognition;
     setIsListening(true);
     setError(null);
 

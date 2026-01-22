@@ -1,66 +1,70 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import ccIcon from '@/assets/images/icons/cc.svg';
-import chatingIcon from '@/assets/images/icons/chating.svg';
-import continueIcon from '@/assets/images/icons/continue.svg';
-import finishIcon from '@/assets/images/icons/finish.svg';
-import loopIcon from '@/assets/images/icons/loop.svg';
-import speakIcon from '@/assets/images/icons/speak.svg';
-import stopIcon from '@/assets/images/icons/stop.svg';
-import { personsData } from '@/mocks/addData';
+import useNavigation from "@/hooks/useNavigation";
+import navIcon from "@/assets/images/icons/nav.svg";
+import { personsData } from "@/mocks/addData";
 
-import ControlButton from './components/Controls/ControlButton';
-import SoundWaveAnimation from './components/Controls/SoundWaveAnimation';
-import SubtitleOverlay from './components/VideoSection/SubtitleOverlay';
-import UserVideoStream from './components/VideoSection/UserVideoStream';
-import { useInterviewTimer } from './hooks/useInterviewTimer';
-import { useSpeechRecognition } from './hooks/useSpeechRecognition';
+import ChatModeContent from "./components/ChatModeContent";
+import ControlButtons from "./components/ControlButtons";
+import SpeakButton from "./components/SpeakButton";
+import VideoModeContent from "./components/VideoModeContent";
+import { useChat } from "./hooks/useChat";
+import { useInterviewTimer } from "./hooks/useInterviewTimer";
+import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
+import type { FinishStep } from "./types/finish.type";
 
 /**
- * InterviewPage - My Speak 면접 실전 연습 페이지 (In-session)
+ * InterviewPage - My Speak 면접 실전 연습 페이지 (통합)
  *
  * @description
- * 실시간 음성 기반 AI 면접 시뮬레이션이 진행되는 메인 페이지입니다.
- * Figma 디자인에 따라 사용자 웹캠, AI 면접관 PIP, 자막, 컨트롤 버튼을 포함합니다.
+ * 영상 모드와 채팅 모드를 통합한 면접 페이지입니다.
+ * 하단 버튼을 통해 모드를 전환할 수 있습니다.
  *
  * @features
- * - 상단: SpeakOn 로고 + 면접명 표시
- * - 비디오: 라운드 카드 형태의 메인 비디오 (사용자 웹캠)
- * - PIP: 왼쪽 상단 오버레이로 AI 면접관 영상 표시
- * - 타이머: 우측 상단 녹화 아이콘과 함께 경과 시간 표시
- * - 자막: 하단 보라색 바로 면접관 질문/AI 응답 표시
- * - 버튼: 3개 원형 버튼 (재생하기, 일시정지, 재시) + 중앙 말하기 버튼
- * - 일시정지 시: 화면 어두워짐 + "학습을 잠시 멈췄습니다" 메시지
+ * - 영상 모드: 웹캠, AI 면접관 PIP, 자막, 말하기 버튼
+ * - 채팅 모드: 메시지 리스트, 텍스트 입력
+ * - 모드 전환: 채팅 ↔ 카메라 버튼
+ * - 마무리 플로우: AI 멘트 → 로딩 → 결과 페이지
  *
  * @related
- * - Issue: https://github.com/UMC-SpeakOn/FE/issues/14
- * - Figma: figma/200 PWA_My Speak (*.png)
+ * - Issue: https://github.com/UMC-SpeakOn/FE/issues/15
  * - Route: /my-speak/interview
  */
 const InterviewPage = () => {
-  // 자막 표시 여부 상태 (기본값: 표시)
-  const [showSubtitles, setShowSubtitles] = useState(true);
+  const { navigateTo } = useNavigation();
 
-  // 일시정지 상태 (기본값: 진행 중)
+  // 뷰 모드 상태 (video | chat)
+  const [viewMode, setViewMode] = useState<"video" | "chat">("video");
+
+  // 자막 표시 여부 (영상 모드에서만 사용)
+  const [showSubtitles, setShowSubtitles] = useState(false);
+
+  // 일시정지 상태
   const [isPaused, setIsPaused] = useState(false);
 
-  // 말하기 상태 (기본값: 준비, 'ready' | 'speaking' | 'done')
+  // 말하기 상태 (영상 모드에서만 사용)
   const [speakState, setSpeakState] = useState<
-    'ready' | 'speaking' | 'done'
-  >('ready');
+    "ready" | "speaking" | "done"
+  >("ready");
 
-  // 면접관 데이터 (personsData에서 첫 번째 사람 사용)
+  // 마무리 플로우 상태
+  const [finishStep, setFinishStep] = useState<FinishStep>("idle");
+
+  // 면접관 데이터
   const interviewer = personsData[0];
 
   // 타이머 훅
   const { formattedTime, start, pause, resume, reset } = useInterviewTimer();
+
+  // 채팅 훅
+  const { messages, isLoading, sendMessage, addFinishMessage } = useChat();
 
   // 음성 인식 훅
   const {
     startListening,
     stopListening,
     audioLevel,
-    // transcript,
+    transcript,
     // error: speechError,
   } = useSpeechRecognition();
 
@@ -71,15 +75,12 @@ const InterviewPage = () => {
 
   /**
    * 일시정지/재개 핸들러
-   * - 일시정지 상태를 토글하고 타이머도 함께 제어
    */
   const handlePauseToggle = () => {
     if (isPaused) {
-      // 재개: 타이머 재개
       resume();
       setIsPaused(false);
     } else {
-      // 일시정지: 타이머 일시정지
       pause();
       setIsPaused(true);
     }
@@ -87,19 +88,20 @@ const InterviewPage = () => {
 
   /**
    * 재시작 핸들러
-   * - 타이머 리셋 및 상태 초기화
    */
   const handleRestart = () => {
     reset();
     start();
     setIsPaused(false);
-    setSpeakState('ready');
+    setSpeakState("ready");
+    setViewMode("video");
   };
 
   /**
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
    * - 음성 인식 시작/중지 통합
+   * - 채팅 모드에서 말하기 완료 시 transcript를 메시지로 전송
    */
   const handleSpeak = () => {
     if (speakState === 'ready') {
@@ -108,125 +110,125 @@ const InterviewPage = () => {
     } else if (speakState === 'speaking') {
       setSpeakState('done');
       stopListening();
+
+      // 채팅 모드이고 transcript가 있으면 자동 전송
+      if (viewMode === 'chat' && transcript.trim()) {
+        sendMessage(transcript.trim());
+      }
     } else {
-      setSpeakState('ready');
+      setSpeakState("ready");
     }
   };
 
+  /**
+   * 모드 전환 핸들러 (채팅 ↔ 영상)
+   */
+  const handleToggleMode = () => {
+    setViewMode((prev) => (prev === "video" ? "chat" : "video"));
+  };
+
+  /**
+   * Step 2: AI 마무리 멘트 출력
+   */
+  const playFinishMessage = () => {
+    if (viewMode === "chat") {
+      addFinishMessage();
+    }
+    setFinishStep("ai_message");
+  };
+
+  /**
+   * Step 3: 결과 로딩 스피너 표시
+   */
+  const showLoadingSpinner = () => {
+    setFinishStep("loading");
+  };
+
+  /**
+   * Step 4: 결과 페이지로 이동
+   */
+  const navigateToResult = () => {
+    navigateTo("/my-speak/interview/result");
+  };
+
+  /**
+   * 마무리하기 핸들러
+   * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 로딩 스피너(2초) → 결과 페이지
+   */
+  const handleFinish = () => {
+    // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
+    setFinishStep("notification");
+
+    // Step 2: AI 마무리 멘트 출력 (1초 후)
+    setTimeout(playFinishMessage, 1000);
+
+    // Step 3: 결과 로딩 스피너 (4초 후: 알림 1초 + 멘트 3초)
+    setTimeout(showLoadingSpinner, 4000);
+
+    // Step 4: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
+    setTimeout(navigateToResult, 6000);
+  };
+
   return (
-    <div className="relative flex flex-col  bg-purple-500 overflow-hidden">
-      {/* 상단 헤더: SpeakOn 로고 + 면접명 */}
+    <div className="relative flex flex-col bg-purple-500 overflow-hidden">
+      {/* 상단 헤더 */}
       <header className="flex flex-col items-center pt-2 pb-1.5 px-4 gap-10 my-5">
-        <h1 className="text-white text-4xl font-unbounded">
-          SpeakOn
-        </h1>
+        <h1 className="text-white text-4xl font-unbounded">SpeakOn</h1>
         <p className="text-white text-xl">{interviewer.city} 면접 연습</p>
       </header>
 
       {/* 메인 컨텐츠 영역 */}
       <div className="flex flex-col px-6 pb-10">
-        {/* 비디오 카드 영역 */}
-        <div className="relative h-[48vh] bg-white rounded-2xl overflow-hidden border border-white">
-          {/* 사용자 웹캠 스트림 */}
-          <UserVideoStream />
-
-          {/* AI 면접관 PIP - 왼쪽 상단 오버레이 (이미지) */}
-          <div className="absolute top-4 left-4 w-45 h-60 rounded-2xl overflow-hidden shadow-lg border border-white">
-            <img
-              src={interviewer.imageUrl}
-              alt={interviewer.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* 타이머 + CC 버튼 - 우측 상단 */}
-          <div className="absolute top-2 right-2 flex items-center gap-2">
-            {/* CC 자막 토글 버튼 */}
-            <button
-              onClick={() => setShowSubtitles(!showSubtitles)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${showSubtitles ? 'bg-purple-500' : 'bg-neutral-900 opacity-30'}`}
-            >
-              <img src={ccIcon} alt="자막" />
-            </button>
-            {/* 새로고침 버튼*/}
-            <button
-              onClick={handleRestart}
-              className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center"
-            >
-              <img src={loopIcon} alt="재시작" />
-            </button>
-            {/* 타이머 */}
-            <div className="flex items-center gap-0.5 bg-black/50 px-1.5 py-0.5 rounded-full">
-              <span className="text-white p-2 text-lg ">
-                {formattedTime}
-              </span>
-            </div>
-          </div>
-
-          {/* 일시정지 오버레이 */}
-          {isPaused && (
-            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-              <p className="text-white text-2xl font-bold">
-                학습을 잠시 멈췄습니다
-              </p>
-            </div>
-          )}
-
-          {/* 자막 오버레이 */}
-          {showSubtitles && !isPaused && (
-            <div className="absolute bottom-0 left-0 right-0">
-              <SubtitleOverlay />
-            </div>
-          )}
-        </div>
-
-        {/* 말하기 버튼 영역 */}
-        <div className="flex items-center justify-center py-4">
-          <button
-            onClick={handleSpeak}
-            className="w-full h-21 bg-purple-600 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
-            disabled={isPaused}
-          >
-            {speakState === 'speaking' ? (
-              <SoundWaveAnimation isActive={audioLevel > 10} />
-            ) : (
-              <>
-                <img src={speakIcon} alt="말하기" />
-                <span className="text-white text-xl font-semibold">
-                  말하기
-                </span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* 하단 컨트롤 버튼 3개 */}
-        <div className="flex items-center justify-between px-13 pt-4 ">
-          <ControlButton
-            icon={finishIcon}
-            label="마무리하기"
-            onClick={() => {
-              /* TODO: 재생 기능 */
-            }}
-            iconSize="w-5 h-5"
+        {viewMode === "video" ? (
+          <VideoModeContent
+            interviewer={interviewer}
+            formattedTime={formattedTime}
+            showSubtitles={showSubtitles}
+            onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
+            onRestart={handleRestart}
+            isPaused={isPaused}
+            finishStep={finishStep}
           />
-
-          <ControlButton
-            icon={isPaused ? continueIcon : stopIcon}
-            label={isPaused ? '이어서하기' : '일시멈춤'}
-            onClick={handlePauseToggle}
+        ) : (
+          <ChatModeContent
+            messages={messages}
+            formattedTime={formattedTime}
+            isLoading={isLoading}
+            onPlayAudio={() => { }}
+            onSendMessage={sendMessage}
+            finishStep={finishStep}
           />
+        )}
 
-          <ControlButton
-            icon={chatingIcon}
-            label="채팅"
-            onClick={() => {
-              /* TODO: 채팅 기능 */
-            }}
-          />
-        </div>
+        <SpeakButton
+          speakState={speakState}
+          audioLevel={audioLevel}
+          isPaused={isPaused}
+          onClick={handleSpeak}
+        />
+
+        <ControlButtons
+          viewMode={viewMode}
+          isPaused={isPaused}
+          onFinish={handleFinish}
+          onPauseToggle={handlePauseToggle}
+          onToggleMode={handleToggleMode}
+        />
       </div>
 
+      {/* 전체 화면 로딩 오버레이 */}
+      {finishStep === "loading" && (
+        <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center px-6 gap-6 z-50">
+          <img
+            src={navIcon}
+            alt="loading"
+            className="w-16 h-16 animate-spin"
+          />
+          <p className="text-white text-xl font-bold text-center">
+            결과를 불러오는 중...
+          </p>
+        </div>
+      )}
     </div>
   );
 };
