@@ -2,10 +2,6 @@ import { useState, useCallback } from 'react';
 
 export type VideoPosition = 'main' | 'pip';
 
-interface VideoSwapState {
-  isUserInMain: boolean;
-}
-
 /**
  * 비디오 스왑 커스텀 훅
  *
