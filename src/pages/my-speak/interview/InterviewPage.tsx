@@ -55,7 +55,7 @@ const InterviewPage = () => {
   const interviewer = personsData[0];
 
   // 타이머 훅
-  const { formattedTime, start, pause, resume, reset } = useInterviewTimer();
+  const { formattedTime, start, pause, resume } = useInterviewTimer();
 
   // 채팅 훅
   const { messages, isLoading, sendMessage, addFinishMessage } = useChat();
