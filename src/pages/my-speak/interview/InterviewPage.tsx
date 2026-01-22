@@ -172,8 +172,7 @@ const InterviewPage = () => {
   return (
     <div className="relative flex flex-col w-full h-full flex-1 bg-purple-500 overflow-hidden">
       {/* 상단 헤더 */}
-      <header className="flex flex-col items-center pt-2 pb-1.5 px-4 gap-10 my-5">
-        <h1 className="text-white text-4xl font-unbounded">SpeakOn</h1>
+      <header className="flex flex-col items-center px-4 gap-10 mb-5">
         <p className="text-white text-xl">{interviewer.city} 면접 연습</p>
       </header>
 

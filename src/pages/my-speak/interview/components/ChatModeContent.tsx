@@ -29,7 +29,7 @@ const ChatModeContent = ({
   finishStep,
 }: ChatModeContentProps) => {
   return (
-    <div className="relative h-[48vh] bg-white rounded-2xl overflow-hidden flex flex-col">
+    <div className="relative h-[65vh] bg-white rounded-2xl overflow-hidden flex flex-col">
 
       <MessageList messages={messages} onPlayAudio={onPlayAudio} />
       <ChatInput onSend={onSendMessage} disabled={isLoading} />
