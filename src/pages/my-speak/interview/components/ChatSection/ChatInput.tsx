@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 
 import sandMessageIcon from "@/assets/images/icons/sand-message.svg";
 
-import "./ChatAnimation.css";
+import "../utilities.css";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -71,7 +71,7 @@ const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalO
         onKeyDown={handleKeyDown}
         placeholder="입력하세요"
         disabled={disabled}
-        className="flex-1 px-8 py-4 bg-gray-100 rounded-3xl resize-none focus:outline-none focus:bg-gray-200 max-h-40 text-2xl text-gray-900 break-all overflow-y-auto hide-scrollbar"
+        className="flex-1 px-8 py-4 bg-gray-100 rounded-3xl resize-none focus:outline-none focus:bg-gray-200 max-h-40 text-2xl text-gray-900 break-all overflow-y-auto no-scroll"
         rows={1}
       />
       <button
