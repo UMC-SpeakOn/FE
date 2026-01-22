@@ -5,6 +5,8 @@ import sandMessageIcon from "@/assets/images/icons/sand-message.svg";
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 /**
@@ -19,9 +21,16 @@ interface ChatInputProps {
  * - 전송 버튼
  * - 키보드 단축키 (Enter: 전송, Shift+Enter: 줄바꿈)
  * - 빈 메시지 전송 방지
+ * - Controlled/Uncontrolled 모드 지원
  */
-const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
-  const [message, setMessage] = useState("");
+const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalOnChange }: ChatInputProps) => {
+  const [internalMessage, setInternalMessage] = useState("");
+
+  // Controlled mode: 외부에서 value와 onChange 제공
+  // Uncontrolled mode: 내부 상태 사용
+  const isControlled = externalValue !== undefined;
+  const message = isControlled ? externalValue : internalMessage;
+  const setMessage = isControlled ? externalOnChange! : setInternalMessage;
 
   const handleSend = () => {
     if (message.trim()) {

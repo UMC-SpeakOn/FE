@@ -27,17 +27,29 @@ const SpeakButton = ({
     <div className="flex items-center justify-center py-4">
       <button
         onClick={onClick}
-        className="w-full h-21 bg-purple-700 hover:bg-purple-700 rounded-[10px] inline-flex justify-center items-center gap-2 transition-colors"
+        className="w-full h-21 bg-purple-700 hover:bg-purple-700 rounded-[10px] relative overflow-hidden transition-colors"
         disabled={isPaused}
       >
-        {speakState === "speaking" ? (
+        <div
+          className={`
+            absolute inset-0 flex items-center justify-center gap-2
+            transition-all duration-300 ease-in-out
+            ${speakState === "speaking" ? "opacity-0 scale-90" : "opacity-100 scale-100"}
+          `}
+        >
+          <img src={speakIcon} alt="말하기" />
+          <span className="text-white text-xl font-semibold">말하기</span>
+        </div>
+
+        <div
+          className={`
+            absolute inset-0 flex items-center justify-center
+            transition-all duration-300 ease-in-out
+            ${speakState === "speaking" ? "opacity-100 scale-100" : "opacity-0 scale-90"}
+          `}
+        >
           <SoundWaveAnimation isActive={audioLevel > 10} />
-        ) : (
-          <>
-            <img src={speakIcon} alt="말하기" />
-            <span className="text-white text-xl font-semibold">말하기</span>
-          </>
-        )}
+        </div>
       </button>
     </div>
   );

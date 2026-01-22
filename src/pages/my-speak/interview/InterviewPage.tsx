@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import useNavigation from "@/hooks/useNavigation";
 import navIcon from "@/assets/images/icons/nav.svg";
@@ -51,6 +51,9 @@ const InterviewPage = () => {
   // 마무리 플로우 상태
   const [finishStep, setFinishStep] = useState<FinishStep>("idle");
 
+  // 채팅 입력 상태 (음성 인식 텍스트 표시용)
+  const [chatInput, setChatInput] = useState("");
+
   // 면접관 데이터
   const interviewer = personsData[0];
 
@@ -64,6 +67,7 @@ const InterviewPage = () => {
   const {
     startListening,
     stopListening,
+    clearTranscript,
     audioLevel,
     transcript,
     // error: speechError,
@@ -72,10 +76,23 @@ const InterviewPage = () => {
   // 비디오 스왑 훅
   const { isUserInMain, swapLayout } = useVideoSwap();
 
+  // 최신 AI 메시지 (자막용)
+  const latestAIMessage = useMemo(() => {
+    const aiMessages = messages.filter(m => m.type === 'AI');
+    return aiMessages.length > 0 ? aiMessages[aiMessages.length - 1].content : undefined;
+  }, [messages]);
+
   // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     start();
   }, []);
+
+  // 음성 인식 transcript를 chatInput에 실시간 반영
+  useEffect(() => {
+    if (viewMode === 'chat' && transcript) {
+      setChatInput(transcript);
+    }
+  }, [transcript, viewMode]);
 
   /**
    * 일시정지/재개 핸들러
@@ -101,20 +118,27 @@ const InterviewPage = () => {
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
    * - 음성 인식 시작/중지 통합
-   * - 채팅 모드에서 말하기 완료 시 transcript를 메시지로 전송
+   * - 카메라 모드: 말하기 완료 시 즉시 메시지 전송
+   * - 채팅 모드: 말하기 완료 시 입력창에만 입력 (사용자가 전송 버튼으로 컨트롤)
    */
   const handleSpeak = () => {
     if (speakState === 'ready') {
       setSpeakState('speaking');
+      setChatInput(''); // 입력 필드 초기화
       startListening();
     } else if (speakState === 'speaking') {
       setSpeakState('done');
-      stopListening();
 
-      // 채팅 모드이고 transcript가 있으면 자동 전송
-      if (viewMode === 'chat' && transcript.trim()) {
+      // 카메라 모드일 경우 transcript를 직접 사용하여 즉시 전송
+      if (viewMode === 'video' && transcript.trim()) {
         sendMessage(transcript.trim());
+        setChatInput(''); // 전송 후 입력 필드 초기화
+        clearTranscript(); // transcript도 초기화
       }
+
+      // 음성 인식 중지
+      // 채팅 모드일 경우 chatInput은 유지되어 사용자가 전송 버튼으로 컨트롤
+      stopListening();
     } else {
       setSpeakState("ready");
     }
@@ -122,9 +146,12 @@ const InterviewPage = () => {
 
   /**
    * 모드 전환 핸들러 (채팅 ↔ 영상)
+   * 모드 전환 시 입력 상태 초기화
    */
   const handleToggleMode = () => {
     setViewMode((prev) => (prev === "video" ? "chat" : "video"));
+    setChatInput(''); // 입력창 초기화
+    clearTranscript(); // transcript 초기화
   };
 
   /**
@@ -148,7 +175,7 @@ const InterviewPage = () => {
    * Step 4: 결과 페이지로 이동
    */
   const navigateToResult = () => {
-    navigateTo("/my-speak/interview/result");
+    navigateTo("/my-speak/result");
   };
 
   /**
@@ -170,36 +197,54 @@ const InterviewPage = () => {
   };
 
   return (
-    <div className="relative flex flex-col bg-purple-500 overflow-hidden">
+    <div className="relative flex flex-col w-full h-full flex-1 bg-purple-500 overflow-hidden">
       {/* 상단 헤더 */}
-      <header className="flex flex-col items-center pt-2 pb-1.5 px-4 gap-10 my-5">
-        <h1 className="text-white text-4xl font-unbounded">SpeakOn</h1>
+      <header className="flex flex-col items-center px-4 gap-10 mb-5">
         <p className="text-white text-xl">{interviewer.city} 면접 연습</p>
       </header>
 
       {/* 메인 컨텐츠 영역 */}
       <div className="flex flex-col px-6 pb-10">
-        {viewMode === "video" ? (
-          <VideoModeContent
-            interviewer={interviewer}
-            formattedTime={formattedTime}
-            showSubtitles={showSubtitles}
-            onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
-            onSwap={handleSwap}
-            isPaused={isPaused}
-            finishStep={finishStep}
-            isUserInMain={isUserInMain}
-          />
-        ) : (
-          <ChatModeContent
-            messages={messages}
-            formattedTime={formattedTime}
-            isLoading={isLoading}
-            onPlayAudio={() => { }}
-            onSendMessage={sendMessage}
-            finishStep={finishStep}
-          />
-        )}
+        <div className="relative">
+          <div
+            className={`
+              transition-opacity duration-300 ease-in-out
+              ${viewMode === "video" ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}
+            `}
+          >
+            <VideoModeContent
+              interviewer={interviewer}
+              formattedTime={formattedTime}
+              showSubtitles={showSubtitles}
+              onToggleSubtitles={() => setShowSubtitles(!showSubtitles)}
+              onSwap={handleSwap}
+              isPaused={isPaused}
+              finishStep={finishStep}
+              isUserInMain={isUserInMain}
+              subtitleText={latestAIMessage}
+            />
+          </div>
+
+          <div
+            className={`
+              transition-opacity duration-300 ease-in-out
+              ${viewMode === "chat" ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}
+            `}
+          >
+            <ChatModeContent
+              messages={messages}
+              formattedTime={formattedTime}
+              isLoading={isLoading}
+              onPlayAudio={() => { }}
+              onSendMessage={sendMessage}
+              finishStep={finishStep}
+              transcript={transcript}
+              inputValue={chatInput}
+              onInputChange={setChatInput}
+              clearTranscript={clearTranscript}
+            />
+          </div>
+        </div>
 
         <SpeakButton
           speakState={speakState}
@@ -217,9 +262,15 @@ const InterviewPage = () => {
         />
       </div>
 
-      {/* 전체 화면 로딩 오버레이 */}
-      {finishStep === "loading" && (
-        <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center px-6 gap-6 z-50">
+      {/* 웹앱 영역 로딩 오버레이 (Footer 포함) */}
+      <div
+        className={`
+          fixed inset-0 flex items-center justify-center z-50
+          transition-opacity duration-300 ease-in-out
+          ${finishStep === "loading" ? "opacity-100" : "opacity-0 pointer-events-none"}
+        `}
+      >
+        <div className="max-w-[430px] w-full h-full bg-black/70 flex flex-col items-center justify-center px-6 gap-6">
           <img
             src={navIcon}
             alt="loading"
@@ -229,7 +280,7 @@ const InterviewPage = () => {
             결과를 불러오는 중...
           </p>
         </div>
-      )}
+      </div>
     </div>
   );
 };
