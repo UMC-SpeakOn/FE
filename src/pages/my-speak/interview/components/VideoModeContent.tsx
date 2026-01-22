@@ -38,20 +38,20 @@ const VideoModeContent = ({
   isUserInMain,
   subtitleText,
 }: VideoModeContentProps) => {
-  // 스타일 클래스 정의
-  const mainStyle = "absolute inset-0 w-full h-full z-0";
-  const pipStyle = "absolute top-4 left-4 w-45 h-60 rounded-2xl shadow-lg z-10 border border-white transition-all duration-500 ease-in-out origin-top-left";
+  // 스타일 클래스 정의 (z-index 명시화 - Issue #26)
+  const mainStyle = "absolute inset-0 w-full h-full z-[1]";
+  const pipStyle = "absolute top-4 left-4 w-45 h-60 rounded-2xl shadow-lg z-[5] border border-white transition-all duration-500 ease-in-out origin-top-left";
 
   return (
     <div className="relative h-[65vh] bg-white rounded-2xl overflow-hidden border border-white">
       {/* 사용자 웹캠 영역 */}
-      <div className={`${isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-black`}>
+      <div className={`${isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-black isolate`}>
         {/* Wrapper handles positioning, so we force 'main' (fill parent) to UserVideoStream */}
         <UserVideoStream position="main" />
       </div>
 
       {/* AI 면접관 영역 */}
-      <div className={`${!isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-gray-200`}>
+      <div className={`${!isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-gray-200 isolate`}>
         <img
           src={interviewer.imageUrl}
           alt={interviewer.name}
