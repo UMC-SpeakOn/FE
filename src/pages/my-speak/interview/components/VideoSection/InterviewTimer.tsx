@@ -5,7 +5,7 @@ interface InterviewTimerProps {
   formattedTime: string;
   showSubtitles?: boolean;
   onToggleSubtitles?: () => void;
-  onRestart?: () => void;
+  onSwap?: () => void;
   variant?: "video" | "chat";
 }
 
@@ -17,7 +17,7 @@ interface InterviewTimerProps {
  *
  * @features
  * - 경과 시간 표시
- * - 재시작 버튼 (영상 모드만)
+ * - 화면 스왑 버튼 (영상 모드만)
  * - CC 자막 토글 (영상 모드만)
  * - 통일된 타이머 스타일
  */
@@ -25,7 +25,7 @@ const InterviewTimer = ({
   formattedTime,
   showSubtitles,
   onToggleSubtitles,
-  onRestart,
+  onSwap,
   variant = "video",
 }: InterviewTimerProps) => {
   const isVideoMode = variant === "video";
@@ -43,13 +43,18 @@ const InterviewTimer = ({
         </button>
       )}
 
-      {/* 재시작 버튼 (영상 모드만) */}
-      {isVideoMode && onRestart && (
+      {/* 스왑 버튼 (영상 모드만) */}
+      {isVideoMode && onSwap && (
         <button
-          onClick={onRestart}
-          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/50 hover:bg-black/60"
+          onClick={onSwap}
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/50 hover:bg-black/60 transition-all duration-200 active:scale-95"
+          aria-label="화면 교체"
         >
-          <img src={loopIcon} alt="재시작" />
+          <img
+            src={loopIcon}
+            alt="화면 교체"
+            className="w-5 h-5 transition-transform duration-300 hover:rotate-180"
+          />
         </button>
       )}
 
