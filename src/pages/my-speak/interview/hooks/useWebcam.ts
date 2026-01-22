@@ -99,53 +99,9 @@ export const useWebcam = (): UseWebcamReturn => {
         active: mediaStream.active,
       });
 
+      // stream 상태 업데이트 - useEffect가 자동으로 video에 연결
       setStream(mediaStream);
-
-      // video 엘리먼트에 스트림 연결
-      if (videoRef.current) {
-        const videoElement = videoRef.current;
-        console.log('[useWebcam] Setting srcObject to video element');
-        videoElement.srcObject = mediaStream;
-
-        // 메타데이터 로드 대기 (타임아웃 포함)
-        console.log('[useWebcam] Waiting for metadata, readyState:', videoElement.readyState);
-        await new Promise<void>((resolve) => {
-          if (videoElement.readyState >= 1) {
-            // 이미 메타데이터가 로드된 경우
-            console.log('[useWebcam] Metadata already loaded');
-            resolve();
-          } else {
-            videoElement.onloadedmetadata = () => {
-              console.log('[useWebcam] Metadata loaded via event');
-              resolve();
-            };
-            // 3초 타임아웃
-            setTimeout(() => {
-              console.log('[useWebcam] Metadata timeout after 3s');
-              resolve();
-            }, 3000);
-          }
-        });
-
-        console.log('[useWebcam] Attempting to play video, readyState:', videoElement.readyState);
-
-        // 브라우저 autoplay 정책/재생 타이밍 문제 해결
-        try {
-          await videoElement.play();
-          console.log('[useWebcam] Video playing successfully');
-        } catch (playError) {
-          console.warn('[useWebcam] Video play failed:', playError);
-          // 재시도
-          setTimeout(async () => {
-            try {
-              await videoElement.play();
-              console.log('[useWebcam] Video play retry successful');
-            } catch (retryError) {
-              console.error('[useWebcam] Video play retry failed:', retryError);
-            }
-          }, 100);
-        }
-      }
+      console.log('[useWebcam] Stream state updated, useEffect will handle video connection');
     } catch (err) {
       // 에러 타입별 사용자 친화적 메시지 생성
       if (err instanceof Error) {
@@ -181,6 +137,49 @@ export const useWebcam = (): UseWebcamReturn => {
       videoRef.current.srcObject = null;
     }
   };
+
+  // stream이 변경되면 video 요소에 자동 연결 (Issue #26)
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      const videoElement = videoRef.current;
+      console.log('[useWebcam] Connecting stream to video element via useEffect');
+      videoElement.srcObject = stream;
+
+      // 메타데이터 로드 및 재생
+      const playVideo = async () => {
+        try {
+          console.log('[useWebcam] Waiting for metadata in useEffect, readyState:', videoElement.readyState);
+
+          if (videoElement.readyState < 1) {
+            await new Promise<void>((resolve) => {
+              videoElement.onloadedmetadata = () => {
+                console.log('[useWebcam] Metadata loaded via useEffect');
+                resolve();
+              };
+              setTimeout(() => resolve(), 3000);
+            });
+          }
+
+          console.log('[useWebcam] Attempting to play video in useEffect');
+          await videoElement.play();
+          console.log('[useWebcam] Video playing successfully via useEffect');
+        } catch (playError) {
+          console.warn('[useWebcam] Video play failed in useEffect:', playError);
+          // 재시도
+          setTimeout(async () => {
+            try {
+              await videoElement.play();
+              console.log('[useWebcam] Video play retry successful in useEffect');
+            } catch (retryError) {
+              console.error('[useWebcam] Video play retry failed in useEffect:', retryError);
+            }
+          }, 100);
+        }
+      };
+
+      playVideo();
+    }
+  }, [stream]);
 
   // 컴포넌트 언마운트 시 웹캠 자동 정리
   useEffect(() => {
