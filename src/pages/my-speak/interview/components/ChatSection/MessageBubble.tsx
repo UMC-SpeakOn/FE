@@ -1,6 +1,7 @@
 import { personsData } from "@/mocks/addData";
 
 import type { ChatMessage } from "../../types/chat.type";
+import "./ChatAnimation.css";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -27,7 +28,7 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
 
   return (
     <div
-      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-8 px-4`}
+      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-8 px-4 animate-fade-in-up`}
     >
       <div className={`flex ${isAI ? "flex-row" : "flex-row-reverse"} gap-2 max-w-[80%]`}>
         {/* AI 튜터 프로필 이미지 (AI 메시지만) */}
