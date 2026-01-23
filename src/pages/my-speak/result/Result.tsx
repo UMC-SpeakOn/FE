@@ -4,8 +4,8 @@ import RightArrow from '@/assets/images/icons/right-arrow.svg';
 import useNavigation from '@/hooks/useNavigation';
 import { resultData } from '@/mocks/resultData';
 
+import StarRating from '../../../components/StarRating/StarRating';
 import ListCard from './components/Card/ListCard/ListCard';
-import StarRating from './components/Card/StarRating/StarRating';
 import Header from './components/Header/Header';
 
 const Result = () => {
