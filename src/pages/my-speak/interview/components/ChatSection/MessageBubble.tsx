@@ -5,7 +5,7 @@ import "./ChatAnimation.css";
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  // onPlayAudio?: () => void;
+  onPlayAudio?: () => void;
 }
 
 /**
