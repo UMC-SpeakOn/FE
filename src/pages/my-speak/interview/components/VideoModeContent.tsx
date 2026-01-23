@@ -46,8 +46,8 @@ const VideoModeContent = ({
     <div className="relative h-[65vh] bg-white rounded-2xl overflow-hidden border border-white">
       {/* 사용자 웹캠 영역 */}
       <div className={`${isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-black isolate`}>
-        {/* Wrapper handles positioning, so we force 'main' (fill parent) to UserVideoStream */}
-        <UserVideoStream position="main" />
+        {/* Wrapper handles positioning, UserVideoStream fills the wrapper */}
+        <UserVideoStream position={isUserInMain ? 'main' : 'pip'} forceStop={finishStep === 'loading'} />
       </div>
 
       {/* AI 면접관 영역 */}
