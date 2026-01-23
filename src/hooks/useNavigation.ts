@@ -29,7 +29,11 @@ const useNavigation = () => {
     [navigate],
   );
 
-  return { navigateTo };
+  const navigateBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  return { navigateTo, navigateBack };
 };
 
 export default useNavigation;

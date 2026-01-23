@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import Spinner from '@/components/Spinner/Spinner';
 import RootLayout from '@/layouts/RootLayout';
 import HomePage from '@/pages/home/Home';
+import MyReportDetailPage from '@/pages/my-report/detail/Detail';
 import MyRolePage from '@/pages/my-role/My-Role';
 import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 import MySpeakResultPage from '@/pages/my-speak/result/Result';
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: 'my-speak/result',
         element: <MySpeakResultPage />,
+      },
+      {
+        path: 'my-report/:id',
+        element: <MyReportDetailPage />,
       },
     ],
   },
