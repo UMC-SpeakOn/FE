@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useSwipe } from '../../../hooks/useSwipe';
 import type { InsightCard, InsightTab } from '../../../types/report.type';
 import Content from './Content/Content';
 import Pagination from './Pagination/Pagination';
@@ -11,7 +12,6 @@ interface AICardProps {
 
 const AICard = ({ data }: AICardProps) => {
   const { tabs, items } = data;
-
   const [activeTab, setActiveTab] = useState<InsightTab>(tabs[0]);
 
   const currentItem = useMemo(() => {
@@ -23,10 +23,26 @@ const AICard = ({ data }: AICardProps) => {
     return idx < 0 ? 0 : idx;
   }, [tabs, activeTab]);
 
+  const { onSwipeStart, onSwipeMove, onSwipeEnd } = useSwipe(
+    tabs,
+    activeTab,
+    setActiveTab,
+  );
+
   return (
     <div className="w-full flex flex-col gap-[1rem]">
       <ListTab tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-      <Content item={currentItem} />
+
+      <div
+        className="w-full touch-pan-y select-none"
+        onPointerDown={onSwipeStart}
+        onPointerMove={onSwipeMove}
+        onPointerUp={onSwipeEnd}
+        onPointerCancel={onSwipeEnd}
+      >
+        <Content item={currentItem} />
+      </div>
+
       <Pagination total={tabs.length} activeIndex={activeIndex} />
     </div>
   );
