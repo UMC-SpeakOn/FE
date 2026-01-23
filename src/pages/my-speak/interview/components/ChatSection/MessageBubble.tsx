@@ -5,7 +5,7 @@ import "./ChatAnimation.css";
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  onPlayAudio?: () => void;
+  // onPlayAudio?: () => void;
 }
 
 /**
@@ -22,7 +22,7 @@ interface MessageBubbleProps {
  * - 타임스탬프 표시
  * - 오디오 재생 버튼 (선택 사항)
  */
-const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
+const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isAI = message.type === "AI";
   const interviewer = personsData[0];
 
