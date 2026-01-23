@@ -63,14 +63,14 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
           </p> */}
 
           {/* 오디오 아이콘 (선택 사항) */}
-          {message.audioUrl && (
+          {/* {message.audioUrl && (
             <button
               onClick={onPlayAudio}
               className="mt-1 text-xs text-purple-500 underline"
             >
               🔊 소리 듣기
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>
