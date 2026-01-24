@@ -22,7 +22,7 @@ interface MessageBubbleProps {
  * - 타임스탬프 표시
  * - 오디오 재생 버튼 (선택 사항)
  */
-const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
+const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isAI = message.type === "AI";
   const interviewer = personsData[0];
 
@@ -63,14 +63,14 @@ const MessageBubble = ({ message, onPlayAudio }: MessageBubbleProps) => {
           </p> */}
 
           {/* 오디오 아이콘 (선택 사항) */}
-          {message.audioUrl && (
+          {/* {message.audioUrl && (
             <button
               onClick={onPlayAudio}
               className="mt-1 text-xs text-purple-500 underline"
             >
               🔊 소리 듣기
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>

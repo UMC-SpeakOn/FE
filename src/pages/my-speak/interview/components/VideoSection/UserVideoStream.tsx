@@ -6,6 +6,7 @@ import { useWebcam } from '../../hooks/useWebcam';
 
 interface UserVideoStreamProps {
   position: 'main' | 'pip';
+  forceStop?: boolean;
 }
 
 /**
@@ -33,14 +34,22 @@ interface UserVideoStreamProps {
  * - hooks/useWebcam.ts - 웹캠 스트림 관리 커스텀 훅
  * - Issue #26: 배포 환경 웹캠 이슈 해결
  */
-const UserVideoStream = ({ position }: UserVideoStreamProps) => {
+const UserVideoStream = ({ position, forceStop }: UserVideoStreamProps) => {
   const isPIP = position === 'pip';
-  const { videoRef, error, isLoading, startWebcam } = useWebcam();
+  const { videoRef, error, isLoading, startWebcam, stopWebcam } = useWebcam();
 
   // 컴포넌트 마운트 시 자동으로 웹캠 시작
   useEffect(() => {
     startWebcam();
   }, [startWebcam]);
+
+  // forceStop이 true일 때 웹캠 강제 종료 (결과 로딩 시)
+  useEffect(() => {
+    if (forceStop) {
+      console.log('[UserVideoStream] Force stopping webcam for result loading');
+      stopWebcam();
+    }
+  }, [forceStop, stopWebcam]);
 
   // 에러 상태: 카메라 권한 거부, 기기 없음 등
   if (error) {
@@ -48,10 +57,10 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
       <div
         className={`
           bg-gray-900 flex items-center justify-center
-          rounded-2xl overflow-hidden shadow-lg border border-white
+          rounded-2xl overflow-hidden shadow-lg 
           transition-all duration-500 ease-in-out
           ${isPIP
-            ? 'absolute top-4 left-4 w-45 h-60 z-[5]'
+            ? 'absolute w-45 h-60 z-[5]'
             : 'absolute inset-0 w-full h-full z-[2]'
           }
         `}
@@ -75,20 +84,15 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
           </div>
 
           {/* 에러 메시지 */}
-          <p className="text-lg font-medium mb-2">{error}</p>
+          <p className="text-xl font-medium text-white text-center mb-3">{error}</p>
 
           {/* 다시 시도 버튼 */}
           <button
             onClick={startWebcam}
-            className="mt-4 px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+            className="w-30 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors text-white text-sm"
           >
             다시 시도
           </button>
-
-          {/* 안내 문구 */}
-          <p className="text-xs text-gray-400 mt-4">
-            브라우저 설정에서 카메라 권한을 확인해주세요
-          </p>
         </div>
       </div>
     );
@@ -97,21 +101,17 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
   // 로딩 상태: 카메라 권한 요청 중
   if (isLoading) {
     return (
-      <div
-        className={`
-          bg-gray-900 flex items-center justify-center
-          rounded-2xl overflow-hidden shadow-lg border border-white
-          transition-all duration-500 ease-in-out
-          ${isPIP
-            ? 'absolute top-4 left-4 w-45 h-60 z-[5]'
-            : 'absolute inset-0 w-full h-full z-[2]'
-          }
-        `}
-      >
-        <div className="text-center text-white">
-          <Spinner size={60} color="var(--color-purple-400)" />
-          <p className="mt-4 text-gray-300">카메라 연결 중...</p>
-        </div>
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+        {isPIP ? (
+          // PIP 모드: 작은 스피너만
+          <Spinner size={40} color="var(--color-purple-400)" />
+        ) : (
+          // Main 모드: 스피너 + 텍스트
+          <div className="flex flex-col items-center">
+            <Spinner size={60} color="var(--color-purple-400)" />
+            <p className="mt-4 text-gray-300 text-sm">카메라 연결 중...</p>
+          </div>
+        )}
       </div>
     );
   }
@@ -123,16 +123,7 @@ const UserVideoStream = ({ position }: UserVideoStreamProps) => {
       autoPlay
       playsInline
       muted
-      className={`
-        object-cover
-        rounded-2xl overflow-hidden shadow-lg border border-white
-        transition-all duration-500 ease-in-out
-        transform-gpu
-        ${isPIP
-          ? 'absolute top-4 left-4 w-45 h-60 z-[5]'
-          : 'absolute inset-0 w-full h-full z-[2]'
-        }
-      `}
+      className="absolute inset-0 w-full h-full object-cover"
       style={{
         transform: 'scaleX(-1) translateZ(0)',
         backgroundColor: '#000',
