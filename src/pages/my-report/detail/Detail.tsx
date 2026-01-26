@@ -3,6 +3,7 @@ import { reportData } from '@/mocks/reportData';
 import ReportBar from './components/common/ReportBar/ReportBar';
 import Navbar from './components/Navbar/Navbar';
 import ReportAI from './components/ReportAI/ReportAI';
+import ReportChat from './components/ReportChat/ReportChat';
 import ReportInfo from './components/ReportInfo/ReportInfo';
 
 const Detail = () => {
@@ -18,6 +19,8 @@ const Detail = () => {
         <ReportAI data={reportData} />
 
         <ReportBar />
+
+        <ReportChat data={reportData} />
       </div>
     </>
   );
