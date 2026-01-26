@@ -1,6 +1,7 @@
 import { reportData } from '@/mocks/reportData';
 
 import ReportBar from './components/common/ReportBar/ReportBar';
+import ReportButton from './components/common/ReportButton/ReportButton';
 import Navbar from './components/Navbar/Navbar';
 import ReportAI from './components/ReportAI/ReportAI';
 import ReportChat from './components/ReportChat/ReportChat';
@@ -21,6 +22,8 @@ const Detail = () => {
         <ReportBar />
 
         <ReportChat data={reportData} />
+
+        <ReportButton text="저장하기" />
       </div>
     </>
   );
