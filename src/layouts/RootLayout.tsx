@@ -24,13 +24,15 @@ const RootLayout = () => {
       <div className="pageContainer">
         <div className="scrollArea scroll">
           <div className="screenSection relative overflow-hidden">
-            <Menu />
             <Header />
             {!hideNavbar && <Navbar />}
 
             <main className="mainSection">
               <Outlet />
             </main>
+
+            {/* 메뉴 컴포넌트 */}
+            <Menu />
           </div>
 
           <Footer />
