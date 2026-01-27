@@ -1,0 +1,89 @@
+@layer utilities {
+  /* 오디오 시각화용 wave animation */
+  .animate-wave {
+    animation: wave 0.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes wave {
+    0% {
+      transform: scaleY(0.5);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+
+  /* 메뉴 slide animations */
+  .animate-slideInRight {
+    animation: slideInRight 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+
+  .animate-slideOutRight {
+    animation: slideOutRight 350ms cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(-100%);
+      opacity: 0.8;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-100%);
+      opacity: 0.8;
+    }
+  }
+
+  /* 오버레이 fade animations */
+  .animate-fadeIn {
+    animation: fadeIn 300ms ease-out forwards;
+  }
+
+  .animate-fadeOut {
+    animation: fadeOut 300ms ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* 채팅 메시지 fade in up animation */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
