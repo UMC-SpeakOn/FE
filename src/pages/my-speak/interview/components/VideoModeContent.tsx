@@ -1,6 +1,6 @@
 import type { FinishStep } from "../types/finish.type";
-import NotificationOverlay from "./NotificationOverlay";
 import InterviewTimer from "./VideoSection/InterviewTimer";
+import NotificationOverlay from "./NotificationOverlay";
 import SubtitleOverlay from "./VideoSection/SubtitleOverlay";
 import UserVideoStream from "./VideoSection/UserVideoStream";
 

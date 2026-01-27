@@ -75,5 +75,20 @@ export const reportData: ReportData = {
       message:
         'Yes, it helped me understand how to create content from a user-centered perspective, combining clear messaging with thoughtful design.',
     },
+    {
+      id: 5,
+      role: 'ai',
+      speakerName: 'SpeakOn',
+      avatarUrl: AI_AVATAR,
+      message: 'That sounds relevant! What made you interested in marketing?',
+    },
+    {
+      id: 6,
+      role: 'user',
+      speakerName: 'You',
+      avatarUrl: USER_AVATAR,
+      message:
+        'Yes, it helped me understand how to create content from a user-centered perspective, combining clear messaging with thoughtful design.',
+    },
   ],
 };
