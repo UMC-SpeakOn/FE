@@ -1,8 +1,7 @@
-import "./ChatAnimation.css";
-
 import { personsData } from "@/mocks/addData";
 
 import type { ChatMessage } from "../../types/chat.type";
+import "./ChatAnimation.css";
 
 interface MessageBubbleProps {
   message: ChatMessage;
