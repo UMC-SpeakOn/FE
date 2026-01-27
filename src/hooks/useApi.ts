@@ -3,7 +3,6 @@ import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 import apiClient, { getErrorMessage } from "@/utils/apiClient";
 
-// ==================== 타입 정의 ====================
 interface UseApiState<T> {
   data: T | null;
   error: string | null;
@@ -30,7 +29,6 @@ interface UseApiReturn<T> extends UseApiState<T> {
   setData: (data: T | null) => void;
 }
 
-// ==================== useApi 훅 ====================
 /**
  * API 호출을 위한 커스텀 훅
  * @param axiosConfig - Axios 요청 설정
@@ -167,7 +165,6 @@ export function useApi<T = unknown>(
   };
 }
 
-// ==================== useMutation 훅 ====================
 /**
  * POST/PUT/DELETE 등의 Mutation 요청을 위한 훅
  * @param axiosConfig - Axios 요청 설정 (함수 형태로 전달 가능)
@@ -262,7 +259,6 @@ export function useMutation<TResponse = unknown, TVariables = unknown>(
   };
 }
 
-// ==================== useQuery 훅 (자동 실행 전용) ====================
 /**
  * GET 요청을 위한 훅 (자동 실행)
  * useApi의 enabled=true 버전의 별칭
