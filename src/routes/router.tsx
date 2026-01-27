@@ -2,8 +2,9 @@ import { Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 import Spinner from '@/components/Spinner/Spinner';
+import Splash from '@/components/Splash/Splash';
 import RootLayout from '@/layouts/RootLayout';
-import HomePage from '@/pages/home/Home';
+import LoginPage from '@/pages/login/Login';
 import MyReportDetailPage from '@/pages/my-report/detail/Detail';
 import MyRolePage from '@/pages/my-role/My-Role';
 import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
@@ -19,9 +20,10 @@ const router = createBrowserRouter([
       </Suspense>
     ),
     children: [
+      { index: true, element: <Splash /> },
       {
-        index: true,
-        element: <HomePage />,
+        path: 'login',
+        element: <LoginPage />,
       },
       {
         path: 'my-role',
