@@ -2,7 +2,9 @@ import { matchPath, Outlet, useLocation } from 'react-router-dom';
 
 import Footer from '@/components/Footer/Footer';
 import Header from '@/components/Header/Header';
+import Menu from '@/components/Menu/Menu';
 import Navbar from '@/components/Navbar/Navbar';
+import { MenuProvider } from '@/contexts/MenuContext';
 
 const RootLayout = () => {
   const { pathname } = useLocation();
@@ -18,20 +20,23 @@ const RootLayout = () => {
   );
 
   return (
-    <div className="pageContainer">
-      <div className="scrollArea scroll">
-        <div className="screenSection">
-          <Header />
-          {!hideNavbar && <Navbar />}
+    <MenuProvider>
+      <Menu />
+      <div className="pageContainer">
+        <div className="scrollArea scroll">
+          <div className="screenSection">
+            <Header />
+            {!hideNavbar && <Navbar />}
 
-          <main className="mainSection">
-            <Outlet />
-          </main>
+            <main className="mainSection">
+              <Outlet />
+            </main>
+          </div>
+
+          <Footer />
         </div>
-
-        <Footer />
       </div>
-    </div>
+    </MenuProvider>
   );
 };
 
