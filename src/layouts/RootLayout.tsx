@@ -21,10 +21,10 @@ const RootLayout = () => {
 
   return (
     <MenuProvider>
+      <Menu />
       <div className="pageContainer">
         <div className="scrollArea scroll">
-          <div className="screenSection relative overflow-hidden">
-            <Menu />
+          <div className="screenSection">
             <Header />
             {!hideNavbar && <Navbar />}
 
