@@ -55,13 +55,13 @@ const Menu = () => {
           }`}
       >
         {/* 메뉴 헤더 */}
-        <div className="relative flex items-center justify-between px-[30px] py-[20px]">
+        <div className="relative flex items-center justify-between pt-10 px-10 pb-5">
           <button
             onClick={closeMenu}
             className="flex items-center justify-center"
             aria-label="메뉴 닫기"
           >
-            <img src={LeftArrowIcon} alt="뒤로가기" className="h-5 w-3" />
+            <img src={LeftArrowIcon} alt="뒤로가기" />
           </button>
         </div>
 
