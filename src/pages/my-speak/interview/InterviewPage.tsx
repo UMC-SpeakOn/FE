@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-import useNavigation from "@/hooks/useNavigation";
 import navIcon from "@/assets/images/icons/nav.svg";
+import useNavigation from "@/hooks/useNavigation";
 import { personsData } from "@/mocks/addData";
 
 import ChatModeContent from "./components/ChatModeContent";
