@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-import useNavigation from "@/hooks/useNavigation";
+import { getAIOpener } from "@/api/ai";
 import navIcon from "@/assets/images/icons/nav.svg";
+import Spinner from "@/components/Spinner/Spinner";
+import useNavigation from "@/hooks/useNavigation";
 import { personsData } from "@/mocks/addData";
 
 import ChatModeContent from "./components/ChatModeContent";
@@ -10,8 +13,11 @@ import SpeakButton from "./components/SpeakButton";
 import VideoModeContent from "./components/VideoModeContent";
 import { useChat } from "./hooks/useChat";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
+import { useSession } from "./hooks/useSession";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
+import { useTTS } from "./hooks/useTTS";
 import { useVideoSwap } from "./hooks/useVideoSwap";
+import type { ChatMessage } from "./types/chat.type";
 import type { FinishStep } from "./types/finish.type";
 
 /**
@@ -33,6 +39,10 @@ import type { FinishStep } from "./types/finish.type";
  */
 const InterviewPage = () => {
   const { navigateTo } = useNavigation();
+  const [searchParams] = useSearchParams();
+  const myRoleId = searchParams.get("roleId")
+    ? Number(searchParams.get("roleId"))
+    : null;
 
   // 뷰 모드 상태 (video | chat)
   const [viewMode, setViewMode] = useState<"video" | "chat">("video");
@@ -51,17 +61,27 @@ const InterviewPage = () => {
   // 마무리 플로우 상태
   const [finishStep, setFinishStep] = useState<FinishStep>("idle");
 
+  // 초기 로딩 상태 (세션 시작 중)
+  const [isInitializing, setIsInitializing] = useState(true);
+
   // 채팅 입력 상태 (음성 인식 텍스트 표시용)
   const [chatInput, setChatInput] = useState("");
 
   // 면접관 데이터
   const interviewer = personsData[0];
 
-  // 타이머 훅
-  const { formattedTime, start, pause, resume } = useInterviewTimer();
+  // 세션 관리 훅
+  const { start: startSession, complete: completeSession } = useSession();
 
-  // 채팅 훅
-  const { messages, isLoading, sendMessage, addFinishMessage } = useChat();
+  // 타이머 훅
+  const { formattedTime, seconds, start, pause, resume } = useInterviewTimer();
+
+  // 채팅 훅 (초기 메시지는 AI 오프너 로드 후 추가)
+  const { messages, isLoading, sendMessage, addFinishMessage, addMessage } =
+    useChat();
+
+  // TTS 재생 훅
+  const { play: playTTS } = useTTS();
 
   // 음성 인식 훅
   const {
@@ -78,13 +98,52 @@ const InterviewPage = () => {
 
   // 최신 AI 메시지 (자막용)
   const latestAIMessage = useMemo(() => {
-    const aiMessages = messages.filter(m => m.type === 'AI');
-    return aiMessages.length > 0 ? aiMessages[aiMessages.length - 1].content : undefined;
+    const aiMessages = messages.filter((m) => m.type === "AI");
+    return aiMessages.length > 0
+      ? aiMessages[aiMessages.length - 1].content
+      : undefined;
   }, [messages]);
 
-  // 컴포넌트 마운트 시 타이머 시작
+  /**
+   * 컴포넌트 마운트 시 세션 시작 및 AI 오프너 로드
+   */
   useEffect(() => {
-    start();
+    const initializeSession = async () => {
+      setIsInitializing(true);
+      try {
+        // 1. 세션 시작
+        await startSession(0);
+
+        // 2. 타이머 시작
+        start();
+
+        // 3. AI 오프너 로드
+        const roleId = myRoleId || 1; // Context에서 가져오거나 기본값 1 사용
+        const opener = await getAIOpener(roleId);
+
+        // 4. 첫 질문 메시지로 추가
+        const firstMessage: ChatMessage = {
+          id: "opener",
+          type: "AI",
+          content: opener.content,
+          timestamp: new Date(),
+          audioUrl: opener.audioUrl,
+        };
+        addMessage(firstMessage);
+
+        // 5. TTS 재생 (영상 모드일 때)
+        if (viewMode === "video" && opener.audioUrl) {
+          await playTTS(opener.audioUrl);
+        }
+      } catch (error) {
+        console.error("[InterviewPage] Failed to initialize session:", error);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
@@ -180,21 +239,41 @@ const InterviewPage = () => {
 
   /**
    * 마무리하기 핸들러
-   * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 로딩 스피너(2초) → 결과 페이지
+   * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 세션 완료 API → 로딩 스피너(2초) → 결과 페이지
    */
-  const handleFinish = () => {
+  const handleFinish = async () => {
     // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
     setFinishStep("notification");
 
     // Step 2: AI 마무리 멘트 출력 (1초 후)
     setTimeout(playFinishMessage, 1000);
 
-    // Step 3: 결과 로딩 스피너 (4초 후: 알림 1초 + 멘트 3초)
+    // Step 3: 로딩 스피너 표시 (4초 후: 알림 1초 + 멘트 3초)
     setTimeout(showLoadingSpinner, 4000);
 
-    // Step 4: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
+    // Step 4: 세션 완료 API 호출 (5초 후)
+    setTimeout(async () => {
+      try {
+        await completeSession(seconds); // 총 시간(초) 전달
+        console.log("[InterviewPage] Session completed successfully");
+      } catch (error) {
+        console.error("[InterviewPage] Failed to complete session:", error);
+      }
+    }, 5000);
+
+    // Step 5: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
     setTimeout(navigateToResult, 6000);
   };
+
+  // 초기 로딩 중
+  if (isInitializing) {
+    return (
+      <div className="relative flex flex-col items-center justify-center w-full h-full flex-1 bg-purple-500">
+        <Spinner />
+        <p className="mt-6 text-white text-lg">면접 준비 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex flex-col w-full h-full flex-1 bg-purple-500 overflow-hidden">

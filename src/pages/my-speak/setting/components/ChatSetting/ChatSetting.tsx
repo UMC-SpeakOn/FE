@@ -13,7 +13,9 @@ const ChatSetting = () => {
   const isAllSelected = selectedAIId !== null && selectedGoalId !== null;
 
   const handleChatClick = () => {
-    navigateTo('/my-speak');
+    if (selectedAIId !== null) {
+      navigateTo(`/my-speak/interview?roleId=${selectedAIId}`);
+    }
   };
 
   return (

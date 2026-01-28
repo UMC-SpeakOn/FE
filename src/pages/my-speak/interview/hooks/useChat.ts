@@ -1,39 +1,37 @@
 import { useCallback, useState } from "react";
 
+import { sendChatMessage as sendChatMessageAPI } from "@/api/ai";
+
 import type { ChatMessage } from "../types/chat.type";
 
-// Mock AI 응답 목록
-const mockAIResponses = [
-  "좋은 답변이었습니다. 다음 질문으로, 본인의 강점을 하나 말씀해 주세요.",
-  "알겠습니다. 그럼 왜 저희 회사에 지원하셨나요?",
-  "흥미로운 경험이네요. 팀에서 갈등이 생겼을 때 어떻게 해결하셨나요?",
-  "잘 이해했습니다. 5년 후 본인의 모습을 어떻게 그리고 계신가요?",
-  "좋습니다. 마지막으로 저희에게 궁금한 점이 있으신가요?",
-];
-
 /**
- * useChat - 채팅 기능 커스텀 훅
+ * useChat - 채팅 기능 커스텀 훅 (API 연동)
  *
  * @description
- * 메시지 목록 관리, 메시지 전송, Mock AI 응답 생성을 담당합니다.
- * 실제 API 연동 시 이 훅에서 API 호출로 교체하면 됩니다.
+ * 메시지 목록 관리, 메시지 전송, AI 응답 생성을 담당합니다.
+ * 실제 백엔드 API와 통신하여 AI 응답을 받아옵니다.
+ *
+ * @param initialMessage - 초기 메시지 (AI 오프너 등)
+ *
+ * @example
+ * const { messages, sendMessage, isLoading } = useChat({
+ *   id: "opener",
+ *   type: "AI",
+ *   content: "안녕하세요! 간단한 자기소개 부탁드립니다.",
+ *   timestamp: new Date(),
+ * });
  */
-export const useChat = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "1",
-      type: "AI",
-      content:
-        "안녕하세요! 면접을 시작하겠습니다. 간단한 자기소개 부탁드립니다.",
-      timestamp: new Date(),
-    },
-  ]);
+export const useChat = (initialMessage?: ChatMessage) => {
+  const [messages, setMessages] = useState<ChatMessage[]>(
+    initialMessage ? [initialMessage] : []
+  );
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   /**
-   * 메시지 전송 및 Mock AI 응답 생성
+   * 메시지 전송 및 AI 응답 생성 (API 연동)
    */
-  const sendMessage = useCallback((content: string) => {
+  const sendMessage = useCallback(async (content: string) => {
     if (!content.trim()) return;
 
     // 유저 메시지 추가
@@ -46,22 +44,42 @@ export const useChat = () => {
 
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+    setError(null);
 
-    // Mock AI 응답 (1초 딜레이)
-    setTimeout(() => {
-      const randomResponse =
-        mockAIResponses[Math.floor(Math.random() * mockAIResponses.length)];
+    try {
+      // AI 응답 요청 (API 호출)
+      const response = await sendChatMessageAPI({
+        schedule: new Date().toISOString(),
+        conversationMessage: content.trim(),
+        content: 0, // TODO: 백엔드 팀과 content 필드 용도 확인 필요
+      });
 
+      // AI 응답 메시지 추가
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: "AI",
-        content: randomResponse,
+        content: response.message,
         timestamp: new Date(),
+        audioUrl: response.audioUrl, // TTS 오디오 URL (있으면)
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (err) {
+      console.error("[useChat] Failed to send message:", err);
+      setError("AI 응답을 받아오는데 실패했습니다. 다시 시도해주세요.");
+
+      // 에러 메시지를 사용자에게 표시 (선택사항)
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: "AI",
+        content:
+          "죄송합니다. 일시적인 오류가 발생했습니다. 다시 말씀해 주시겠어요?",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   }, []);
 
   /**
@@ -79,10 +97,19 @@ export const useChat = () => {
     setMessages((prev) => [...prev, finishMessage]);
   }, []);
 
+  /**
+   * 메시지 직접 추가 (AI 오프너 등)
+   */
+  const addMessage = useCallback((message: ChatMessage) => {
+    setMessages((prev) => [...prev, message]);
+  }, []);
+
   return {
     messages,
     isLoading,
+    error,
     sendMessage,
     addFinishMessage,
+    addMessage,
   };
 };

@@ -35,7 +35,7 @@ export const tokenManager = {
 };
 
 // 타입 정의
-interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
     authRequired?: boolean;
     _isRetry?: boolean;
     _retryCount?: number;

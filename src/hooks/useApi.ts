@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import apiClient, { getErrorMessage } from "@/utils/apiClient";
 
@@ -11,13 +11,13 @@ interface UseApiState<T> {
   isError: boolean;
 }
 
-interface UseApiOptions {
+interface UseApiOptions<T = unknown> {
   /** 컴포넌트 마운트 시 자동으로 API 호출 여부 */
   enabled?: boolean;
   /** 에러 발생 시 콜백 */
   onError?: (error: string) => void;
   /** 성공 시 콜백 */
-  onSuccess?: <T>(data: T) => void;
+  onSuccess?: (data: T) => void;
 }
 
 interface UseApiReturn<T> extends UseApiState<T> {
@@ -43,7 +43,7 @@ interface UseApiReturn<T> extends UseApiState<T> {
  */
 export function useApi<T = unknown>(
   axiosConfig: AxiosRequestConfig,
-  options: UseApiOptions = {}
+  options: UseApiOptions<T> = {}
 ): UseApiReturn<T> {
   const { enabled = false, onError, onSuccess } = options;
 
@@ -182,7 +182,7 @@ export function useApi<T = unknown>(
  */
 export function useMutation<TResponse = unknown, TVariables = unknown>(
   axiosConfigFn: (variables: TVariables) => AxiosRequestConfig,
-  options: UseApiOptions = {}
+  options: UseApiOptions<TResponse> = {}
 ) {
   const { onError, onSuccess } = options;
 
@@ -270,7 +270,7 @@ export function useMutation<TResponse = unknown, TVariables = unknown>(
  */
 export function useQuery<T = unknown>(
   axiosConfig: AxiosRequestConfig,
-  options: UseApiOptions = {}
+  options: UseApiOptions<T> = {}
 ): UseApiReturn<T> {
   return useApi<T>(axiosConfig, { ...options, enabled: true });
 }
