@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import LeftArrowIcon from "@/assets/images/icons/left-arrow.svg";
 import NavPurpleIcon from "@/assets/images/icons/nav-purple.svg";
 import { useMenu } from "@/contexts/MenuContext";
+import useNavigation from "@/hooks/useNavigation";
 import { useSwipe } from "@/hooks/useSwipe";
 
 interface SubMenuItem {
@@ -22,7 +22,7 @@ interface MenuItem {
 
 const Menu = () => {
   const { isMenuOpen, closeMenu } = useMenu();
-  const navigate = useNavigate();
+  const { navigateTo } = useNavigation();
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
   const [openSubMenuId, setOpenSubMenuId] = useState<string | null>(null);
@@ -68,7 +68,7 @@ const Menu = () => {
   // 임시 메뉴 항목 데이터
   const menuItems: MenuItem[] = [
     { id: "my-role", label: "My Role", path: "/my-role", iconPosition: "left" },
-    { id: "my-speak", label: "My Speak", path: "/my-speak", iconPosition: "right" },
+    { id: "my-speak", label: "My Speak", path: "/my-speak/setting", iconPosition: "right" },
     { id: "my-report", label: "My Report", path: "/my-report", iconPosition: "left" },
     {
       id: "profile",
@@ -87,13 +87,13 @@ const Menu = () => {
       setOpenSubMenuId(openSubMenuId === item.id ? null : item.id);
     } else if (item.path) {
       // 하위 메뉴가 없으면 바로 네비게이션
-      navigate(item.path);
+      navigateTo(item.path);
       closeMenu();
     }
   };
 
   const handleSubItemClick = (path: string) => {
-    navigate(path);
+    navigateTo(path);
     closeMenu();
   };
 
