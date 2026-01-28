@@ -14,7 +14,7 @@ const ItemStep2 = ({ item, isSelected, onClick }: ItemStep2Props) => {
       type="button"
       onClick={onClick}
       className={clsx(
-        'w-fit py-[0.9rem] px-[1.4rem] rounded-[1.6rem] text-[1.4rem] font-medium leading-none transition-colors whitespace-nowrap',
+        'w-fit py-[0.9rem] px-[1.4rem] rounded-full text-[clamp(1.2rem,1.2vw,1.4rem)] font-medium leading-none transition-colors whitespace-nowrap',
         'border-[0.1rem]',
         isSelected
           ? 'bg-purple-600 text-white border-purple-600'

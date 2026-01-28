@@ -1,11 +1,11 @@
-import CloseCircle from '@/assets/images/icons/close-circle.svg';
+import Error from '@/assets/images/icons/error.svg';
 
-interface ModalProps {
+interface ErrorModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-const Modal = ({ open, onClose }: ModalProps) => {
+const ErrorModal = ({ open, onClose }: ErrorModalProps) => {
   if (!open) return null;
 
   return (
@@ -20,7 +20,7 @@ const Modal = ({ open, onClose }: ModalProps) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col gap-[1.2rem] items-center">
-          <img src={CloseCircle} alt="close" className="w-[3.9rem]" />
+          <img src={Error} alt="error" className="w-[3.9rem]" />
           <p className="text-[1.5rem] font-bold text-black text-center leading-none">
             이미 동일한 조건의 롤이 있어요
           </p>
@@ -30,4 +30,4 @@ const Modal = ({ open, onClose }: ModalProps) => {
   );
 };
 
-export default Modal;
+export default ErrorModal;
