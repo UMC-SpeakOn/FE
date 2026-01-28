@@ -9,7 +9,7 @@ interface ListStep1Props {
 
 const ListStep1 = ({ selectedId, onSelect }: ListStep1Props) => {
   return (
-    <div className="w-full max-w-full flex flex-nowrap gap-[1.2rem] overflow-x-auto overflow-y-hidden scroll">
+    <div className="w-full max-w-full flex flex-nowrap gap-4 overflow-x-auto overflow-y-hidden scroll">
       {aiData.map((item) => (
         <ItemStep1
           key={item.id}
