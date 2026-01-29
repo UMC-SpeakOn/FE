@@ -1,13 +1,11 @@
-import Navbar from './components/Navbar/Navbar';
+import { DECORATIONS1, DECORATIONS2, DECORATIONS3 } from '@/mocks/loginData';
+
 import ListButton from './components/Button/ListButton';
 import ListDecoration from './components/Decoration/ListDecoration';
-import { DECORATIONS1, DECORATIONS2, DECORATIONS3 } from '@/mocks/loginData';
 
 const Login = () => {
   return (
     <div className="pageContainer h-screen px-[1.6rem] relative flex flex-col items-center">
-      <Navbar />
-
       <div className="relative z-10 mt-[30%] flex flex-col gap-[6.827rem] text-center text-white font-bold leading-none">
         <p className="font-unbounded text-[3.866rem]">SpeakOn</p>
         <p className="text-[1.5rem]">
