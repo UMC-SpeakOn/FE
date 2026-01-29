@@ -6,6 +6,7 @@ import Splash from '@/components/Splash/Splash';
 import RootLayout from '@/layouts/RootLayout';
 import LoginPage from '@/pages/login/Login';
 import MyReportDetailPage from '@/pages/my-report/detail/Detail';
+import MyReportPage from '@/pages/my-report/report/MyReport';
 import MyRolePage from '@/pages/my-role/My-Role';
 import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 import MySpeakResultPage from '@/pages/my-speak/result/Result';
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: 'my-speak/result',
         element: <MySpeakResultPage />,
+      },
+      {
+        path: 'my-report',
+        element: <MyReportPage />,
       },
       {
         path: 'my-report/:id',

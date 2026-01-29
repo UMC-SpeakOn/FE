@@ -11,4 +11,8 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: 'My Speak',
     match: (pathname) => pathname.startsWith('/my-speak'),
   },
+  {
+    label: 'My Report',
+    match: (pathname) => pathname.startsWith('/my-report'),
+  },
 ];
