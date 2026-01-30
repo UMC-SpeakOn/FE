@@ -24,7 +24,13 @@ const router = createBrowserRouter([
       { index: true, element: <Splash /> },
       {
         path: 'login',
-        element: <LoginPage />,
+        children: [
+          { index: true, element: <LoginPage /> },
+          {
+            path: 'oauth2/code/kakao',
+            element: <LoginPage />,
+          },
+        ],
       },
       {
         path: 'my-role',

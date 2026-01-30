@@ -1,9 +1,11 @@
 import clsx from 'clsx';
+import { useState } from 'react';
 
 import useNavigation from '@/hooks/useNavigation';
 
 import { useMyReportViewModel } from '../report/hooks/useMyReportViewModel';
 import TabBar from './components/Bar/Bar';
+import DateRangePickerBottomSheet from './components/DateRangePicker/DateRangePicker';
 import FilterBar from './components/Filter/Filter';
 import ReportCard from './components/ReportCard/ReportCard';
 import {
@@ -18,6 +20,7 @@ const MyReport = () => {
   const {
     activeTab,
     setActiveTab,
+    range,
     rangeLabel,
     setRange,
     activeJob,
@@ -29,12 +32,25 @@ const MyReport = () => {
     activeSituationItems,
   } = useMyReportViewModel();
 
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+
   const handleCardClick = (id: string) => {
     navigateTo(`/my-report/${id}`);
   };
 
   const handleOpenDatePicker = () => {
-    void setRange;
+    // ✅ 회색 박스/달력 아이콘 어느 곳을 눌러도 동일하게 오픈
+    setIsDatePickerOpen(true);
+  };
+
+  const handleCloseDatePicker = () => {
+    setIsDatePickerOpen(false);
+  };
+
+  const handleConfirmDatePicker = (next: { start: string; end: string }) => {
+    // ✅ 확정(하단 파란/보라 버튼 클릭) 시 range 반영 + 닫기
+    setRange(next);
+    setIsDatePickerOpen(false);
   };
 
   return (
@@ -170,6 +186,14 @@ const MyReport = () => {
           )}
         </div>
       )}
+
+      {/* ✅ 현재 화면 기준 하단 fixed 바텀시트 */}
+      <DateRangePickerBottomSheet
+        open={isDatePickerOpen}
+        initialRange={range}
+        onClose={handleCloseDatePicker}
+        onConfirm={handleConfirmDatePicker}
+      />
     </div>
   );
 };
