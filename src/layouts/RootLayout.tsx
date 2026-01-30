@@ -20,7 +20,7 @@ const RootLayout = () => {
   );
 
   const isSplash = useMatch('/');
-  const isLogin = useMatch('/login');
+  const isLogin = pathname.startsWith('/login');
 
   if (isSplash || isLogin) {
     return <Outlet />;

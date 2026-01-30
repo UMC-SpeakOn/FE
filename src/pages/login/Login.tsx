@@ -1,11 +1,50 @@
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+
 import { DECORATIONS1, DECORATIONS2, DECORATIONS3 } from '@/mocks/loginData';
+import { getKakaoCode } from '@/utils/login/kakao/getKakaoCode';
+import { getRedirectUri } from '@/utils/login/kakao/getRedirectUri';
 
 import ListButton from './components/Button/ListButton';
 import ListDecoration from './components/Decoration/ListDecoration';
+import Navbar from './components/Navbar/Navbar';
+import { useKakaoLogin } from './hooks/useKakaoLogin';
 
 const Login = () => {
+  const location = useLocation();
+  const { mutate, isLoading, isError, error } = useKakaoLogin();
+  const called = useRef(false);
+
+  useEffect(() => {
+    if (called.current) return;
+
+    const code = getKakaoCode();
+    if (!code) return;
+
+    called.current = true;
+    mutate({ code, redirectUri: getRedirectUri() });
+  }, [location.search, mutate]);
+
+  if (isLoading) {
+    return (
+      <div className="pageContainer h-screen flex items-center justify-center">
+        <p>카카오 로그인 처리 중...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="pageContainer h-screen flex items-center justify-center">
+        <p>로그인 실패: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="pageContainer h-screen px-[1.6rem] relative flex flex-col items-center">
+      <Navbar />
+
       <div className="relative z-10 mt-[30%] flex flex-col gap-[6.827rem] text-center text-white font-bold leading-none">
         <p className="font-unbounded text-[3.866rem]">SpeakOn</p>
         <p className="text-[1.5rem]">

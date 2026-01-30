@@ -19,7 +19,7 @@ export const formatRangeLabel = (range: DateRange) => {
   const s = range.start.replaceAll('-', '/');
   const e = range.end.replaceAll('-', '/');
 
-  return `${s} ~ ${e}`;
+  return `${s} → ${e}`;
 };
 
 export const normalize = (v: string) => v.replaceAll(' ', '');

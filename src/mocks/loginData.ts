@@ -12,6 +12,7 @@ export const loginData: LoginItem[] = [
     text: '구글로 시작하기',
     alt: 'google',
     bgColor: 'bg-white',
+    provider: 'google',
   },
   {
     id: 2,
@@ -19,6 +20,7 @@ export const loginData: LoginItem[] = [
     text: '카카오로 시작하기',
     alt: 'kakao',
     bgColor: 'bg-yellow',
+    provider: 'kakao',
   },
 ];
 

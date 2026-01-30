@@ -4,6 +4,7 @@ export interface LoginItem {
   text: string;
   alt: string;
   bgColor: string;
+  provider: 'kakao' | 'google';
 }
 
 export interface DecorationItem {
