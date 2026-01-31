@@ -1,25 +1,15 @@
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import Title from '@/components/Title/Title';
-import { useDeleteRoleProfile } from '@/hooks/role/useDeleteRoleProfile';
-import { useRoleProfile } from '@/hooks/role/useRoleProfile';
+import type { RoleProfileItem } from '@/types/role/role-profile.type';
 
 import NotFavs from './NotFavs';
 
-const Favs = () => {
-  const { profiles, refetch } = useRoleProfile();
-  const { mutate: deleteRole } = useDeleteRoleProfile();
+interface FavsProps {
+  profiles: RoleProfileItem[];
+  onDelete: (id: number) => void;
+}
 
-  const handleDelete = async (id: number) => {
-    const result = await deleteRole(id);
-
-    if (!result) return;
-
-    if (result.isSuccess) {
-      alert('롤이 삭제되었습니다.');
-      refetch();
-    }
-  };
-
+const Favs = ({ profiles, onDelete }: FavsProps) => {
   return (
     <div className="flex flex-col gap-8">
       <Title
@@ -28,7 +18,7 @@ const Favs = () => {
       />
 
       {profiles.length > 0 ? (
-        <RoleProfileList data={profiles} onDelete={handleDelete} />
+        <RoleProfileList data={profiles} onDelete={onDelete} />
       ) : (
         <NotFavs />
       )}

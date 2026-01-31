@@ -4,7 +4,6 @@ import { jobsData, situationsData } from '@/mocks/addData';
 import { useAddMyRole } from '@/pages/my-role/hooks/useAddMyRole';
 
 import Title from '../../../../components/Title/Title';
-import AddModal from '../Modal/AddModal';
 import ErrorModal from '../Modal/ErrorModal';
 import ListStep1 from './Step/Step1/ListStep1';
 import ListStep2 from './Step/Step2/ListStep2';
@@ -12,26 +11,26 @@ import ListStep3 from './Step/Step3/ListStep3';
 import StepSection from './Step/StepSection';
 
 interface AddProps {
-  onSubmit: () => void;
+  onSuccess: () => void;
 }
 
-const Add = ({ onSubmit }: AddProps) => {
+const Add = ({ onSuccess }: AddProps) => {
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [selectedSituationId, setSelectedSituationId] = useState<number | null>(
     null,
   );
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  const { mutate, isLoading, isError, reset } = useAddMyRole();
+  const { mutate, isLoading, isError, reset } = useAddMyRole({
+    onSuccess,
+  });
 
   const isAllSelected =
     selectedPersonId !== null &&
     selectedJobId !== null &&
     selectedSituationId !== null;
 
-  const handleAdd = async () => {
+  const handleAdd = () => {
     if (!isAllSelected) return;
 
     const job = jobsData.find((j) => j.id === selectedJobId)?.value;
@@ -41,16 +40,11 @@ const Add = ({ onSubmit }: AddProps) => {
 
     if (!job || !situation) return;
 
-    const result = await mutate({
-      avatarId: selectedPersonId,
+    mutate({
+      avatarId: selectedPersonId!,
       job,
       situation,
     });
-
-    if (result?.isSuccess) {
-      setIsAddModalOpen(true);
-      onSubmit();
-    }
   };
 
   return (
@@ -101,11 +95,6 @@ const Add = ({ onSubmit }: AddProps) => {
           </StepSection>
         )}
       </div>
-
-      <AddModal
-        open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-      />
 
       <ErrorModal open={isError} onClose={reset} />
     </div>

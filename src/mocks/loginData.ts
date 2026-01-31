@@ -1,9 +1,8 @@
-import type { LoginItem, DecorationItem } from '@/pages/login/types/login.type';
-
 import Google from '@/assets/images/icons/google.svg';
 import Kakao from '@/assets/images/icons/kakao.svg';
-import NavPurple from '@/assets/images/icons/nav-purple.svg';
 import Nav from '@/assets/images/icons/nav.svg';
+import NavPurple from '@/assets/images/icons/nav-purple.svg';
+import type { DecorationItem, LoginItem } from '@/pages/login/types/login.type';
 
 export const loginData: LoginItem[] = [
   {

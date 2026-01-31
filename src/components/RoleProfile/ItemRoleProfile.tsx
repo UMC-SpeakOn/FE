@@ -65,12 +65,12 @@ const ItemRoleProfile = ({
             {item.job}
           </p>
           <p className="mx-2 text-purple-900">|</p>
-          <p className="text-purple-900 text-[1.2rem] whitespace-nowrap">
+          <p className="text-purple-900 text-[1.2rem] whitespace-nowrap font-medium">
             {item.situation}
           </p>
         </div>
 
-        <div className="w-fit py-1 px-4 rounded-2xl bg-purple-50 flex items-center gap-2 text-purple-900 text-[1.2rem]">
+        <div className="w-fit py-1 px-4 rounded-2xl bg-purple-50 flex items-center gap-2 text-purple-900 text-[1.2rem] font-medium">
           <p>{item.city}</p>
           <p>|</p>
           <p>{item.age}세</p>
