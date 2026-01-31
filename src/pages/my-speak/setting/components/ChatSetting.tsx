@@ -1,14 +1,15 @@
 import { useState } from 'react';
 
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
+import { useRoleProfile } from '@/hooks/role/useRoleProfile';
 import useNavigation from '@/hooks/useNavigation';
-import { aiData } from '@/mocks/settingData';
 
 import ListGoal from './Step/Goal/ListGoal';
 import StepSection from './Step/StepSection';
 
 const ChatSetting = () => {
   const { navigateTo } = useNavigation();
+  const { profiles } = useRoleProfile();
   const [selectedAIId, setSelectedAIId] = useState<number | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const isAllSelected = selectedAIId !== null && selectedGoalId !== null;
@@ -26,7 +27,7 @@ const ChatSetting = () => {
           done={selectedAIId !== null}
         >
           <RoleProfileList
-            data={aiData}
+            data={profiles}
             selectedId={selectedAIId}
             onSelect={setSelectedAIId}
           />

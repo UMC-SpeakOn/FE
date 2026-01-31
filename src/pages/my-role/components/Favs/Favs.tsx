@@ -1,11 +1,24 @@
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import Title from '@/components/Title/Title';
-import favsData from '@/mocks/favsData';
+import { useDeleteRoleProfile } from '@/hooks/role/useDeleteRoleProfile';
+import { useRoleProfile } from '@/hooks/role/useRoleProfile';
 
 import NotFavs from './NotFavs';
 
 const Favs = () => {
-  const hasFavs = favsData.length > 0;
+  const { profiles, refetch } = useRoleProfile();
+  const { mutate: deleteRole } = useDeleteRoleProfile();
+
+  const handleDelete = async (id: number) => {
+    const result = await deleteRole(id);
+
+    if (!result) return;
+
+    if (result.isSuccess) {
+      alert('롤이 삭제되었습니다.');
+      refetch();
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -14,13 +27,8 @@ const Favs = () => {
         description="여러 개의 역할을 저장해두고 골라서 연습할 수 있어요"
       />
 
-      {hasFavs ? (
-        <RoleProfileList
-          data={favsData}
-          onDelete={(id) => {
-            console.log('삭제:', id);
-          }}
-        />
+      {profiles.length > 0 ? (
+        <RoleProfileList data={profiles} onDelete={handleDelete} />
       ) : (
         <NotFavs />
       )}
