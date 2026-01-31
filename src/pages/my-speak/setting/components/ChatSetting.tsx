@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
+import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import useNavigation from '@/hooks/useNavigation';
+import { aiData } from '@/mocks/settingData';
 
-import ListStep1 from './Step/Step1/ListStep1';
-import ListStep2 from './Step/Step2/ListStep2';
+import ListGoal from './Step/Goal/ListGoal';
 import StepSection from './Step/StepSection';
 
 const ChatSetting = () => {
@@ -24,7 +25,11 @@ const ChatSetting = () => {
           title="AI 롤 선택"
           done={selectedAIId !== null}
         >
-          <ListStep1 selectedId={selectedAIId} onSelect={setSelectedAIId} />
+          <RoleProfileList
+            data={aiData}
+            selectedId={selectedAIId}
+            onSelect={setSelectedAIId}
+          />
         </StepSection>
 
         {selectedAIId !== null && (
@@ -33,7 +38,7 @@ const ChatSetting = () => {
             title="세션 목표"
             done={selectedGoalId !== null}
           >
-            <ListStep2
+            <ListGoal
               selectedId={selectedGoalId}
               onSelect={setSelectedGoalId}
             />

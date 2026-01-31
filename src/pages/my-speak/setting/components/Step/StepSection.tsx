@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import type { SettingStepSectionProps } from '@/types/my-speak/setting.type';
+import type { SettingStepSectionProps } from '../../types/setting.type';
 
 const StepSection = ({
   stepNumber,

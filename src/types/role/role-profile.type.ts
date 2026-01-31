@@ -1,4 +1,4 @@
-export interface FavItem {
+export interface RoleProfileItem {
   id: number;
   name: string;
   job: string;

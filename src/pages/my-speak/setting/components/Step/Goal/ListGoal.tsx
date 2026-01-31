@@ -1,14 +1,14 @@
 import { goalData } from '@/mocks/settingData';
 
 import Title from '../../Title/Title';
-import ItemStep2 from './ItemStep2';
+import ItemGoal from './ItemGoal';
 
-interface ListStep2Props {
+interface ListGoalProps {
   selectedId: number | null;
   onSelect: (id: number) => void;
 }
 
-const ListStep2 = ({ selectedId, onSelect }: ListStep2Props) => {
+const ListGoal = ({ selectedId, onSelect }: ListGoalProps) => {
   return (
     <div className="w-full flex flex-col gap-[clamp(1.1rem,1.1vw,1.2rem)] mt-[1.118rem]">
       <Title
@@ -18,7 +18,7 @@ const ListStep2 = ({ selectedId, onSelect }: ListStep2Props) => {
 
       <div className="w-full flex gap-[clamp(0.7rem,0.5vw,0.8rem)] items-center max-[375px]:flex-col max-[375px]:items-stretch">
         {goalData.map((item) => (
-          <ItemStep2
+          <ItemGoal
             key={item.id}
             item={item}
             isSelected={selectedId === item.id}
@@ -30,4 +30,4 @@ const ListStep2 = ({ selectedId, onSelect }: ListStep2Props) => {
   );
 };
 
-export default ListStep2;
+export default ListGoal;

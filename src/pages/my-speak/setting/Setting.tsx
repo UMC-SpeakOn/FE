@@ -1,6 +1,6 @@
 import Title from '@/components/Title/Title';
 
-import ChatSetting from './components/ChatSetting/ChatSetting';
+import ChatSetting from './components/ChatSetting';
 
 const Setting = () => {
   return (
