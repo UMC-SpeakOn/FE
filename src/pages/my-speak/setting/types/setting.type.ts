@@ -16,4 +16,13 @@ export type AiItem = RoleProfileItem;
 export interface GoalItem {
   id: number;
   label: string;
+  targetQuestionCount: number;
 }
+
+export interface CreateSessionRequest {
+  myRoleId: number;
+  targetQuestionCount: GoalItem['targetQuestionCount'];
+  startedAt: string;
+}
+
+export type CreateSessionResult = number;

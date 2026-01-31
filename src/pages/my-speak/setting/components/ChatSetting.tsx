@@ -3,6 +3,8 @@ import { useState } from 'react';
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import { useRoleProfile } from '@/hooks/role/useRoleProfile';
 import useNavigation from '@/hooks/useNavigation';
+import { goalData } from '@/mocks/settingData';
+import { useCreateSession } from '@/pages/my-speak/setting/hooks/useCreateSession';
 
 import ListGoal from './Step/Goal/ListGoal';
 import StepSection from './Step/StepSection';
@@ -10,12 +12,33 @@ import StepSection from './Step/StepSection';
 const ChatSetting = () => {
   const { navigateTo } = useNavigation();
   const { profiles } = useRoleProfile();
+
   const [selectedAIId, setSelectedAIId] = useState<number | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+
   const isAllSelected = selectedAIId !== null && selectedGoalId !== null;
 
+  const { mutate: createSession, isLoading } = useCreateSession({
+    onSuccess: (sessionId) => {
+      // console.log('sessionId:', sessionId);
+      alert('대화 세션이 생성되었습니다.');
+
+      navigateTo('/my-speak/interview', {
+        state: { sessionId },
+      });
+    },
+  });
+
   const handleChatClick = () => {
-    navigateTo('/my-speak/interview');
+    const selectedGoal = goalData.find((goal) => goal.id === selectedGoalId);
+
+    if (!selectedAIId || !selectedGoal) return;
+
+    createSession({
+      myRoleId: selectedAIId,
+      targetQuestionCount: selectedGoal.targetQuestionCount,
+      startedAt: new Date().toISOString(),
+    });
   };
 
   return (
@@ -50,10 +73,11 @@ const ChatSetting = () => {
           <StepSection done={false} isLast hideNumber>
             <button
               type="button"
-              className="w-full py-[1.4rem] rounded-2xl bg-purple-600 text-white font-semibold text-[1.6rem] leading-none cursor-pointer"
+              disabled={isLoading}
+              className="w-full py-[1.4rem] rounded-2xl bg-purple-600 text-white font-semibold text-[1.6rem] leading-none disabled:opacity-50"
               onClick={handleChatClick}
             >
-              대화 시작하기
+              {isLoading ? '세션 생성 중...' : '대화 시작하기'}
             </button>
           </StepSection>
         )}
