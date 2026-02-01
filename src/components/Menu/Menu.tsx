@@ -20,6 +20,31 @@ interface MenuItem {
   subItems?: SubMenuItem[];
 }
 
+const MENU_ITEMS: MenuItem[] = [
+  { id: "my-role", label: "My Role", path: "/my-role", iconPosition: "left" },
+  {
+    id: "my-speak",
+    label: "My Speak",
+    path: "/my-speak/setting",
+    iconPosition: "right",
+  },
+  {
+    id: "my-report",
+    label: "My Report",
+    path: "/my-report",
+    iconPosition: "left",
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    iconPosition: "none",
+    subItems: [
+      { id: "account", label: "계정", path: "/profile/account" },
+      { id: "subscription", label: "구독", path: "/profile/subscription" },
+    ],
+  },
+];
+
 const Menu = () => {
   const { isMenuOpen, closeMenu } = useMenu();
   const { navigateTo } = useNavigation();
@@ -40,7 +65,8 @@ const Menu = () => {
     } else if (shouldRender) {
       setIsClosing(true);
     }
-  }, [isMenuOpen, shouldRender]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMenuOpen]);
 
   // ESC 키로 메뉴 닫기
   useEffect(() => {
@@ -64,22 +90,6 @@ const Menu = () => {
   };
 
   if (!shouldRender) return null;
-
-  // 임시 메뉴 항목 데이터
-  const menuItems: MenuItem[] = [
-    { id: "my-role", label: "My Role", path: "/my-role", iconPosition: "left" },
-    { id: "my-speak", label: "My Speak", path: "/my-speak/setting", iconPosition: "right" },
-    { id: "my-report", label: "My Report", path: "/my-report", iconPosition: "left" },
-    {
-      id: "profile",
-      label: "Profile",
-      iconPosition: "none",
-      subItems: [
-        { id: "account", label: "계정", path: "/profile/account" },
-        { id: "subscription", label: "구독", path: "/profile/subscription" }
-      ]
-    },
-  ];
 
   const handleMenuItemClick = (item: MenuItem) => {
     if (item.subItems) {
@@ -126,7 +136,7 @@ const Menu = () => {
 
         {/* 메뉴 아이템 */}
         <div className="flex flex-col">
-          {menuItems.map((item) => (
+          {MENU_ITEMS.map((item) => (
             <div key={item.id} className="flex flex-col">
               {/* 텍스트 버튼 (클릭 가능 영역) */}
               <button

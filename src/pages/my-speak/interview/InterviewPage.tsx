@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { getAIOpener } from "@/api/ai";
 import navIcon from "@/assets/images/icons/nav.svg";
 import Spinner from "@/components/Spinner/Spinner";
 import useNavigation from "@/hooks/useNavigation";
-import { personsData } from "@/mocks/addData";
 
 import ChatModeContent from "./components/ChatModeContent";
 import ControlButtons from "./components/ControlButtons";
@@ -67,8 +66,15 @@ const InterviewPage = () => {
   // 채팅 입력 상태 (음성 인식 텍스트 표시용)
   const [chatInput, setChatInput] = useState('');
 
-  // 면접관 데이터
-  const interviewer = personsData[0];
+  // 초기화 완료 여부 추적 (마운트 시 1회만 실행)
+  const hasInitialized = useRef(false);
+
+  // 면접관 데이터 (기본값)
+  const interviewer = {
+    name: "AI 면접관",
+    nationality: "AI",
+    imgUrl: "/images/default-interviewer.png",
+  };
 
   // 세션 관리 훅
   const { start: startSession, complete: completeSession } = useSession();
@@ -90,7 +96,6 @@ const InterviewPage = () => {
     clearTranscript,
     audioLevel,
     transcript,
-    // error: speechError,
   } = useSpeechRecognition();
 
   // 비디오 스왑 훅
@@ -106,9 +111,13 @@ const InterviewPage = () => {
 
   /**
    * 컴포넌트 마운트 시 세션 시작 및 AI 오프너 로드
+   * hasInitialized ref를 사용하여 마운트 시 1회만 실행
    */
   useEffect(() => {
+    if (hasInitialized.current) return;
+
     const initializeSession = async () => {
+      hasInitialized.current = true;
       setIsInitializing(true);
       try {
         // 1. 세션 시작
@@ -118,7 +127,7 @@ const InterviewPage = () => {
         start();
 
         // 3. AI 오프너 로드
-        const roleId = myRoleId || 1; // Context에서 가져오거나 기본값 1 사용
+        const roleId = myRoleId || 1; // URL 파라미터에서 가져오거나 기본값 1 사용
         const opener = await getAIOpener(roleId);
 
         // 4. 첫 질문 메시지로 추가
@@ -143,8 +152,7 @@ const InterviewPage = () => {
     };
 
     initializeSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [startSession, start, myRoleId, addMessage, viewMode, playTTS]);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
   useEffect(() => {
