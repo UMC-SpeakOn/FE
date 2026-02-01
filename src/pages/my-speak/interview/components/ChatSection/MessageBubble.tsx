@@ -1,5 +1,3 @@
-import './ChatAnimation.css';
-
 import { personsData } from '@/mocks/addData';
 
 import type { ChatMessage } from '../../types/chat.type';
@@ -46,9 +44,8 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
         <div className={`flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
           {/* 말풍선 */}
           <div
-            className={`px-4 py-3 rounded-xl text-gray-900 ${
-              isAI ? 'bg-purple-200 ' : 'bg-gray-100'
-            }`}
+            className={`px-4 py-3 rounded-xl text-gray-900 ${isAI ? 'bg-purple-200 ' : 'bg-gray-100'
+              }`}
           >
             <p className="text-xl font-medium leading-relaxed whitespace-pre-wrap break-all">
               {message.content}
