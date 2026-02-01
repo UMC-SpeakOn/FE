@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import type { AddStepSectionProps } from '@/types/my-role/add.type';
+import type { AddStepSectionProps } from '@/pages/my-role/types/add.type';
 
 const StepSection = ({
   stepNumber,

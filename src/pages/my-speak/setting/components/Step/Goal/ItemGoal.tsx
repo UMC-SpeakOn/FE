@@ -1,14 +1,14 @@
 import clsx from 'clsx';
 
-import type { GoalItem } from '@/types/my-speak/setting.type';
+import type { GoalItem } from '../../../types/setting.type';
 
-interface ItemStep2Props {
+interface ItemGoalProps {
   item: GoalItem;
   isSelected: boolean;
   onClick: () => void;
 }
 
-const ItemStep2 = ({ item, isSelected, onClick }: ItemStep2Props) => {
+const ItemGoal = ({ item, isSelected, onClick }: ItemGoalProps) => {
   return (
     <button
       type="button"
@@ -26,4 +26,4 @@ const ItemStep2 = ({ item, isSelected, onClick }: ItemStep2Props) => {
   );
 };
 
-export default ItemStep2;
+export default ItemGoal;
