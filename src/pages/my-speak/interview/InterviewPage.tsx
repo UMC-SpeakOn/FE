@@ -41,6 +41,9 @@ const InterviewPage = () => {
   const [searchParams] = useSearchParams();
   const myRoleId = searchParams.get("roleId")
     ? Number(searchParams.get("roleId"))
+    : 1; // 기본값 1
+  const goalId = searchParams.get("goalId")
+    ? Number(searchParams.get("goalId"))
     : null;
 
   // 뷰 모드 상태 (video | chat)
@@ -120,15 +123,15 @@ const InterviewPage = () => {
       hasInitialized.current = true;
       setIsInitializing(true);
       try {
-        // 1. 세션 시작
-        await startSession(0);
+        // 1. 세션 시작 (myRoleId와 targetQuestionCount 전달)
+        const targetQuestionCount = goalId || 10; // goalId를 목표 질문 수로 사용
+        await startSession(myRoleId, targetQuestionCount);
 
         // 2. 타이머 시작
         start();
 
         // 3. AI 오프너 로드
-        const roleId = myRoleId || 1; // URL 파라미터에서 가져오거나 기본값 1 사용
-        const opener = await getAIOpener(roleId);
+        const opener = await getAIOpener(myRoleId);
 
         // 4. 첫 질문 메시지로 추가
         const firstMessage: ChatMessage = {

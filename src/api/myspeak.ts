@@ -19,7 +19,7 @@ export const startSession = async (
   data: StartSessionRequest
 ): Promise<StartSessionResponse> => {
   const response = await apiClient.post<ApiResponse<StartSessionResponse>>(
-    "/api/myspeak/sessions",
+    "/myspeak/sessions",
     data,
     { authRequired: false } as CustomAxiosRequestConfig
   );
@@ -33,7 +33,7 @@ export const generateTTS = async (
   data: GenerateTTSRequest
 ): Promise<GenerateTTSResponse> => {
   const response = await apiClient.post<ApiResponse<GenerateTTSResponse>>(
-    "/api/myspeak/tts",
+    "/myspeak/tts",
     data,
     { authRequired: false } as CustomAxiosRequestConfig
   );
@@ -51,7 +51,7 @@ export const uploadSTT = async (
   formData.append("meta", JSON.stringify(data.meta));
 
   const response = await apiClient.post<ApiResponse<UploadSTTResponse>>(
-    "/api/myspeak/stt",
+    "/myspeak/stt",
     formData,
     {
       headers: {
@@ -85,7 +85,7 @@ export const getTTSCache = async (
   userId: number
 ): Promise<GetTTSCacheResponse> => {
   const response = await apiClient.get<ApiResponse<GetTTSCacheResponse>>(
-    "/api/myspeak/ttsCache",
+    "/myspeak/ttsCache",
     {
       params: { userId },
       authRequired: false,

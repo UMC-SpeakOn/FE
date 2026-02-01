@@ -24,7 +24,7 @@ import type {
  * await complete(900); // 15분 = 900초
  */
 export const useSession = () => {
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<number | null>(null);
 
   // 세션 시작 mutation
   const {
@@ -34,7 +34,7 @@ export const useSession = () => {
   } = useMutation<StartSessionResponse, StartSessionRequest>(
     (data) => ({
       method: "POST",
-      url: "/api/myspeak/sessions",
+      url: "/myspeak/sessions",
       data,
     }),
     {
@@ -54,19 +54,24 @@ export const useSession = () => {
   } = useMutation<CompleteSessionResponse, CompleteSessionRequest>(
     (data) => ({
       method: "POST",
-      url: `/api/myspeak/${sessionId}/complete`,
+      url: `/myspeak/${sessionId}/complete`,
       data,
     })
   );
 
   /**
    * 세션 시작
-   * @param totalTime - 예상 면접 시간 (초 단위, 보통 0으로 시작)
+   * @param myRoleId - My Role ID
+   * @param targetQuestionCount - 목표 질문 수
    */
   const start = useCallback(
-    async (totalTime: number = 0) => {
-      const schedule = new Date().toISOString();
-      return await startSessionMutation({ schedule, totalTime });
+    async (myRoleId: number, targetQuestionCount: number = 10) => {
+      const startedAt = new Date().toISOString();
+      return await startSessionMutation({
+        myRoleId,
+        targetQuestionCount,
+        startedAt,
+      });
     },
     [startSessionMutation]
   );
@@ -80,8 +85,8 @@ export const useSession = () => {
       if (!sessionId) {
         throw new Error("Session ID is not available");
       }
-      const endGoal = new Date().toISOString();
-      return await completeSessionMutation({ endGoal, totalTime });
+      const endedAt = new Date().toISOString();
+      return await completeSessionMutation({ endedAt, totalTime });
     },
     [sessionId, completeSessionMutation]
   );

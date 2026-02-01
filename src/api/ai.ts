@@ -13,7 +13,7 @@ export const getAIOpener = async (
   myRoleId: number
 ): Promise<GetAIOpenerResponse> => {
   const response = await apiClient.get<ApiResponse<GetAIOpenerResponse>>(
-    "/api/ai/opener",
+    "/ai/opener",
     {
       params: { myRoleId },
       authRequired: false,
@@ -29,7 +29,7 @@ export const sendChatMessage = async (
   data: SendChatMessageRequest
 ): Promise<SendChatMessageResponse> => {
   const response = await apiClient.post<ApiResponse<SendChatMessageResponse>>(
-    "/api/ai/chat",
+    "/ai/chat",
     data,
     { authRequired: false } as CustomAxiosRequestConfig
   );

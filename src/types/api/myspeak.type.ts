@@ -4,12 +4,13 @@
 
 // 세션 시작
 export interface StartSessionRequest {
-  schedule: string; // ISO 8601 format
-  totalTime: number; // 초 단위
+  myRoleId: number; // My Role ID
+  targetQuestionCount: number; // 목표 질문 수
+  startedAt: string; // ISO 8601 format (LocalDateTime)
 }
 
 export interface StartSessionResponse {
-  sessionId: string;
+  sessionId: number; // Long 타입 (숫자)
 }
 
 // TTS 생성
@@ -42,12 +43,12 @@ export interface UploadSTTResponse {
 
 // 세션 완료
 export interface CompleteSessionRequest {
-  endGoal: string; // ISO 8601 format
+  endedAt: string; // ISO 8601 format (LocalDateTime)
   totalTime: number; // 초 단위
 }
 
 export interface CompleteSessionResponse {
-  resultId: string;
+  resultId: number; // Long 타입 (숫자)
 }
 
 // TTS 캐시 조회
