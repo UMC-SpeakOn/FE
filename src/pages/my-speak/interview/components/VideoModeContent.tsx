@@ -1,14 +1,14 @@
-import type { FinishStep } from "../types/finish.type";
-import InterviewTimer from "./VideoSection/InterviewTimer";
-import NotificationOverlay from "./NotificationOverlay";
-import SubtitleOverlay from "./VideoSection/SubtitleOverlay";
-import UserVideoStream from "./VideoSection/UserVideoStream";
+import type { FinishStep } from '../types/finish.type';
+import NotificationOverlay from './NotificationOverlay';
+import InterviewTimer from './VideoSection/InterviewTimer';
+import SubtitleOverlay from './VideoSection/SubtitleOverlay';
+import UserVideoStream from './VideoSection/UserVideoStream';
 
 interface VideoModeContentProps {
   interviewer: {
-    imageUrl: string;
+    imgUrl: string;
     name: string;
-    city: string;
+    nationality: string;
   };
   formattedTime: string;
   showSubtitles: boolean;
@@ -39,21 +39,29 @@ const VideoModeContent = ({
   subtitleText,
 }: VideoModeContentProps) => {
   // 스타일 클래스 정의 (z-index 명시화 - Issue #26)
-  const mainStyle = "absolute inset-0 w-full h-full z-[1]";
-  const pipStyle = "absolute top-4 left-4 w-45 h-60 rounded-2xl shadow-lg z-[5] border border-white transition-all duration-500 ease-in-out origin-top-left";
+  const mainStyle = 'absolute inset-0 w-full h-full z-[1]';
+  const pipStyle =
+    'absolute top-4 left-4 w-45 h-60 rounded-2xl shadow-lg z-[5] border border-white transition-all duration-500 ease-in-out origin-top-left';
 
   return (
     <div className="relative h-[65vh] bg-white rounded-2xl overflow-hidden border border-white">
       {/* 사용자 웹캠 영역 */}
-      <div className={`${isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-black isolate`}>
+      <div
+        className={`${isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-black isolate`}
+      >
         {/* Wrapper handles positioning, UserVideoStream fills the wrapper */}
-        <UserVideoStream position={isUserInMain ? 'main' : 'pip'} forceStop={finishStep === 'loading'} />
+        <UserVideoStream
+          position={isUserInMain ? 'main' : 'pip'}
+          forceStop={finishStep === 'loading'}
+        />
       </div>
 
       {/* AI 면접관 영역 */}
-      <div className={`${!isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-gray-200 isolate`}>
+      <div
+        className={`${!isUserInMain ? mainStyle : pipStyle} overflow-hidden bg-gray-200 isolate`}
+      >
         <img
-          src={interviewer.imageUrl}
+          src={interviewer.imgUrl}
           alt={interviewer.name}
           className="w-full h-full object-cover"
         />
@@ -76,22 +84,21 @@ const VideoModeContent = ({
           ${isPaused ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
       >
-        <p className="text-white text-2xl font-bold">
-          학습을 잠시 멈췄습니다
-        </p>
+        <p className="text-white text-2xl font-bold">학습을 잠시 멈췄습니다</p>
       </div>
 
       {/* Step 1: 알림 오버레이 (부분 화면) */}
-      {finishStep === "notification" && <NotificationOverlay />}
+      {finishStep === 'notification' && <NotificationOverlay />}
 
       {/* 자막 오버레이 */}
       <div
         className={`
           absolute left-0 right-0 z-20
           transition-all duration-400 ease-out
-          ${showSubtitles && !isPaused && finishStep === "idle"
-            ? "bottom-0 opacity-100"
-            : "-bottom-20 opacity-0 pointer-events-none"
+          ${
+            showSubtitles && !isPaused && finishStep === 'idle'
+              ? 'bottom-0 opacity-100'
+              : '-bottom-20 opacity-0 pointer-events-none'
           }
         `}
       >

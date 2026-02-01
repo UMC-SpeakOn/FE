@@ -1,7 +1,8 @@
-import { personsData } from "@/mocks/addData";
+import './ChatAnimation.css';
 
-import type { ChatMessage } from "../../types/chat.type";
-import "./ChatAnimation.css";
+import { personsData } from '@/mocks/addData';
+
+import type { ChatMessage } from '../../types/chat.type';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -23,35 +24,35 @@ interface MessageBubbleProps {
  * - 오디오 재생 버튼 (선택 사항)
  */
 const MessageBubble = ({ message }: MessageBubbleProps) => {
-  const isAI = message.type === "AI";
+  const isAI = message.type === 'AI';
   const interviewer = personsData[0];
 
   return (
     <div
-      className={`flex ${isAI ? "justify-start" : "justify-end"} mb-8 px-4 animate-fade-in-up`}
+      className={`flex ${isAI ? 'justify-start' : 'justify-end'} mb-8 px-4 animate-fade-in-up`}
     >
-      <div className={`flex ${isAI ? "flex-row" : "flex-row-reverse"} gap-2 max-w-[80%]`}>
+      <div
+        className={`flex ${isAI ? 'flex-row' : 'flex-row-reverse'} gap-2 max-w-[80%]`}
+      >
         {/* AI 튜터 프로필 이미지 (AI 메시지만) */}
         {isAI && (
           <img
-            src={interviewer.imageUrl}
+            src={interviewer.imgUrl}
             alt={interviewer.name}
             className="w-12 h-12 rounded-full flex-shrink-0"
           />
         )}
 
-        <div
-          className={`flex flex-col ${isAI ? "items-start" : "items-end"}`}
-        >
+        <div className={`flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
           {/* 말풍선 */}
           <div
-            className={`px-4 py-3 rounded-xl text-gray-900 ${isAI ? "bg-purple-200 " : "bg-gray-100"
-              }`}
+            className={`px-4 py-3 rounded-xl text-gray-900 ${
+              isAI ? 'bg-purple-200 ' : 'bg-gray-100'
+            }`}
           >
             <p className="text-xl font-medium leading-relaxed whitespace-pre-wrap break-all">
               {message.content}
             </p>
-
           </div>
 
           {/* 타임스탬프 */}

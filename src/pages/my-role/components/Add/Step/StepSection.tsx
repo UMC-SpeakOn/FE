@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import type { AddStepSectionProps } from '@/types/my-role/add.type';
+import type { AddStepSectionProps } from '@/pages/my-role/types/add.type';
 
 const StepSection = ({
   stepNumber,
@@ -13,7 +13,7 @@ const StepSection = ({
   if (hideNumber) {
     return (
       <section className="flex gap-[0.876rem] items-center mr-[1.462rem]">
-        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 shrink-0">
+        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 shrink-0 border-[0.2rem] border-white">
           <div className="w-[0.614rem] h-[0.614rem] rounded-full bg-purple-500" />
         </div>
 
@@ -25,7 +25,7 @@ const StepSection = ({
   return (
     <section className="flex gap-[0.876rem]">
       <div className="relative flex flex-col items-center shrink-0">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-50 text-purple-500 text-[1.6rem]">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-50 text-purple-500 text-[1.6rem] border-[0.2rem] border-white">
           {stepNumber}
         </div>
 
@@ -42,7 +42,7 @@ const StepSection = ({
       </div>
 
       <div className="flex-1 min-w-0 pt-[0.3rem] flex flex-col gap-5 pb-[3.161rem]">
-        <h2 className="text-[1.9rem] font-bold text-black leading-none">
+        <h2 className="text-[clamp(1.8rem,1.5vw,1.9rem)] font-bold text-black leading-none">
           {title}
         </h2>
 

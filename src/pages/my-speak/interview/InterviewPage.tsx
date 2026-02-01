@@ -45,7 +45,7 @@ const InterviewPage = () => {
     : null;
 
   // 뷰 모드 상태 (video | chat)
-  const [viewMode, setViewMode] = useState<"video" | "chat">("video");
+  const [viewMode, setViewMode] = useState<'video' | 'chat'>('video');
 
   // 자막 표시 여부 (영상 모드에서만 사용)
   const [showSubtitles, setShowSubtitles] = useState(false);
@@ -54,18 +54,18 @@ const InterviewPage = () => {
   const [isPaused, setIsPaused] = useState(false);
 
   // 말하기 상태 (영상 모드에서만 사용)
-  const [speakState, setSpeakState] = useState<
-    "ready" | "speaking" | "done"
-  >("ready");
+  const [speakState, setSpeakState] = useState<'ready' | 'speaking' | 'done'>(
+    'ready',
+  );
 
   // 마무리 플로우 상태
-  const [finishStep, setFinishStep] = useState<FinishStep>("idle");
+  const [finishStep, setFinishStep] = useState<FinishStep>('idle');
 
   // 초기 로딩 상태 (세션 시작 중)
   const [isInitializing, setIsInitializing] = useState(true);
 
   // 채팅 입력 상태 (음성 인식 텍스트 표시용)
-  const [chatInput, setChatInput] = useState("");
+  const [chatInput, setChatInput] = useState('');
 
   // 면접관 데이터
   const interviewer = personsData[0];
@@ -98,7 +98,7 @@ const InterviewPage = () => {
 
   // 최신 AI 메시지 (자막용)
   const latestAIMessage = useMemo(() => {
-    const aiMessages = messages.filter((m) => m.type === "AI");
+    const aiMessages = messages.filter((m) => m.type === 'AI');
     return aiMessages.length > 0
       ? aiMessages[aiMessages.length - 1].content
       : undefined;
@@ -199,7 +199,7 @@ const InterviewPage = () => {
       // 채팅 모드일 경우 chatInput은 유지되어 사용자가 전송 버튼으로 컨트롤
       stopListening();
     } else {
-      setSpeakState("ready");
+      setSpeakState('ready');
     }
   };
 
@@ -208,7 +208,7 @@ const InterviewPage = () => {
    * 모드 전환 시 입력 상태 초기화
    */
   const handleToggleMode = () => {
-    setViewMode((prev) => (prev === "video" ? "chat" : "video"));
+    setViewMode((prev) => (prev === 'video' ? 'chat' : 'video'));
     setChatInput(''); // 입력창 초기화
     clearTranscript(); // transcript 초기화
   };
@@ -217,24 +217,24 @@ const InterviewPage = () => {
    * Step 2: AI 마무리 멘트 출력
    */
   const playFinishMessage = () => {
-    if (viewMode === "chat") {
+    if (viewMode === 'chat') {
       addFinishMessage();
     }
-    setFinishStep("ai_message");
+    setFinishStep('ai_message');
   };
 
   /**
    * Step 3: 결과 로딩 스피너 표시
    */
   const showLoadingSpinner = () => {
-    setFinishStep("loading");
+    setFinishStep('loading');
   };
 
   /**
    * Step 4: 결과 페이지로 이동
    */
   const navigateToResult = () => {
-    navigateTo("/my-speak/result");
+    navigateTo('/my-speak/result');
   };
 
   /**
@@ -243,7 +243,7 @@ const InterviewPage = () => {
    */
   const handleFinish = async () => {
     // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
-    setFinishStep("notification");
+    setFinishStep('notification');
 
     // Step 2: AI 마무리 멘트 출력 (1초 후)
     setTimeout(playFinishMessage, 1000);
@@ -279,7 +279,9 @@ const InterviewPage = () => {
     <div className="relative flex flex-col w-full h-full flex-1 bg-purple-500 overflow-hidden">
       {/* 상단 헤더 */}
       <header className="flex flex-col items-center px-4 gap-10 mb-5">
-        <p className="text-white text-xl">{interviewer.city} 면접 연습</p>
+        <p className="text-white text-xl">
+          {interviewer.nationality} 면접 연습
+        </p>
       </header>
 
       {/* 메인 컨텐츠 영역 */}
@@ -288,7 +290,7 @@ const InterviewPage = () => {
           <div
             className={`
               transition-opacity duration-300 ease-in-out
-              ${viewMode === "video" ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}
+              ${viewMode === 'video' ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'}
             `}
           >
             <VideoModeContent
@@ -307,7 +309,7 @@ const InterviewPage = () => {
           <div
             className={`
               transition-opacity duration-300 ease-in-out
-              ${viewMode === "chat" ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}
+              ${viewMode === 'chat' ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'}
             `}
           >
             <ChatModeContent
@@ -346,15 +348,11 @@ const InterviewPage = () => {
         className={`
           fixed inset-0 flex items-center justify-center z-50
           transition-opacity duration-300 ease-in-out
-          ${finishStep === "loading" ? "opacity-100" : "opacity-0 pointer-events-none"}
+          ${finishStep === 'loading' ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
       >
         <div className="max-w-[430px] w-full h-full bg-black/70 flex flex-col items-center justify-center px-6 gap-6">
-          <img
-            src={navIcon}
-            alt="loading"
-            className="w-16 h-16 animate-spin"
-          />
+          <img src={navIcon} alt="loading" className="w-16 h-16 animate-spin" />
           <p className="text-white text-xl font-bold text-center">
             결과를 불러오는 중...
           </p>

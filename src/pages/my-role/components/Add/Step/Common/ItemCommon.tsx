@@ -12,7 +12,7 @@ const ItemCommon = ({ label, isSelected, onClick }: ItemCommonProps) => {
       type="button"
       onClick={onClick}
       className={clsx(
-        'w-fit py-[0.9rem] px-[1.2rem] rounded-[1.6rem] text-[1.4rem] font-medium leading-none transition-colors whitespace-nowrap',
+        'w-fit py-[0.9rem] px-[clamp(1.4rem,1.5vw,1.6rem)] rounded-full text-[clamp(1.2rem,1vw,1.4rem)] font-medium leading-none transition-colors whitespace-nowrap',
         'border-[0.1rem]',
         isSelected
           ? 'bg-purple-500 text-white border-purple-500'

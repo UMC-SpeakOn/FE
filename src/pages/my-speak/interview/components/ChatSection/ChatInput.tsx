@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import sandMessageIcon from "@/assets/images/icons/sand-message.svg";
+import sandMessageIcon from '@/assets/images/icons/sand-message.svg';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -24,8 +24,13 @@ interface ChatInputProps {
  * - Controlled/Uncontrolled 모드 지원
  * - 동적 높이 조정 (내용에 따라 자동으로 늘어남)
  */
-const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalOnChange }: ChatInputProps) => {
-  const [internalMessage, setInternalMessage] = useState("");
+const ChatInput = ({
+  onSend,
+  disabled,
+  value: externalValue,
+  onChange: externalOnChange,
+}: ChatInputProps) => {
+  const [internalMessage, setInternalMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Controlled mode: 외부에서 value와 onChange 제공
@@ -45,7 +50,7 @@ const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalO
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
-      setMessage("");
+      setMessage('');
       // 전송 후 높이 초기화
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
@@ -54,7 +59,7 @@ const ChatInput = ({ onSend, disabled, value: externalValue, onChange: externalO
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }

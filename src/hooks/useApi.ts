@@ -1,7 +1,7 @@
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import apiClient, { getErrorMessage } from "@/utils/apiClient";
+import apiClient, { getErrorMessage } from '@/utils/apiClient';
 
 interface UseApiState<T> {
   data: T | null;
@@ -43,7 +43,7 @@ interface UseApiReturn<T> extends UseApiState<T> {
  */
 export function useApi<T = unknown>(
   axiosConfig: AxiosRequestConfig,
-  options: UseApiOptions<T> = {}
+  options: UseApiOptions<T> = {},
 ): UseApiReturn<T> {
   const { enabled = false, onError, onSuccess } = options;
 
@@ -99,7 +99,7 @@ export function useApi<T = unknown>(
       return responseData;
     } catch (error: unknown) {
       // 요청이 취소된 경우 무시
-      if ((error as { name?: string }).name === "CanceledError") {
+      if ((error as { name?: string }).name === 'CanceledError') {
         return null;
       }
 
@@ -182,7 +182,7 @@ export function useApi<T = unknown>(
  */
 export function useMutation<TResponse = unknown, TVariables = unknown>(
   axiosConfigFn: (variables: TVariables) => AxiosRequestConfig,
-  options: UseApiOptions<TResponse> = {}
+  options: UseApiOptions<TResponse> = {},
 ) {
   const { onError, onSuccess } = options;
 
@@ -239,7 +239,7 @@ export function useMutation<TResponse = unknown, TVariables = unknown>(
         return null;
       }
     },
-    [axiosConfigFn, onError, onSuccess]
+    [axiosConfigFn, onError, onSuccess],
   );
 
   const reset = useCallback(() => {
@@ -270,7 +270,7 @@ export function useMutation<TResponse = unknown, TVariables = unknown>(
  */
 export function useQuery<T = unknown>(
   axiosConfig: AxiosRequestConfig,
-  options: UseApiOptions<T> = {}
+  options: UseApiOptions<T> = {},
 ): UseApiReturn<T> {
   return useApi<T>(axiosConfig, { ...options, enabled: true });
 }

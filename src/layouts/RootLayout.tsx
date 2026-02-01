@@ -1,4 +1,4 @@
-import { matchPath, Outlet, useLocation } from 'react-router-dom';
+import { matchPath, Outlet, useLocation, useMatch } from 'react-router-dom';
 
 import Footer from '@/components/Footer/Footer';
 import Header from '@/components/Header/Header';
@@ -18,6 +18,13 @@ const RootLayout = () => {
   const hideNavbar = HIDE_NAV_PATHS.some((path) =>
     matchPath({ path, end: false }, pathname),
   );
+
+  const isSplash = useMatch('/');
+  const isLogin = pathname.startsWith('/login');
+
+  if (isSplash || isLogin) {
+    return <Outlet />;
+  }
 
   return (
     <MenuProvider>

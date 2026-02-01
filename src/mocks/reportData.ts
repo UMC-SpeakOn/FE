@@ -15,30 +15,54 @@ export const reportData: ReportData = {
 
   insightCard: {
     tabs: ['핵심요약', '톤 분석', '근거', '교정'],
+
     items: [
       {
         tab: '핵심요약',
         title: 'Summary On',
-        content:
-          '이번 대화는 전반적으로 Neutral 톤에 가까웠으며, 면접 상황에 비해 개인적인 표현이 비교적 빠르게 등장했습니다.',
+        summary:
+          '이번 대화는 전반적으로 Neutral 톤에 가까웠으며,\n면접 상황에 비해 개인적인 표현이 비교적 빠르게 등장했습니다.',
       },
+
       {
         tab: '톤 분석',
-        title: 'Tone Analysis',
-        content:
-          '전체적으로 차분한 톤이었으나, 일부 문장에서 확신이 낮은 표현이 반복되었습니다.',
+        title: '대화 톤은 어땠을까요?',
+        tones: [
+          {
+            label: '나의 대화 톤',
+            value: 'Neutral',
+          },
+          {
+            label: '상황에 기대된 톤',
+            value: 'Confident',
+          },
+        ],
       },
+
       {
         tab: '근거',
-        title: 'Evidence',
-        content:
-          '"I think maybe..." / "I’m not sure" 표현이 반복되어 자신감이 낮게 전달될 수 있습니다.',
+        title: '이런 점이 보였어요',
+        evidences: [
+          '이 상황에서는 의견을 말하기 전 배경 설명이 자주 사용됩니다.',
+          '이번 대화에서는 결론 중심의 응답이 많았습니다.',
+        ],
       },
+
       {
         tab: '교정',
-        title: 'Correction',
-        content:
-          '"I think maybe" → "I believe"\n"I’m not sure" → "Let me clarify"\n\n확신형 문장으로 교정해보세요.',
+        title: '이 문장을 이렇게 말할 수도 있어요',
+        corrections: [
+          {
+            before: 'I think this will work.',
+            after: 'From our perspective, this approach could be effective.',
+          },
+          {
+            before:
+              'Your background shows a strong fit for user-centered marketing.',
+            after:
+              'Based on our discussion, your background aligns well with user-centered marketing.',
+          },
+        ],
       },
     ],
   },
