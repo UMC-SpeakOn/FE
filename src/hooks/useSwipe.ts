@@ -27,17 +27,8 @@ export const useSwipe = (options: UseSwipeOptions) => {
         const element = elementRef.current;
         if (!element) return;
 
-        const handleTouchStart = (e: TouchEvent) => {
-            touchStartX.current = e.touches[0].clientX;
-            touchStartY.current = e.touches[0].clientY;
-        };
-
-        const handleTouchMove = (e: TouchEvent) => {
-            touchEndX.current = e.touches[0].clientX;
-            touchEndY.current = e.touches[0].clientY;
-        };
-
-        const handleTouchEnd = () => {
+        // 공통 처리 로직
+        const handleSwipeEnd = () => {
             const deltaX = touchEndX.current - touchStartX.current;
             const deltaY = touchEndY.current - touchStartY.current;
             const absDeltaX = Math.abs(deltaX);
@@ -67,14 +58,51 @@ export const useSwipe = (options: UseSwipeOptions) => {
             touchEndY.current = 0;
         };
 
+        // 터치 이벤트 핸들러
+        const handleTouchStart = (e: TouchEvent) => {
+            touchStartX.current = e.touches[0].clientX;
+            touchStartY.current = e.touches[0].clientY;
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            touchEndX.current = e.touches[0].clientX;
+            touchEndY.current = e.touches[0].clientY;
+        };
+
+        // 마우스 이벤트 핸들러
+        const handleMouseDown = (e: MouseEvent) => {
+            touchStartX.current = e.clientX;
+            touchStartY.current = e.clientY;
+            // document에 등록하여 마우스가 영역 밖으로 나가도 감지
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            touchEndX.current = e.clientX;
+            touchEndY.current = e.clientY;
+        };
+
+        const handleMouseUp = () => {
+            handleSwipeEnd();
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+        };
+
+        // 이벤트 리스너 등록
         element.addEventListener("touchstart", handleTouchStart);
         element.addEventListener("touchmove", handleTouchMove);
-        element.addEventListener("touchend", handleTouchEnd);
+        element.addEventListener("touchend", handleSwipeEnd);
+        element.addEventListener("mousedown", handleMouseDown);
 
         return () => {
             element.removeEventListener("touchstart", handleTouchStart);
             element.removeEventListener("touchmove", handleTouchMove);
-            element.removeEventListener("touchend", handleTouchEnd);
+            element.removeEventListener("touchend", handleSwipeEnd);
+            element.removeEventListener("mousedown", handleMouseDown);
+            // document에 등록된 이벤트 제거
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
         };
     }, [onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, threshold]);
 

@@ -4,7 +4,6 @@ import LeftArrowIcon from "@/assets/images/icons/left-arrow.svg";
 import NavPurpleIcon from "@/assets/images/icons/nav-purple.svg";
 import { useMenu } from "@/contexts/MenuContext";
 import useNavigation from "@/hooks/useNavigation";
-import { useSwipe } from "@/hooks/useSwipe";
 
 interface SubMenuItem {
   id: string;
@@ -51,12 +50,6 @@ const Menu = () => {
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
   const [openSubMenuId, setOpenSubMenuId] = useState<string | null>(null);
-
-  // 스와이프 제스처로 메뉴 닫기
-  const swipeRef = useSwipe({
-    onSwipeLeft: closeMenu,
-    threshold: 50,
-  });
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -118,7 +111,6 @@ const Menu = () => {
     >
       {/* 메뉴 컨테이너 */}
       <div
-        ref={swipeRef}
         className={`absolute inset-y-0 left-0 w-full h-full flex flex-col bg-purple-500 ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"
           }`}
       >
