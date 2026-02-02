@@ -7,26 +7,11 @@ import type {
   GenerateTTSRequest,
   GenerateTTSResponse,
   GetTTSCacheResponse,
-  StartSessionRequest,
-  StartSessionResponse,
   UploadSTTRequest,
   UploadSTTResponse,
 } from "@/types/api/myspeak.type";
 import apiClient, { type CustomAxiosRequestConfig } from "@/utils/apiClient";
 
-/**
- * 세션 시작 API
- */
-export const startSession = async (
-  data: StartSessionRequest
-): Promise<StartSessionResponse> => {
-  const response = await apiClient.post<ApiResponse<StartSessionResponse>>(
-    "/myspeak/sessions",
-    data,
-    { authRequired: false } as CustomAxiosRequestConfig
-  );
-  return response.data.data;
-};
 
 /**
  * TTS 생성 API

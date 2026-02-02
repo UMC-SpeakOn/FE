@@ -2,16 +2,6 @@
  * MySpeak API 요청/응답 타입
  */
 
-// 세션 시작
-export interface StartSessionRequest {
-  myRoleId: number; // My Role ID
-  targetQuestionCount: number; // 목표 질문 수
-  startedAt: string; // ISO 8601 format (LocalDateTime)
-}
-
-export interface StartSessionResponse {
-  sessionId: number; // Long 타입 (숫자)
-}
 
 // TTS 생성
 export interface GenerateTTSRequest {

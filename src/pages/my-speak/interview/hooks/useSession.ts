@@ -4,8 +4,6 @@ import { useMutation } from "@/hooks/useApi";
 import type {
   CompleteSessionRequest,
   CompleteSessionResponse,
-  StartSessionRequest,
-  StartSessionResponse,
 } from "@/types/api/myspeak.type";
 
 /**
@@ -26,25 +24,6 @@ import type {
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<number | null>(null);
 
-  // 세션 시작 mutation
-  const {
-    mutate: startSessionMutation,
-    isLoading: isStarting,
-    error: startError,
-  } = useMutation<{ isSuccess: boolean; code: string; message: string; result: number }, StartSessionRequest>(
-    (data) => ({
-      method: "POST",
-      url: "/myspeak/sessions",
-      data,
-    }),
-    {
-      onSuccess: (data) => {
-        if (data && data.result) {
-          setSessionId(data.result);
-        }
-      },
-    }
-  );
 
   // 세션 완료 mutation
   const {
@@ -59,28 +38,6 @@ export const useSession = () => {
     })
   );
 
-  /**
-   * 세션 시작
-   * @param myRoleId - My Role ID
-   * @param targetQuestionCount - 목표 질문 수
-   */
-  const start = useCallback(
-    async (myRoleId: number, targetQuestionCount: number = 10): Promise<StartSessionResponse | null> => {
-      const startedAt = new Date().toISOString();
-      const response = await startSessionMutation({
-        myRoleId,
-        targetQuestionCount,
-        startedAt,
-      });
-
-      // 백엔드 응답 { result: sessionId }을 { sessionId }로 매핑
-      if (response && response.result) {
-        return { sessionId: response.result };
-      }
-      return null;
-    },
-    [startSessionMutation]
-  );
 
   /**
    * 세션 완료
@@ -100,11 +57,8 @@ export const useSession = () => {
   return {
     sessionId,
     setSessionId,
-    isStarting,
     isCompleting,
-    startError,
     completeError,
-    start,
     complete,
   };
 };

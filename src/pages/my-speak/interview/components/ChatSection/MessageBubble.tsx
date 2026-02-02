@@ -1,10 +1,13 @@
-import { personsData } from '@/mocks/addData';
-
 import type { ChatMessage } from '../../types/chat.type';
 
 interface MessageBubbleProps {
   message: ChatMessage;
   onPlayAudio?: () => void;
+  interviewer?: {
+    name: string;
+    nationality: string;
+    imgUrl: string;
+  };
 }
 
 /**
@@ -21,9 +24,8 @@ interface MessageBubbleProps {
  * - 타임스탬프 표시
  * - 오디오 재생 버튼 (선택 사항)
  */
-const MessageBubble = ({ message }: MessageBubbleProps) => {
+const MessageBubble = ({ message, interviewer }: MessageBubbleProps) => {
   const isAI = message.type === 'AI';
-  const interviewer = personsData[0];
 
   return (
     <div
@@ -33,7 +35,7 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
         className={`flex ${isAI ? 'flex-row' : 'flex-row-reverse'} gap-2 max-w-[80%]`}
       >
         {/* AI 튜터 프로필 이미지 (AI 메시지만) */}
-        {isAI && (
+        {isAI && interviewer && (
           <img
             src={interviewer.imgUrl}
             alt={interviewer.name}

@@ -296,8 +296,14 @@ const InterviewPage = () => {
         await playAudio(result.closingTtsBase64);
       }
 
-      // 4. 결과 페이지로 이동 (sessionId 전달)
-      navigateTo(`/my-speak/result?sessionId=${result.sessionId}`);
+      // 4. 결과 페이지로 이동 (세션 완료 데이터를 state로 전달)
+      navigateTo('/my-speak/result', {
+        state: {
+          sessionId: result.sessionId,
+          totalTime: result.totalTime,
+          sentenceCount: result.sentenceCount,
+        }
+      });
     } catch (error) {
       console.error("[InterviewPage] Failed to complete session:", error);
       setFinishStep('idle'); // 로딩 상태 해제
@@ -365,6 +371,7 @@ const InterviewPage = () => {
               inputValue={chatInput}
               onInputChange={setChatInput}
               clearTranscript={clearTranscript}
+              interviewer={interviewer}
             />
           </div>
         </div>
