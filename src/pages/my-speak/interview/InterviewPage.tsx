@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 import { getAIOpener } from "@/api/ai";
+import { sendConversationTurnText } from "@/api/myspeak";
 import navIcon from "@/assets/images/icons/nav.svg";
 import Spinner from "@/components/Spinner/Spinner";
 import useNavigation from "@/hooks/useNavigation";
@@ -12,7 +13,6 @@ import SpeakButton from "./components/SpeakButton";
 import VideoModeContent from "./components/VideoModeContent";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { useChat } from "./hooks/useChat";
-import { useConversationTurn } from "./hooks/useConversationTurn";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
 import { useSession } from "./hooks/useSession";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
@@ -39,14 +39,12 @@ import type { FinishStep } from "./types/finish.type";
  */
 const InterviewPage = () => {
   const { navigateTo } = useNavigation();
-  const [searchParams] = useSearchParams();
-  const myRoleId = searchParams.get("roleId")
-    ? Number(searchParams.get("roleId"))
-    : 2;
+  const { sessionId: sessionIdFromUrl } = useParams<{ sessionId: string }>();
+  const location = useLocation();
 
-  const goalId = searchParams.get("goalId")
-    ? Number(searchParams.get("goalId"))
-    : null;
+  // state에서 roleId 가져오기 (기본값: 1)
+  const myRoleId = (location.state as { myRoleId?: number })?.myRoleId ?? 1;
+  const sessionIdNumber = sessionIdFromUrl ? Number(sessionIdFromUrl) : null;
 
   // 뷰 모드 상태 (video | chat)
   const [viewMode, setViewMode] = useState<'video' | 'chat'>('video');
@@ -82,10 +80,7 @@ const InterviewPage = () => {
   };
 
   // 세션 관리 훅
-  const { sessionId, start: startSession, complete: completeSession } = useSession();
-
-  // 대화 턴 훅
-  const { sendTurn } = useConversationTurn(sessionId);
+  const { sessionId, setSessionId, complete: completeSession } = useSession();
 
   // 오디오 재생 훅
   const { play: playAudio } = useAudioPlayer();
@@ -94,7 +89,7 @@ const InterviewPage = () => {
   const { formattedTime, seconds, start, pause, resume } = useInterviewTimer();
 
   // 채팅 훅 (초기 메시지는 AI 오프너 로드 후 추가)
-  const { messages, isLoading, sendMessage, addMessage } = useChat();
+  const { messages, isLoading, addMessage } = useChat();
 
   // 음성 인식 훅
   const {
@@ -117,8 +112,8 @@ const InterviewPage = () => {
   }, [messages]);
 
   /**
-   * 컴포넌트 마운트 시 세션 시작 및 AI 오프너 로드
-   * hasInitialized ref를 사용하여 마운트 시 1회만 실행
+   * 컴포넌트 마운트 시 세션 초기화 및 AI 오프너 로드
+   * ChatSetting에서 생성된 세션을 사용
    */
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -126,18 +121,25 @@ const InterviewPage = () => {
     const initializeSession = async () => {
       hasInitialized.current = true;
       setIsInitializing(true);
-      try {
-        // 1. 세션 시작 (myRoleId와 targetQuestionCount 전달)
-        const targetQuestionCount = goalId || 10; // goalId를 목표 질문 수로 사용
-        await startSession(myRoleId, targetQuestionCount);
 
-        // 2. 타이머 시작
+      try {
+        // 1. sessionId 유효성 검사
+        if (!sessionIdNumber) {
+          alert("잘못된 접근입니다. 세션 설정 페이지로 이동합니다.");
+          navigateTo("/my-speak/setting");
+          return;
+        }
+
+        // 2. ChatSetting에서 생성된 세션 사용
+        setSessionId(sessionIdNumber);
+
+        // 3. 타이머 시작
         start();
 
-        // 3. AI 오프너 로드
+        // 4. AI 오프너 로드
         const opener = await getAIOpener(myRoleId);
 
-        // 4. 오프닝 메시지 추가 (텍스트만, 오디오 없음)
+        // 5. 오프닝 메시지 추가 (텍스트만, 오디오 없음)
         const firstMessage: ChatMessage = {
           id: "opener",
           type: "AI",
@@ -148,14 +150,14 @@ const InterviewPage = () => {
       } catch (error) {
         console.error("[InterviewPage] Failed to initialize session:", error);
         alert("면접 세션을 시작하는데 실패했습니다. 다시 시도해주세요.");
-        navigateTo("/my-speak");
+        navigateTo("/my-speak/setting");
       } finally {
         setIsInitializing(false);
       }
     };
 
     initializeSession();
-  }, [startSession, start, myRoleId, goalId, addMessage, navigateTo]);
+  }, [sessionIdNumber, setSessionId, start, myRoleId, addMessage, navigateTo]);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
   useEffect(() => {
@@ -165,35 +167,31 @@ const InterviewPage = () => {
   }, [transcript, viewMode]);
 
   /**
-   * 사용자 응답 처리 (음성 → AI 응답 → TTS 재생)
-   *
-   * TODO: 음성 녹음 기능 통합 필요
-   * - useSpeechRecognition은 텍스트만 제공하므로 MediaRecorder API로 오디오 녹음 추가 필요
-   * - 현재는 임시 오디오 파일로 API 호출 테스트
+   * 사용자 응답 처리 (텍스트 → AI 응답 → TTS 재생)
    */
   const handleUserResponse = async (transcript: string) => {
+    if (!transcript.trim() || !sessionId) return;
+
     try {
       // 1. 사용자 메시지 추가
       const userMessage: ChatMessage = {
         id: `msg-${Date.now()}`,
         type: "User",
-        content: transcript,
+        content: transcript.trim(),
         timestamp: new Date(),
       };
       addMessage(userMessage);
 
-      // 2. AI 응답 요청 (TODO: 실제 오디오 파일로 교체)
-      // 임시: 빈 오디오 파일 생성 (실제 녹음 기능 구현 후 교체)
-      const dummyAudioBlob = new Blob([], { type: "audio/wav" });
-      const audioFile = new File([dummyAudioBlob], "recording.wav", {
-        type: "audio/wav",
-      });
-
-      const response = await sendTurn(audioFile, "MAIN");
+      // 2. AI 응답 요청 (텍스트 전용 API 사용)
+      const response = await sendConversationTurnText(
+        sessionId!,
+        transcript.trim(),
+        "MAIN",
+        "en-US"
+      );
 
       // 응답이 없으면 종료
       if (!response) {
-        console.error("[InterviewPage] No response from sendTurn");
         alert("AI 응답을 받는데 실패했습니다. 다시 시도해주세요.");
         return;
       }
@@ -293,8 +291,6 @@ const InterviewPage = () => {
         throw new Error("Session completion failed: no result");
       }
 
-      console.log("[InterviewPage] Session completed:", result);
-
       // 3. 마무리 TTS 재생 (영상 모드일 때)
       if (viewMode === 'video' && result.closingTtsBase64) {
         await playAudio(result.closingTtsBase64);
@@ -363,7 +359,7 @@ const InterviewPage = () => {
               formattedTime={formattedTime}
               isLoading={isLoading}
               onPlayAudio={() => { }}
-              onSendMessage={sendMessage}
+              onSendMessage={handleUserResponse}
               finishStep={finishStep}
               transcript={transcript}
               inputValue={chatInput}

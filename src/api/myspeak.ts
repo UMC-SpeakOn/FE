@@ -91,6 +91,42 @@ export const sendConversationTurn = async (
 };
 
 /**
+ * 대화 턴 전송 API (텍스트 전용)
+ */
+export const sendConversationTurnText = async (
+  sessionId: number,
+  answerText: string,
+  messageType: "MAIN" | "FOLLOW" | "CLOSING" = "MAIN",
+  languageCode: string = "en-US"
+): Promise<ConversationTurnResponse> => {
+  const response = await apiClient.post<{
+    isSuccess: boolean;
+    code: string;
+    message: string;
+    result: {
+      questionText: string;
+      base64Audio: string;
+      messageType: "MAIN" | "FOLLOW" | "CLOSING";
+    };
+  }>(
+    `/myspeak/sessions/${sessionId}/turns/text`,
+    {
+      languageCode,
+      answerText,
+      messageType,
+    },
+    { authRequired: true } as CustomAxiosRequestConfig
+  );
+
+  // 백엔드 응답 구조 { result: { questionText, base64Audio, messageType } }를 매핑
+  return {
+    questionText: response.data.result.questionText,
+    base64Audio: response.data.result.base64Audio,
+    messageType: response.data.result.messageType,
+  };
+};
+
+/**
  * 세션 완료 API
  */
 export const completeSession = async (

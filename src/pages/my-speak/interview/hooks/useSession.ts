@@ -31,7 +31,7 @@ export const useSession = () => {
     mutate: startSessionMutation,
     isLoading: isStarting,
     error: startError,
-  } = useMutation<StartSessionResponse, StartSessionRequest>(
+  } = useMutation<{ isSuccess: boolean; code: string; message: string; result: number }, StartSessionRequest>(
     (data) => ({
       method: "POST",
       url: "/myspeak/sessions",
@@ -39,8 +39,8 @@ export const useSession = () => {
     }),
     {
       onSuccess: (data) => {
-        if (data) {
-          setSessionId(data.sessionId);
+        if (data && data.result) {
+          setSessionId(data.result);
         }
       },
     }
@@ -65,13 +65,19 @@ export const useSession = () => {
    * @param targetQuestionCount - 목표 질문 수
    */
   const start = useCallback(
-    async (myRoleId: number, targetQuestionCount: number = 10) => {
+    async (myRoleId: number, targetQuestionCount: number = 10): Promise<StartSessionResponse | null> => {
       const startedAt = new Date().toISOString();
-      return await startSessionMutation({
+      const response = await startSessionMutation({
         myRoleId,
         targetQuestionCount,
         startedAt,
       });
+
+      // 백엔드 응답 { result: sessionId }을 { sessionId }로 매핑
+      if (response && response.result) {
+        return { sessionId: response.result };
+      }
+      return null;
     },
     [startSessionMutation]
   );
@@ -93,6 +99,7 @@ export const useSession = () => {
 
   return {
     sessionId,
+    setSessionId,
     isStarting,
     isCompleting,
     startError,

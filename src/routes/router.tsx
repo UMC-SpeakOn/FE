@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         element: <MySpeakSettingPage />,
       },
       {
-        path: 'my-speak/interview',
+        path: 'my-speak/interview/:sessionId',
         element: <InterviewPage />,
       },
       {
