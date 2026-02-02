@@ -23,8 +23,8 @@ const ChatSetting = () => {
       // console.log('sessionId:', sessionId);
       alert('대화 세션이 생성되었습니다.');
 
-      navigateTo('/my-speak/interview', {
-        state: { sessionId },
+      navigateTo(`/my-speak/interview/${sessionId}`, {
+        state: { myRoleId: selectedAIId },
       });
     },
   });
