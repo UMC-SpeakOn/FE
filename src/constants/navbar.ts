@@ -15,4 +15,8 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: 'My Report',
     match: (pathname) => pathname.startsWith('/my-report'),
   },
+  {
+    label: 'Profile',
+    match: (pathname) => pathname.startsWith('/profile'),
+  },
 ];

@@ -11,6 +11,7 @@ import MyRolePage from '@/pages/my-role/My-Role';
 import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 import MySpeakResultPage from '@/pages/my-speak/result/Result';
 import MySpeakSettingPage from '@/pages/my-speak/setting/Setting';
+import AccountPage from '@/pages/profile/account/Account';
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: 'my-report/:id',
         element: <MyReportDetailPage />,
+      },
+      {
+        path: 'profile/account',
+        element: <AccountPage />,
       },
     ],
   },
