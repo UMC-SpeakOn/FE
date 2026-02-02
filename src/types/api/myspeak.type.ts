@@ -41,6 +41,18 @@ export interface UploadSTTResponse {
   confidence?: number;
 }
 
+// 대화 턴
+export interface ConversationTurnRequest {
+  languageCode?: string; // 기본값: "en-US"
+  messageType: "MAIN" | "FOLLOW" | "CLOSING";
+}
+
+export interface ConversationTurnResponse {
+  questionText: string; // AI 질문 텍스트
+  base64Audio: string; // base64 인코딩된 mp3
+  messageType: "MAIN" | "FOLLOW" | "CLOSING";
+}
+
 // 세션 완료
 export interface CompleteSessionRequest {
   endedAt: string; // ISO 8601 format (LocalDateTime)
@@ -48,7 +60,10 @@ export interface CompleteSessionRequest {
 }
 
 export interface CompleteSessionResponse {
-  resultId: number; // Long 타입 (숫자)
+  sessionId: number; // Long 타입
+  totalTime: number; // 초 단위
+  sentenceCount: number; // 문장 수
+  closingTtsBase64: string; // 마무리 TTS
 }
 
 // TTS 캐시 조회

@@ -54,7 +54,7 @@ export const useSession = () => {
   } = useMutation<CompleteSessionResponse, CompleteSessionRequest>(
     (data) => ({
       method: "POST",
-      url: `/myspeak/${sessionId}/complete`,
+      url: `/myspeak/sessions/${sessionId}/complete`,
       data,
     })
   );

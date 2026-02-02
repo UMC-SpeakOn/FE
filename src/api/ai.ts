@@ -12,14 +12,22 @@ import apiClient, { type CustomAxiosRequestConfig } from "@/utils/apiClient";
 export const getAIOpener = async (
   myRoleId: number
 ): Promise<GetAIOpenerResponse> => {
-  const response = await apiClient.get<ApiResponse<GetAIOpenerResponse>>(
+  const response = await apiClient.get<
+    ApiResponse<{ result: string }>
+  >(
     "/ai/opener",
     {
       params: { myRoleId },
       authRequired: false,
     } as CustomAxiosRequestConfig
   );
-  return response.data.data;
+
+  // Swagger 응답(result)을 기존 구조로 매핑 (Phase 4에서 리팩토링 예정)
+  return {
+    result: response.data.data.result,
+    content: response.data.data.result, // 임시 호환성
+    audioUrl: undefined, // AI Opener는 오디오 없음
+  };
 };
 
 /**

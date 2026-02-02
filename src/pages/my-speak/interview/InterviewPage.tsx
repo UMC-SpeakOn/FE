@@ -10,11 +10,12 @@ import ChatModeContent from "./components/ChatModeContent";
 import ControlButtons from "./components/ControlButtons";
 import SpeakButton from "./components/SpeakButton";
 import VideoModeContent from "./components/VideoModeContent";
+import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { useChat } from "./hooks/useChat";
+import { useConversationTurn } from "./hooks/useConversationTurn";
 import { useInterviewTimer } from "./hooks/useInterviewTimer";
 import { useSession } from "./hooks/useSession";
 import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
-import { useTTS } from "./hooks/useTTS";
 import { useVideoSwap } from "./hooks/useVideoSwap";
 import type { ChatMessage } from "./types/chat.type";
 import type { FinishStep } from "./types/finish.type";
@@ -41,7 +42,8 @@ const InterviewPage = () => {
   const [searchParams] = useSearchParams();
   const myRoleId = searchParams.get("roleId")
     ? Number(searchParams.get("roleId"))
-    : 1; // 기본값 1
+    : 2;
+
   const goalId = searchParams.get("goalId")
     ? Number(searchParams.get("goalId"))
     : null;
@@ -80,17 +82,19 @@ const InterviewPage = () => {
   };
 
   // 세션 관리 훅
-  const { start: startSession, complete: completeSession } = useSession();
+  const { sessionId, start: startSession, complete: completeSession } = useSession();
+
+  // 대화 턴 훅
+  const { sendTurn } = useConversationTurn(sessionId);
+
+  // 오디오 재생 훅
+  const { play: playAudio } = useAudioPlayer();
 
   // 타이머 훅
   const { formattedTime, seconds, start, pause, resume } = useInterviewTimer();
 
   // 채팅 훅 (초기 메시지는 AI 오프너 로드 후 추가)
-  const { messages, isLoading, sendMessage, addFinishMessage, addMessage } =
-    useChat();
-
-  // TTS 재생 훅
-  const { play: playTTS } = useTTS();
+  const { messages, isLoading, sendMessage, addMessage } = useChat();
 
   // 음성 인식 훅
   const {
@@ -133,20 +137,14 @@ const InterviewPage = () => {
         // 3. AI 오프너 로드
         const opener = await getAIOpener(myRoleId);
 
-        // 4. 첫 질문 메시지로 추가
+        // 4. 오프닝 메시지 추가 (텍스트만, 오디오 없음)
         const firstMessage: ChatMessage = {
           id: "opener",
           type: "AI",
-          content: opener.content,
+          content: opener.result, // Swagger 응답 result 필드 사용
           timestamp: new Date(),
-          audioUrl: opener.audioUrl,
         };
         addMessage(firstMessage);
-
-        // 5. TTS 재생 (영상 모드일 때)
-        if (viewMode === "video" && opener.audioUrl) {
-          await playTTS(opener.audioUrl);
-        }
       } catch (error) {
         console.error("[InterviewPage] Failed to initialize session:", error);
       } finally {
@@ -155,7 +153,7 @@ const InterviewPage = () => {
     };
 
     initializeSession();
-  }, [startSession, start, myRoleId, addMessage, viewMode, playTTS]);
+  }, [startSession, start, myRoleId, addMessage]);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
   useEffect(() => {
@@ -163,6 +161,58 @@ const InterviewPage = () => {
       setChatInput(transcript);
     }
   }, [transcript, viewMode]);
+
+  /**
+   * 사용자 응답 처리 (음성 → AI 응답 → TTS 재생)
+   *
+   * TODO: 음성 녹음 기능 통합 필요
+   * - useSpeechRecognition은 텍스트만 제공하므로 MediaRecorder API로 오디오 녹음 추가 필요
+   * - 현재는 임시 오디오 파일로 API 호출 테스트
+   */
+  const handleUserResponse = async (transcript: string) => {
+    try {
+      // 1. 사용자 메시지 추가
+      const userMessage: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        type: "User",
+        content: transcript,
+        timestamp: new Date(),
+      };
+      addMessage(userMessage);
+
+      // 2. AI 응답 요청 (TODO: 실제 오디오 파일로 교체)
+      // 임시: 빈 오디오 파일 생성 (실제 녹음 기능 구현 후 교체)
+      const dummyAudioBlob = new Blob([], { type: "audio/wav" });
+      const audioFile = new File([dummyAudioBlob], "recording.wav", {
+        type: "audio/wav",
+      });
+
+      const response = await sendTurn(audioFile, "MAIN");
+
+      // 응답이 없으면 종료
+      if (!response) {
+        console.error("[InterviewPage] No response from sendTurn");
+        return;
+      }
+
+      // 3. AI 메시지 추가
+      const aiMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        type: "AI",
+        content: response.questionText,
+        timestamp: new Date(),
+      };
+      addMessage(aiMessage);
+
+      // 4. TTS 오디오 재생 (영상 모드일 때)
+      if (viewMode === "video" && response.base64Audio) {
+        await playAudio(response.base64Audio);
+      }
+    } catch (error) {
+      console.error("[InterviewPage] Failed to send turn:", error);
+      // TODO: 에러 UI 표시
+    }
+  };
 
   /**
    * 일시정지/재개 핸들러
@@ -188,7 +238,7 @@ const InterviewPage = () => {
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
    * - 음성 인식 시작/중지 통합
-   * - 카메라 모드: 말하기 완료 시 즉시 메시지 전송
+   * - 카메라 모드: 말하기 완료 시 즉시 메시지 전송 (API 호출)
    * - 채팅 모드: 말하기 완료 시 입력창에만 입력 (사용자가 전송 버튼으로 컨트롤)
    */
   const handleSpeak = () => {
@@ -199,9 +249,9 @@ const InterviewPage = () => {
     } else if (speakState === 'speaking') {
       setSpeakState('done');
 
-      // 카메라 모드일 경우 transcript를 직접 사용하여 즉시 전송
+      // 카메라 모드일 경우 API를 통해 즉시 전송
       if (viewMode === 'video' && transcript.trim()) {
-        sendMessage(transcript.trim());
+        handleUserResponse(transcript.trim());
         setChatInput(''); // 전송 후 입력 필드 초기화
         clearTranscript(); // transcript도 초기화
       }
@@ -225,55 +275,36 @@ const InterviewPage = () => {
   };
 
   /**
-   * Step 2: AI 마무리 멘트 출력
-   */
-  const playFinishMessage = () => {
-    if (viewMode === 'chat') {
-      addFinishMessage();
-    }
-    setFinishStep('ai_message');
-  };
-
-  /**
-   * Step 3: 결과 로딩 스피너 표시
-   */
-  const showLoadingSpinner = () => {
-    setFinishStep('loading');
-  };
-
-  /**
-   * Step 4: 결과 페이지로 이동
-   */
-  const navigateToResult = () => {
-    navigateTo('/my-speak/result');
-  };
-
-  /**
    * 마무리하기 핸들러
-   * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 세션 완료 API → 로딩 스피너(2초) → 결과 페이지
+   * - 플로우: 세션 완료 API → 마무리 TTS 재생 → 결과 페이지 이동
    */
   const handleFinish = async () => {
-    // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
-    setFinishStep('notification');
+    try {
+      // 1. 로딩 상태 표시
+      setFinishStep('loading');
 
-    // Step 2: AI 마무리 멘트 출력 (1초 후)
-    setTimeout(playFinishMessage, 1000);
+      // 2. 세션 완료 API 호출
+      const result = await completeSession(seconds); // 총 시간(초) 전달
 
-    // Step 3: 로딩 스피너 표시 (4초 후: 알림 1초 + 멘트 3초)
-    setTimeout(showLoadingSpinner, 4000);
-
-    // Step 4: 세션 완료 API 호출 (5초 후)
-    setTimeout(async () => {
-      try {
-        await completeSession(seconds); // 총 시간(초) 전달
-        console.log("[InterviewPage] Session completed successfully");
-      } catch (error) {
-        console.error("[InterviewPage] Failed to complete session:", error);
+      if (!result) {
+        throw new Error("Session completion failed: no result");
       }
-    }, 5000);
 
-    // Step 5: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
-    setTimeout(navigateToResult, 6000);
+      console.log("[InterviewPage] Session completed:", result);
+
+      // 3. 마무리 TTS 재생 (영상 모드일 때)
+      if (viewMode === 'video' && result.closingTtsBase64) {
+        await playAudio(result.closingTtsBase64);
+      }
+
+      // 4. 결과 페이지로 이동 (sessionId 전달)
+      navigateTo(`/my-speak/result?sessionId=${result.sessionId}`);
+    } catch (error) {
+      console.error("[InterviewPage] Failed to complete session:", error);
+      // TODO: 에러 UI 표시
+      // 에러 발생 시에도 결과 페이지로 이동 (임시)
+      navigateTo('/my-speak/result');
+    }
   };
 
   // 초기 로딩 중

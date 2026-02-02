@@ -2,6 +2,8 @@ import type { ApiResponse } from "@/types/api/common.type";
 import type {
   CompleteSessionRequest,
   CompleteSessionResponse,
+  ConversationTurnRequest,
+  ConversationTurnResponse,
   GenerateTTSRequest,
   GenerateTTSResponse,
   GetTTSCacheResponse,
@@ -64,14 +66,39 @@ export const uploadSTT = async (
 };
 
 /**
+ * 대화 턴 전송 API
+ */
+export const sendConversationTurn = async (
+  sessionId: number,
+  audioFile: File,
+  metadata: ConversationTurnRequest
+): Promise<ConversationTurnResponse> => {
+  const formData = new FormData();
+  formData.append("file", audioFile);
+  formData.append("languageCode", metadata.languageCode || "en-US");
+  formData.append("messageType", metadata.messageType);
+
+  const response = await apiClient.post<ApiResponse<ConversationTurnResponse>>(
+    `/myspeak/sessions/${sessionId}/turns`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+      authRequired: false,
+    } as CustomAxiosRequestConfig
+  );
+
+  return response.data.data;
+};
+
+/**
  * 세션 완료 API
  */
 export const completeSession = async (
-  sessionId: string,
+  sessionId: number,
   data: CompleteSessionRequest
 ): Promise<CompleteSessionResponse> => {
   const response = await apiClient.post<ApiResponse<CompleteSessionResponse>>(
-    `/api/myspeak/${sessionId}/complete`,
+    `/myspeak/sessions/${sessionId}/complete`,
     data,
     { authRequired: false } as CustomAxiosRequestConfig
   );
