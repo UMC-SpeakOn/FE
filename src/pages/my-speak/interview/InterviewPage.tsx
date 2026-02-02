@@ -147,13 +147,15 @@ const InterviewPage = () => {
         addMessage(firstMessage);
       } catch (error) {
         console.error("[InterviewPage] Failed to initialize session:", error);
+        alert("면접 세션을 시작하는데 실패했습니다. 다시 시도해주세요.");
+        navigateTo("/my-speak");
       } finally {
         setIsInitializing(false);
       }
     };
 
     initializeSession();
-  }, [startSession, start, myRoleId, addMessage]);
+  }, [startSession, start, myRoleId, goalId, addMessage, navigateTo]);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
   useEffect(() => {
@@ -192,6 +194,7 @@ const InterviewPage = () => {
       // 응답이 없으면 종료
       if (!response) {
         console.error("[InterviewPage] No response from sendTurn");
+        alert("AI 응답을 받는데 실패했습니다. 다시 시도해주세요.");
         return;
       }
 
@@ -210,7 +213,7 @@ const InterviewPage = () => {
       }
     } catch (error) {
       console.error("[InterviewPage] Failed to send turn:", error);
-      // TODO: 에러 UI 표시
+      alert("대화 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -301,9 +304,10 @@ const InterviewPage = () => {
       navigateTo(`/my-speak/result?sessionId=${result.sessionId}`);
     } catch (error) {
       console.error("[InterviewPage] Failed to complete session:", error);
-      // TODO: 에러 UI 표시
-      // 에러 발생 시에도 결과 페이지로 이동 (임시)
-      navigateTo('/my-speak/result');
+      setFinishStep('idle'); // 로딩 상태 해제
+      alert("세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setFinishStep('idle'); // 로딩 상태 초기화
     }
   };
 
