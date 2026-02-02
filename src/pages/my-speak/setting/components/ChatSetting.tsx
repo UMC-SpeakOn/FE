@@ -3,6 +3,8 @@ import { useState } from 'react';
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import { useRoleProfile } from '@/hooks/role/useRoleProfile';
 import useNavigation from '@/hooks/useNavigation';
+import { goalData } from '@/mocks/settingData';
+import { useCreateSession } from '@/pages/my-speak/setting/hooks/useCreateSession';
 
 import ListGoal from './Step/Goal/ListGoal';
 import StepSection from './Step/StepSection';
@@ -28,11 +30,15 @@ const ChatSetting = () => {
   });
 
   const handleChatClick = () => {
-    if (selectedAIId === null || selectedGoalId === null) return;
+    const selectedGoal = goalData.find((goal) => goal.id === selectedGoalId);
 
-    // InterviewPage로 roleId와 goalId를 전달하여 이동
-    // 세션 생성은 InterviewPage에서 처리
-    navigateTo(`/my-speak/interview?roleId=${selectedAIId}&goalId=${selectedGoalId}`);
+    if (!selectedAIId || !selectedGoal) return;
+
+    createSession({
+      myRoleId: selectedAIId,
+      targetQuestionCount: selectedGoal.targetQuestionCount,
+      startedAt: new Date().toISOString(),
+    });
   };
 
   return (
@@ -67,10 +73,11 @@ const ChatSetting = () => {
           <StepSection done={false} isLast hideNumber>
             <button
               type="button"
-              className="w-full py-[1.4rem] rounded-2xl bg-purple-600 text-white font-semibold text-[1.6rem] leading-none"
+              disabled={isLoading}
+              className="w-full py-[1.4rem] rounded-2xl bg-purple-600 text-white font-semibold text-[1.6rem] leading-none disabled:opacity-50"
               onClick={handleChatClick}
             >
-              대화 시작하기
+              {isLoading ? '세션 생성 중...' : '대화 시작하기'}
             </button>
           </StepSection>
         )}
