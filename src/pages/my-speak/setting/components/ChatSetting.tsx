@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
-import { useRoleProfile } from '@/hooks/role/useRoleProfile';
+import { useRoleProfile } from '@/hooks/role-profile/useRoleProfile';
 import useNavigation from '@/hooks/useNavigation';
 import { goalData } from '@/mocks/settingData';
 import { useCreateSession } from '@/pages/my-speak/setting/hooks/useCreateSession';

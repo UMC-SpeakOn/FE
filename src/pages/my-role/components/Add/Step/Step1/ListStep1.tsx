@@ -1,4 +1,4 @@
-import { usePersons } from '@/pages/my-role/hooks/usePersons';
+import { useAvatar } from '@/pages/my-role/hooks/useAvatar';
 
 import ItemStep1 from './ItemStep1';
 
@@ -8,11 +8,11 @@ interface ListStep1Props {
 }
 
 const ListStep1 = ({ selectedId, onSelect }: ListStep1Props) => {
-  const { response } = usePersons();
+  const { avatars } = useAvatar();
 
   return (
     <div className="w-full flex gap-3 overflow-x-auto">
-      {response?.result?.map((person) => (
+      {avatars?.map((person) => (
         <ItemStep1
           key={person.id}
           person={person}

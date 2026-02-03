@@ -1,4 +1,4 @@
-import type { SituationItem } from '@/pages/my-role/types/add.type';
+import type { SituationItem } from '@/pages/my-role/types/myrole.type';
 
 import ListCommon from '../Common/ListCommon';
 

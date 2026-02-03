@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
 import Delete from '@/assets/images/icons/delete.svg';
-import type { RoleProfileItem } from '@/types/role/role-profile.type';
+import type { RoleProfileItem } from '@/types/role-profile/role-profile.type';
 
 interface ItemRoleProfileProps {
   item: RoleProfileItem;
