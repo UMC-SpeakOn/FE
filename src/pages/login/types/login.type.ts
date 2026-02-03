@@ -7,6 +7,7 @@ export interface LoginItem {
   provider: 'kakao' | 'google';
 }
 
+// 배경 UI
 export interface DecorationItem {
   src: string;
   alt: string;
