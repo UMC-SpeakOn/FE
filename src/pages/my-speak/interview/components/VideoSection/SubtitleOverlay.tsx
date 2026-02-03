@@ -23,7 +23,7 @@ interface SubtitleOverlayProps {
 const SubtitleOverlay = ({ text, isVisible = true }: SubtitleOverlayProps) => {
   // 기본 자막 텍스트
   const defaultSubtitle =
-    'Thank you for coming in today.\nCould you start by telling me a bit about yourself?';
+    '현재 통신이 원할하지 않습니다. 잠시후 다시 시도해주세요.';
 
   if (!isVisible) return null;
 

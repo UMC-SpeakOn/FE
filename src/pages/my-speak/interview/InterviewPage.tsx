@@ -1,18 +1,24 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
 
-import navIcon from '@/assets/images/icons/nav.svg';
-import useNavigation from '@/hooks/useNavigation';
-import { personsData } from '@/mocks/addData';
+import { getAIOpener } from "@/api/ai";
+import { sendConversationTurnText } from "@/api/myspeak";
+import navIcon from "@/assets/images/icons/nav.svg";
+import Spinner from "@/components/Spinner/Spinner";
+import useNavigation from "@/hooks/useNavigation";
 
-import ChatModeContent from './components/ChatModeContent';
-import ControlButtons from './components/ControlButtons';
-import SpeakButton from './components/SpeakButton';
-import VideoModeContent from './components/VideoModeContent';
-import { useChat } from './hooks/useChat';
-import { useInterviewTimer } from './hooks/useInterviewTimer';
-import { useSpeechRecognition } from './hooks/useSpeechRecognition';
-import { useVideoSwap } from './hooks/useVideoSwap';
-import type { FinishStep } from './types/finish.type';
+import ChatModeContent from "./components/ChatModeContent";
+import ControlButtons from "./components/ControlButtons";
+import SpeakButton from "./components/SpeakButton";
+import VideoModeContent from "./components/VideoModeContent";
+import { useAudioPlayer } from "./hooks/useAudioPlayer";
+import { useChat } from "./hooks/useChat";
+import { useInterviewTimer } from "./hooks/useInterviewTimer";
+import { useSession } from "./hooks/useSession";
+import { useSpeechRecognition } from "./hooks/useSpeechRecognition";
+import { useVideoSwap } from "./hooks/useVideoSwap";
+import type { ChatMessage } from "./types/chat.type";
+import type { FinishStep } from "./types/finish.type";
 
 /**
  * InterviewPage - My Speak 면접 실전 연습 페이지 (통합)
@@ -33,6 +39,12 @@ import type { FinishStep } from './types/finish.type';
  */
 const InterviewPage = () => {
   const { navigateTo } = useNavigation();
+  const { sessionId: sessionIdFromUrl } = useParams<{ sessionId: string }>();
+  const location = useLocation();
+
+  // state에서 roleId 가져오기 (기본값: 1)
+  const myRoleId = (location.state as { myRoleId?: number })?.myRoleId ?? 1;
+  const sessionIdNumber = sessionIdFromUrl ? Number(sessionIdFromUrl) : null;
 
   // 뷰 모드 상태 (video | chat)
   const [viewMode, setViewMode] = useState<'video' | 'chat'>('video');
@@ -51,17 +63,33 @@ const InterviewPage = () => {
   // 마무리 플로우 상태
   const [finishStep, setFinishStep] = useState<FinishStep>('idle');
 
+  // 초기 로딩 상태 (세션 시작 중)
+  const [isInitializing, setIsInitializing] = useState(true);
+
   // 채팅 입력 상태 (음성 인식 텍스트 표시용)
   const [chatInput, setChatInput] = useState('');
 
-  // 면접관 데이터
-  const interviewer = personsData[0];
+  // 초기화 완료 여부 추적 (마운트 시 1회만 실행)
+  const hasInitialized = useRef(false);
+
+  // 면접관 데이터 (기본값)
+  const interviewer = {
+    name: "AI 면접관",
+    nationality: "AI",
+    imgUrl: "/images/default-interviewer.png",
+  };
+
+  // 세션 관리 훅
+  const { sessionId, setSessionId, complete: completeSession } = useSession();
+
+  // 오디오 재생 훅
+  const { play: playAudio } = useAudioPlayer();
 
   // 타이머 훅
-  const { formattedTime, start, pause, resume } = useInterviewTimer();
+  const { formattedTime, seconds, start, pause, resume } = useInterviewTimer();
 
-  // 채팅 훅
-  const { messages, isLoading, sendMessage, addFinishMessage } = useChat();
+  // 채팅 훅 (초기 메시지는 AI 오프너 로드 후 추가)
+  const { messages, isLoading, addMessage } = useChat();
 
   // 음성 인식 훅
   const {
@@ -70,7 +98,6 @@ const InterviewPage = () => {
     clearTranscript,
     audioLevel,
     transcript,
-    // error: speechError,
   } = useSpeechRecognition();
 
   // 비디오 스왑 훅
@@ -84,10 +111,53 @@ const InterviewPage = () => {
       : undefined;
   }, [messages]);
 
-  // 컴포넌트 마운트 시 타이머 시작
+  /**
+   * 컴포넌트 마운트 시 세션 초기화 및 AI 오프너 로드
+   * ChatSetting에서 생성된 세션을 사용
+   */
   useEffect(() => {
-    start();
-  }, []);
+    if (hasInitialized.current) return;
+
+    const initializeSession = async () => {
+      hasInitialized.current = true;
+      setIsInitializing(true);
+
+      try {
+        // 1. sessionId 유효성 검사
+        if (!sessionIdNumber) {
+          alert("잘못된 접근입니다. 세션 설정 페이지로 이동합니다.");
+          navigateTo("/my-speak/setting");
+          return;
+        }
+
+        // 2. ChatSetting에서 생성된 세션 사용
+        setSessionId(sessionIdNumber);
+
+        // 3. 타이머 시작
+        start();
+
+        // 4. AI 오프너 로드
+        const opener = await getAIOpener(myRoleId);
+
+        // 5. 오프닝 메시지 추가 (텍스트만, 오디오 없음)
+        const firstMessage: ChatMessage = {
+          id: "opener",
+          type: "AI",
+          content: opener.result, // Swagger 응답 result 필드 사용
+          timestamp: new Date(),
+        };
+        addMessage(firstMessage);
+      } catch (error) {
+        console.error("[InterviewPage] Failed to initialize session:", error);
+        alert("면접 세션을 시작하는데 실패했습니다. 다시 시도해주세요.");
+        navigateTo("/my-speak/setting");
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeSession();
+  }, [sessionIdNumber, setSessionId, start, myRoleId, addMessage, navigateTo]);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
   useEffect(() => {
@@ -95,6 +165,55 @@ const InterviewPage = () => {
       setChatInput(transcript);
     }
   }, [transcript, viewMode]);
+
+  /**
+   * 사용자 응답 처리 (텍스트 → AI 응답 → TTS 재생)
+   */
+  const handleUserResponse = async (transcript: string) => {
+    if (!transcript.trim() || !sessionId) return;
+
+    try {
+      // 1. 사용자 메시지 추가
+      const userMessage: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        type: "User",
+        content: transcript.trim(),
+        timestamp: new Date(),
+      };
+      addMessage(userMessage);
+
+      // 2. AI 응답 요청 (텍스트 전용 API 사용)
+      const response = await sendConversationTurnText(
+        sessionId!,
+        transcript.trim(),
+        "MAIN",
+        "en-US"
+      );
+
+      // 응답이 없으면 종료
+      if (!response) {
+        alert("AI 응답을 받는데 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+
+      // 3. AI 메시지 추가
+      const aiMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        type: "AI",
+        content: response.questionText,
+        timestamp: new Date(),
+      };
+      addMessage(aiMessage);
+
+      // 4. TTS 오디오 재생 (영상 모드일 때)
+      if (viewMode === "video" && response.base64Audio) {
+        await playAudio(response.base64Audio);
+      }
+    } catch (error) {
+      console.error("[InterviewPage] Failed to send turn:", error);
+      alert("대화 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+  };
 
   /**
    * 일시정지/재개 핸들러
@@ -120,7 +239,7 @@ const InterviewPage = () => {
    * 말하기 버튼 핸들러
    * - ready → speaking → done 순환
    * - 음성 인식 시작/중지 통합
-   * - 카메라 모드: 말하기 완료 시 즉시 메시지 전송
+   * - 카메라 모드: 말하기 완료 시 즉시 메시지 전송 (API 호출)
    * - 채팅 모드: 말하기 완료 시 입력창에만 입력 (사용자가 전송 버튼으로 컨트롤)
    */
   const handleSpeak = () => {
@@ -131,9 +250,9 @@ const InterviewPage = () => {
     } else if (speakState === 'speaking') {
       setSpeakState('done');
 
-      // 카메라 모드일 경우 transcript를 직접 사용하여 즉시 전송
+      // 카메라 모드일 경우 API를 통해 즉시 전송
       if (viewMode === 'video' && transcript.trim()) {
-        sendMessage(transcript.trim());
+        handleUserResponse(transcript.trim());
         setChatInput(''); // 전송 후 입력 필드 초기화
         clearTranscript(); // transcript도 초기화
       }
@@ -157,46 +276,52 @@ const InterviewPage = () => {
   };
 
   /**
-   * Step 2: AI 마무리 멘트 출력
-   */
-  const playFinishMessage = () => {
-    if (viewMode === 'chat') {
-      addFinishMessage();
-    }
-    setFinishStep('ai_message');
-  };
-
-  /**
-   * Step 3: 결과 로딩 스피너 표시
-   */
-  const showLoadingSpinner = () => {
-    setFinishStep('loading');
-  };
-
-  /**
-   * Step 4: 결과 페이지로 이동
-   */
-  const navigateToResult = () => {
-    navigateTo('/my-speak/result');
-  };
-
-  /**
    * 마무리하기 핸들러
-   * - 공통 플로우: 알림(1초) → 멘트(영상: TTS, 채팅: 채팅) → 로딩 스피너(2초) → 결과 페이지
+   * - 플로우: 세션 완료 API → 마무리 TTS 재생 → 결과 페이지 이동
    */
-  const handleFinish = () => {
-    // Step 1: 알림 - "AI의 마무리 멘트가 한 턴 추가됩니다."
-    setFinishStep('notification');
+  const handleFinish = async () => {
+    try {
+      // 1. 로딩 상태 표시
+      setFinishStep('loading');
 
-    // Step 2: AI 마무리 멘트 출력 (1초 후)
-    setTimeout(playFinishMessage, 1000);
+      // 2. 세션 완료 API 호출
+      const result = await completeSession(seconds); // 총 시간(초) 전달
 
-    // Step 3: 결과 로딩 스피너 (4초 후: 알림 1초 + 멘트 3초)
-    setTimeout(showLoadingSpinner, 4000);
+      if (!result) {
+        throw new Error("Session completion failed: no result");
+      }
 
-    // Step 4: 결과 화면 이동 (6초 후: 알림 1초 + 멘트 3초 + 로딩 2초)
-    setTimeout(navigateToResult, 6000);
+      // 3. 마무리 TTS 재생 (영상 모드일 때)
+      if (viewMode === 'video' && result.closingTtsBase64) {
+        await playAudio(result.closingTtsBase64);
+      }
+
+      // 4. 결과 페이지로 이동 (세션 완료 데이터를 state로 전달)
+      navigateTo('/my-speak/result', {
+        state: {
+          sessionId: result.sessionId,
+          totalTime: result.totalTime,
+          sentenceCount: result.sentenceCount,
+        }
+      });
+    } catch (error) {
+      console.error("[InterviewPage] Failed to complete session:", error);
+      setFinishStep('idle'); // 로딩 상태 해제
+      alert("세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setFinishStep('idle'); // 로딩 상태 초기화
+    }
   };
+
+  // 초기 로딩 중
+  if (isInitializing) {
+    return (
+      <div className="relative flex flex-col items-center justify-center w-full h-full flex-1 bg-purple-500">
+        <Spinner />
+        <p className="mt-6 text-white text-lg">면접 준비 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex flex-col w-full h-full flex-1 bg-purple-500 overflow-hidden">
@@ -239,13 +364,14 @@ const InterviewPage = () => {
               messages={messages}
               formattedTime={formattedTime}
               isLoading={isLoading}
-              onPlayAudio={() => {}}
-              onSendMessage={sendMessage}
+              onPlayAudio={() => { }}
+              onSendMessage={handleUserResponse}
               finishStep={finishStep}
               transcript={transcript}
               inputValue={chatInput}
               onInputChange={setChatInput}
               clearTranscript={clearTranscript}
+              interviewer={interviewer}
             />
           </div>
         </div>

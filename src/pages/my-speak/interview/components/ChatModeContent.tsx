@@ -16,6 +16,11 @@ interface ChatModeContentProps {
   inputValue?: string;
   onInputChange?: (value: string) => void;
   clearTranscript?: () => void;
+  interviewer?: {
+    name: string;
+    nationality: string;
+    imgUrl: string;
+  };
 }
 
 /**
@@ -34,6 +39,7 @@ const ChatModeContent = ({
   inputValue,
   onInputChange,
   clearTranscript,
+  interviewer,
 }: ChatModeContentProps) => {
   // 전송 후 transcript 초기화를 포함한 wrapper
   const handleSend = (message: string) => {
@@ -43,7 +49,7 @@ const ChatModeContent = ({
   return (
     <div className="relative h-[65vh] bg-white rounded-2xl overflow-hidden flex flex-col">
 
-      <MessageList messages={messages} onPlayAudio={onPlayAudio} />
+      <MessageList messages={messages} onPlayAudio={onPlayAudio} interviewer={interviewer} />
       <ChatInput
         onSend={handleSend}
         disabled={isLoading}

@@ -1,5 +1,6 @@
-import type { LoginItem } from '../../types/login.type';
 import { getKakaoLogin } from '@/utils/login/kakao/getKakaoLogin';
+
+import type { LoginItem } from '../../types/login.type';
 
 interface ItemButtonProps {
   item: LoginItem;

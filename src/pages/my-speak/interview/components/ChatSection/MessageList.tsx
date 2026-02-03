@@ -6,6 +6,11 @@ import MessageBubble from "./MessageBubble";
 interface MessageListProps {
   messages: ChatMessage[];
   onPlayAudio?: (message: ChatMessage) => void;
+  interviewer?: {
+    name: string;
+    nationality: string;
+    imgUrl: string;
+  };
 }
 
 /**
@@ -19,7 +24,7 @@ interface MessageListProps {
  * - 새 메시지 추가 시 자동 스크롤
  * - 빈 상태 처리
  */
-const MessageList = ({ messages, onPlayAudio }: MessageListProps) => {
+const MessageList = ({ messages, onPlayAudio, interviewer }: MessageListProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 새 메시지 추가 시 자동 스크롤
@@ -41,6 +46,7 @@ const MessageList = ({ messages, onPlayAudio }: MessageListProps) => {
             key={message.id}
             message={message}
             onPlayAudio={() => onPlayAudio?.(message)}
+            interviewer={interviewer}
           />
         ))
       )}
