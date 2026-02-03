@@ -12,12 +12,12 @@ const ListStep1 = ({ selectedId, onSelect }: ListStep1Props) => {
 
   return (
     <div className="w-full flex gap-3 overflow-x-auto">
-      {avatars?.map((person) => (
+      {avatars?.map((avatar) => (
         <ItemStep1
-          key={person.id}
-          person={person}
-          isSelected={selectedId === person.id}
-          onClick={() => onSelect(person.id)}
+          key={avatar.id}
+          avatar={avatar}
+          isSelected={selectedId === avatar.id}
+          onClick={() => onSelect(avatar.id)}
         />
       ))}
     </div>
