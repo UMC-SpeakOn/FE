@@ -9,7 +9,7 @@ const Subscribe = () => {
   const { navigateTo } = useNavigation();
 
   const handleSubscribeClick = () => {
-    navigateTo('/profile/subscribe');
+    navigateTo('/profile/subscription');
   };
 
   return (

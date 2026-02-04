@@ -12,6 +12,8 @@ import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 import MySpeakResultPage from '@/pages/my-speak/result/Result';
 import MySpeakSettingPage from '@/pages/my-speak/setting/Setting';
 import AccountPage from '@/pages/profile/account/Account';
+import PaymentsPage from '@/pages/profile/payments/Payments';
+import SubscriptionPage from '@/pages/profile/subscription/Subscription';
 
 const router = createBrowserRouter([
   {
@@ -58,8 +60,12 @@ const router = createBrowserRouter([
         element: <MyReportDetailPage />,
       },
       {
-        path: 'profile/account',
-        element: <AccountPage />,
+        path: 'profile',
+        children: [
+          { path: 'account', element: <AccountPage /> },
+          { path: 'subscription', element: <SubscriptionPage /> },
+          { path: 'payments', element: <PaymentsPage /> },
+        ],
       },
     ],
   },

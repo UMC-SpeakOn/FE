@@ -19,6 +19,7 @@ export type PaymentMethod = '토스페이';
 
 export interface PaymentsItem {
   name: string;
+  explain: string;
   price: number;
   nextPaymentDate: string;
   paymentMethod: PaymentMethod;
