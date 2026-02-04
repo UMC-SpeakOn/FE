@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { useDeleteRoleProfile } from '@/hooks/role/useDeleteRoleProfile';
-import { useRoleProfile } from '@/hooks/role/useRoleProfile';
+import { useRoleProfile } from '@/hooks/role-profile/useRoleProfile';
+import { useDeleteRoleProfile } from '@/pages/my-role/hooks/useDeleteRoleProfile';
 
 import Add from './components/Add/Add';
 import Bar from './components/Bar/Bar';

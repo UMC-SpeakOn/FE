@@ -1,5 +1,5 @@
-import { initKakao } from './initKakao';
 import { getRedirectUri } from './getRedirectUri';
+import { initKakao } from './initKakao';
 
 export const getKakaoLogin = () => {
   initKakao();

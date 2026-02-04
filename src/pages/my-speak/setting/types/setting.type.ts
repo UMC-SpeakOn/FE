@@ -1,5 +1,4 @@
-import type { RoleProfileItem } from '@/types/role/role-profile.type';
-
+// 단계 UI
 export type SettingStep = 1 | 2;
 
 export type SettingStepSectionProps = {
@@ -11,18 +10,9 @@ export type SettingStepSectionProps = {
   children: React.ReactNode;
 };
 
-export type AiItem = RoleProfileItem;
-
+// 목표 설정 UI
 export interface GoalItem {
   id: number;
   label: string;
   targetQuestionCount: number;
 }
-
-export interface CreateSessionRequest {
-  myRoleId: number;
-  targetQuestionCount: GoalItem['targetQuestionCount'];
-  startedAt: string;
-}
-
-export type CreateSessionResult = number;

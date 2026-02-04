@@ -2,14 +2,17 @@ import { useMutation } from '@/hooks/useApi';
 import type {
   CreateSessionRequest,
   CreateSessionResult,
-} from '@/pages/my-speak/setting/types/setting.type';
-import type { ApiResponse } from '@/types/common/common.type';
+} from '@/types/api/myspeak.type';
+import type { ServerApiResponse } from '@/types/api/server.type';
 
 export const useCreateSession = (options?: {
   onSuccess?: (sessionId: number) => void;
   onError?: (error: string) => void;
 }) => {
-  return useMutation<ApiResponse<CreateSessionResult>, CreateSessionRequest>(
+  return useMutation<
+    ServerApiResponse<CreateSessionResult>,
+    CreateSessionRequest
+  >(
     (data) => ({
       method: 'POST',
       url: '/myspeak/sessions',

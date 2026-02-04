@@ -1,4 +1,4 @@
-import type { JobItem } from '@/pages/my-role/types/add.type';
+import type { JobItem } from '@/pages/my-role/types/myrole.type';
 
 import ListCommon from '../Common/ListCommon';
 

@@ -1,6 +1,6 @@
 import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import Title from '@/components/Title/Title';
-import type { RoleProfileItem } from '@/types/role/role-profile.type';
+import type { RoleProfileItem } from '@/types/role-profile/role-profile.type';
 
 import NotFavs from './NotFavs';
 

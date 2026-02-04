@@ -1,4 +1,4 @@
-import type { RoleProfileItem } from '@/types/role/role-profile.type';
+import type { RoleProfileItem } from '@/types/role-profile/role-profile.type';
 
 import ItemRoleProfile from './ItemRoleProfile';
 

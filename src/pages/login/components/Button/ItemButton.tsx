@@ -1,4 +1,4 @@
-import { getKakaoLogin } from '@/utils/login/kakao/getKakaoLogin';
+import { getKakaoLogin } from '@/pages/login/utils/kakao/getKakaoLogin';
 
 import type { LoginItem } from '../../types/login.type';
 

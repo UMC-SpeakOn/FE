@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
 import { useQuery } from '@/hooks/useApi';
-import type { ApiResponse } from '@/types/common/common.type';
-import type { RoleProfileListResponse } from '@/types/role/role-profile.type';
-import { mapRoleProfileApiToItem } from '@/types/role/role-profile.type';
+import type { RoleProfileListResponse } from '@/types/api/role-profile.type';
+import type { ServerApiResponse } from '@/types/api/server.type';
+import { mapRoleProfileApiToItem } from '@/types/role-profile/role-profile.type';
 
 export const useRoleProfile = () => {
   const queryConfig = useMemo(
@@ -15,7 +15,7 @@ export const useRoleProfile = () => {
   );
 
   const { data, isLoading, isError, error, execute } =
-    useQuery<ApiResponse<RoleProfileListResponse>>(queryConfig);
+    useQuery<ServerApiResponse<RoleProfileListResponse>>(queryConfig);
 
   const profiles = data?.result.roles.map(mapRoleProfileApiToItem) ?? [];
 
