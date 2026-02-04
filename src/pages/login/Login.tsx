@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { DECORATIONS1, DECORATIONS2, DECORATIONS3 } from '@/mocks/loginData';
-import { getKakaoCode } from '@/utils/login/kakao/getKakaoCode';
-import { getRedirectUri } from '@/utils/login/kakao/getRedirectUri';
+import { getKakaoCode } from '@/pages/login/utils/kakao/getKakaoCode';
+import { getRedirectUri } from '@/pages/login/utils/kakao/getRedirectUri';
 
 import ListButton from './components/Button/ListButton';
 import ListDecoration from './components/Decoration/ListDecoration';

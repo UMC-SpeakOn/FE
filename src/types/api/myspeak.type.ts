@@ -1,13 +1,24 @@
+import type { GoalItem } from '@/pages/my-speak/setting/types/setting.type';
+
 /**
  * MySpeak API 요청/응답 타입
  */
 
+// 대화 세션 생성 요청
+export interface CreateSessionRequest {
+  myRoleId: number;
+  targetQuestionCount: GoalItem['targetQuestionCount'];
+  startedAt: string;
+}
+
+// 대화 세션 생성 응답
+export type CreateSessionResult = number;
 
 // TTS 생성
 export interface GenerateTTSRequest {
   text: string;
   interviewId: string;
-  messageType: "FOLLOW" | "MAIN" | "FOLLOWCLOSING";
+  messageType: 'FOLLOW' | 'MAIN' | 'FOLLOWCLOSING';
   voiceName: string;
   threadingFile?: string;
 }
@@ -34,13 +45,13 @@ export interface UploadSTTResponse {
 // 대화 턴
 export interface ConversationTurnRequest {
   languageCode?: string; // 기본값: "en-US"
-  messageType: "MAIN" | "FOLLOW" | "CLOSING";
+  messageType: 'MAIN' | 'FOLLOW' | 'CLOSING';
 }
 
 export interface ConversationTurnResponse {
   questionText: string; // AI 질문 텍스트
   base64Audio: string; // base64 인코딩된 mp3
-  messageType: "MAIN" | "FOLLOW" | "CLOSING";
+  messageType: 'MAIN' | 'FOLLOW' | 'CLOSING';
 }
 
 // 세션 완료

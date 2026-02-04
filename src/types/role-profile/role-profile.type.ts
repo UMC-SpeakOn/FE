@@ -1,3 +1,6 @@
+import type { RoleProfileApiItem } from '../api/role-profile.type';
+
+// 공용 컴포넌트 roleProfile UI
 export interface RoleProfileItem {
   id: number;
   name: string;
@@ -8,22 +11,7 @@ export interface RoleProfileItem {
   imageUrl: string;
 }
 
-/* 조회 */
-export interface RoleProfileApiItem {
-  myRoleId: number;
-  avatarImgUrl: string;
-  avatarName: string;
-  avatarAge: number;
-  avatarNationality: string;
-  job: string;
-  situation: string;
-}
-
-export interface RoleProfileListResponse {
-  roles: RoleProfileApiItem[];
-  totalCount: number;
-}
-
+// 매핑
 export const mapRoleProfileApiToItem = (
   apiItem: RoleProfileApiItem,
 ): RoleProfileItem => ({
@@ -35,9 +23,3 @@ export const mapRoleProfileApiToItem = (
   age: apiItem.avatarAge,
   imageUrl: apiItem.avatarImgUrl,
 });
-
-/* 삭제 */
-export interface DeleteRoleProfileResponse {
-  myRoleId: number;
-  message: string;
-}

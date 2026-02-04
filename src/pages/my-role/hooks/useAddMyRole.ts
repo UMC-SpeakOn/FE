@@ -2,15 +2,15 @@ import { useMutation } from '@/hooks/useApi';
 import type {
   AddMyRoleRequest,
   AddMyRoleResult,
-} from '@/pages/my-role/types/add.type';
-import type { ApiResponse } from '@/types/common/common.type';
+} from '@/types/api/myrole.type';
+import type { ServerApiResponse } from '@/types/api/server.type';
 
 interface Options {
   onSuccess?: () => void;
 }
 
 export const useAddMyRole = (options?: Options) => {
-  return useMutation<ApiResponse<AddMyRoleResult>, AddMyRoleRequest>(
+  return useMutation<ServerApiResponse<AddMyRoleResult>, AddMyRoleRequest>(
     (body) => ({
       method: 'POST',
       url: '/my-role',

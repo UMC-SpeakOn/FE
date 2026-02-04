@@ -1,11 +1,8 @@
-import type {
-  JobItem,
-  PersonItem,
-  SituationItem,
-} from '@/pages/my-role/types/add.type';
+import type { JobItem, SituationItem } from '@/pages/my-role/types/myrole.type';
+import type { AvatarItem } from '@/types/api/myrole.type';
 
 // STEP 1: 사람
-export const personsData: PersonItem[] = [
+export const personsData: AvatarItem[] = [
   {
     id: 1,
     name: 'Emily',

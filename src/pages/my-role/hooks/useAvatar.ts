@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 
 import { useApi } from '@/hooks/useApi';
-import type { ApiResponse } from '@/types/common/common.type';
+import type { AvatarItem } from '@/types/api/myrole.type';
+import type { ServerApiResponse } from '@/types/api/server.type';
 
-import type { PersonItem } from '../types/add.type';
-
-export const usePersons = () => {
+export const useAvatar = () => {
   const axiosConfig = useMemo(
     () => ({
       method: 'GET',
@@ -14,13 +13,13 @@ export const usePersons = () => {
     [],
   );
 
-  const { data, isLoading, isError } = useApi<ApiResponse<PersonItem[]>>(
+  const { data, isLoading, isError } = useApi<ServerApiResponse<AvatarItem[]>>(
     axiosConfig,
     { enabled: true },
   );
 
   return {
-    response: data,
+    avatars: data?.result ?? [],
     isLoading,
     isError,
   };
