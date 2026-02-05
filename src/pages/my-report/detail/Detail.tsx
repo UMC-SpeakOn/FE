@@ -8,18 +8,22 @@ import ReportAI from './components/ReportAI/ReportAI';
 import ReportChat from './components/ReportChat/ReportChat';
 import ReportInfo from './components/ReportInfo/ReportInfo';
 import { useReportDetail } from './hooks/useReportDetail';
+import { useReportLogs } from './hooks/useReportLogs';
 
 const Detail = () => {
   const { id } = useParams<{ id: string }>();
+  const reportId = Number(id);
 
-  const { report, isLoading, isError } = useReportDetail(Number(id));
-  console.log('report', report);
+  const { report, isLoading, isError } = useReportDetail(reportId);
+  const { logs, isLoading: isLogsLoading } = useReportLogs(reportId);
 
-  if (isLoading) {
+  // console.log('report', report);
+
+  if (isLoading || isLogsLoading) {
     return <div>로딩 중...</div>;
   }
 
-  if (isError || !report) {
+  if (isError || !report || !logs) {
     return <div>리포트를 불러올 수 없습니다.</div>;
   }
 
@@ -40,7 +44,7 @@ const Detail = () => {
         <ReportBar />
 
         <ReportChat
-          data={report.conversationLog}
+          data={logs}
           aiAvatarUrl={report.sessionSummary.avatarImgUrl}
         />
 

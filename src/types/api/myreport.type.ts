@@ -1,3 +1,11 @@
+export interface ReportLogResult {
+  messageId: number;
+  senderRole: 'AI' | 'USER';
+  content: string;
+  audioUrl?: string;
+  createdAt: string;
+}
+
 // 리포트 상세 조회 응답
 export interface ReportDetailResult {
   reportId: number;
@@ -32,11 +40,20 @@ export interface ReportDetailResult {
 
   userReflection: string;
 
-  conversationLog: {
-    messageId: number;
-    senderRole: 'AI' | 'USER';
-    content: string;
-    audioUrl?: string;
-    createdAt: string;
-  }[];
+  conversationLog: ReportLogResult[];
+}
+
+export interface ReportLogResult {
+  messageId: number;
+  senderRole: 'AI' | 'USER';
+  content: string;
+  audioUrl?: string;
+  createdAt: string;
+}
+
+// 대화 로그 상세 조회 응답
+export interface ReportLogsApiResult {
+  reportId: number;
+  totalMessageCount: number;
+  messages: ReportLogResult[];
 }

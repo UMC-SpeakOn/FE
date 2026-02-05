@@ -1,12 +1,10 @@
-import type { ReportDetailResult } from '@/types/api/myreport.type';
+import type { ReportLogResult } from '@/types/api/myreport.type';
 
 import ReportSection from '../common/ReportSection/ReportSection';
 import ChatCard from './ChatCard/ChatCard';
 
-type ConversationLog = ReportDetailResult['conversationLog'];
-
 interface ReportChatProps {
-  data: ConversationLog;
+  data: ReportLogResult[];
   aiAvatarUrl: string;
 }
 
