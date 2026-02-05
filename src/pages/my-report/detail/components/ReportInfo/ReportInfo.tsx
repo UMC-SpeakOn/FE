@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 import type { ReportDetailResult } from '@/types/api/myreport.type';
 
 import ReportSection from '../common/ReportSection/ReportSection';
@@ -9,21 +7,19 @@ import ReviewCard from './ReviewCard/ReviewCard';
 
 interface ReportInfoProps {
   data: ReportDetailResult['sessionSummary'];
-  reflection: string;
+  difficulty: number;
+  review: string;
+  onChangeDifficulty: (v: number) => void;
+  onChangeReview: (v: string) => void;
 }
 
-const ReportInfo = ({ data, reflection }: ReportInfoProps) => {
-  const [difficulty, setDifficulty] = useState<number>(data.difficulty);
-  const [review, setReview] = useState(reflection);
-
-  useEffect(() => {
-    setDifficulty(data.difficulty);
-  }, [data.difficulty]);
-
-  useEffect(() => {
-    setReview(reflection);
-  }, [reflection]);
-
+const ReportInfo = ({
+  data,
+  difficulty,
+  review,
+  onChangeDifficulty,
+  onChangeReview,
+}: ReportInfoProps) => {
   return (
     <div className="flex flex-col gap-[2.8rem]">
       <div className="grid grid-cols-2 gap-[1.7rem]">
@@ -37,11 +33,11 @@ const ReportInfo = ({ data, reflection }: ReportInfoProps) => {
       </div>
 
       <ReportSection title="난이도" description="눌러서 수정할 수 있어요">
-        <DifficultyCard value={difficulty} onChange={setDifficulty} />
+        <DifficultyCard value={difficulty} onChange={onChangeDifficulty} />
       </ReportSection>
 
       <ReportSection title="소감">
-        <ReviewCard text={review} onChange={setReview} maxLength={120} />
+        <ReviewCard text={review} onChange={onChangeReview} maxLength={120} />
       </ReportSection>
     </div>
   );
