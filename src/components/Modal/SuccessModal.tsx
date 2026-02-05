@@ -1,12 +1,19 @@
 import Check from '@/assets/images/icons/check.svg';
 import Close from '@/assets/images/icons/close.svg';
 
-interface AddModalProps {
+interface SuccessModalProps {
   open: boolean;
+  title: string;
+  descriptions: string[];
   onClose: () => void;
 }
 
-const AddModal = ({ open, onClose }: AddModalProps) => {
+const SuccessModal = ({
+  open,
+  onClose,
+  title,
+  descriptions,
+}: SuccessModalProps) => {
   if (!open) return null;
 
   return (
@@ -30,17 +37,17 @@ const AddModal = ({ open, onClose }: AddModalProps) => {
         <div className="flex flex-col gap-[1.2rem] items-center">
           <img src={Check} alt="check" className="w-[3.9rem]" />
           <p className="text-[1.5rem] font-bold text-black text-center leading-none">
-            등록 완료
+            {title}
           </p>
-          <p className="text-[1.2rem] font-semibold text-black text-center leading-[1.3]">
-            메뉴 → My Speak으로
-            <br />
-            이동해서 학습을 시작하세요!
-          </p>
+          <div className="text-[1.2rem] font-semibold text-black text-center leading-[1.3] whitespace-pre-line">
+            {descriptions.map((text, index) => (
+              <p key={index}>{text}</p>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default AddModal;
+export default SuccessModal;

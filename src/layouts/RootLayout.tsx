@@ -13,6 +13,8 @@ const RootLayout = () => {
     '/my-speak/result',
     '/my-speak/interview',
     '/my-report/:id',
+    '/profile/subscription',
+    '/profile/payments',
   ];
 
   const hideNavbar = HIDE_NAV_PATHS.some((path) =>

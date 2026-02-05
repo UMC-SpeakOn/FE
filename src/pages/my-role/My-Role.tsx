@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
+import SuccessModal from '@/components/Modal/SuccessModal';
 import { useRoleProfile } from '@/hooks/role-profile/useRoleProfile';
 import { useDeleteRoleProfile } from '@/pages/my-role/hooks/useDeleteRoleProfile';
 
 import Add from './components/Add/Add';
 import Bar from './components/Bar/Bar';
 import Favs from './components/Favs/Favs';
-import AddModal from './components/Modal/AddModal';
 
 const MyRole = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -49,9 +49,11 @@ const MyRole = () => {
       <Bar />
       <Add onSuccess={handleAddSuccess} key={resetKey} />
 
-      <AddModal
+      <SuccessModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        title="등록 완료"
+        descriptions={['메뉴 → My Speak으로', '이동해서 학습을 시작하세요!']}
       />
     </div>
   );

@@ -22,10 +22,10 @@ const ProfileModal = ({
 }: ProfileModalProps) => {
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-center bg-black/50"
+      className="fixed inset-y-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[430px] bg-black/50"
       onClick={onClose}
     >
-      <div className="relative w-full max-w-[430px]">
+      <div className="relative w-full">
         <div className="flex min-h-screen items-center justify-center px-[1.6rem]">
           <div
             className="relative flex flex-col gap-[3rem] px-[2.05rem] py-[2.08rem] bg-white rounded-[1.2rem]"

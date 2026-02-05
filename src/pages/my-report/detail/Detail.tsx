@@ -1,8 +1,8 @@
+import PrevNavbar from '@/components/Navbar/PrevNavbar';
 import { reportData } from '@/mocks/reportData';
 
 import ReportBar from './components/common/ReportBar/ReportBar';
 import ReportButton from './components/common/ReportButton/ReportButton';
-import Navbar from './components/Navbar/Navbar';
 import ReportAI from './components/ReportAI/ReportAI';
 import ReportChat from './components/ReportChat/ReportChat';
 import ReportInfo from './components/ReportInfo/ReportInfo';
@@ -10,7 +10,7 @@ import ReportInfo from './components/ReportInfo/ReportInfo';
 const Detail = () => {
   return (
     <>
-      <Navbar title={reportData.interviewTitle} />
+      <PrevNavbar title={reportData.interviewTitle} path={'/my-report'} />
 
       <div className="white-pageContainer pr-[1.597rem] gap-[3.3rem]">
         <ReportInfo data={reportData} />

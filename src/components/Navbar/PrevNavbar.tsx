@@ -1,20 +1,25 @@
 import LeftArrow from '@/assets/images/icons/left-arrow.svg';
 import useNavigation from '@/hooks/useNavigation';
 
-interface NavbarProps {
+interface PrevNavbarProps {
   title: string;
+  path?: string;
+  back?: boolean;
 }
 
-const Navbar = ({ title }: NavbarProps) => {
-  const { navigateTo } = useNavigation();
+const PrevNavbar = ({ title, path, back }: PrevNavbarProps) => {
+  const { navigateTo, navigateBack } = useNavigation();
 
-  const handleMyreportClick = () => {
-    navigateTo('/my-report');
+  const handleClick = () => {
+    if (back) {
+      navigateBack();
+    } else if (path) {
+      navigateTo(path);
+    }
   };
-
   return (
     <nav className="relative w-full flex items-center px-[2.4rem] my-[0.8rem]">
-      <button onClick={handleMyreportClick}>
+      <button onClick={handleClick}>
         <img src={LeftArrow} alt="left" className="w-[0.9rem]" />
       </button>
 
@@ -25,4 +30,4 @@ const Navbar = ({ title }: NavbarProps) => {
   );
 };
 
-export default Navbar;
+export default PrevNavbar;
