@@ -1,27 +1,48 @@
+import { useParams } from 'react-router-dom';
+
 import PrevNavbar from '@/components/Navbar/PrevNavbar';
-import { reportData } from '@/mocks/reportData';
 
 import ReportBar from './components/common/ReportBar/ReportBar';
 import ReportButton from './components/common/ReportButton/ReportButton';
 import ReportAI from './components/ReportAI/ReportAI';
 import ReportChat from './components/ReportChat/ReportChat';
 import ReportInfo from './components/ReportInfo/ReportInfo';
+import { useReportDetail } from './hooks/useReportDetail';
 
 const Detail = () => {
+  const { id } = useParams<{ id: string }>();
+
+  const { report, isLoading, isError } = useReportDetail(Number(id));
+  console.log('report', report);
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (isError || !report) {
+    return <div>리포트를 불러올 수 없습니다.</div>;
+  }
+
   return (
     <>
-      <PrevNavbar title={reportData.interviewTitle} path={'/my-report'} />
+      <PrevNavbar title={report.sessionSummary.job} path={'/my-report'} />
 
       <div className="white-pageContainer pr-[1.597rem] gap-[3.3rem]">
-        <ReportInfo data={reportData} />
+        <ReportInfo
+          data={report.sessionSummary}
+          reflection={report.userReflection}
+        />
 
         <ReportBar />
 
-        <ReportAI data={reportData} />
+        <ReportAI data={report.aiInsightCard} />
 
         <ReportBar />
 
-        <ReportChat data={reportData} />
+        <ReportChat
+          data={report.conversationLog}
+          aiAvatarUrl={report.sessionSummary.avatarImgUrl}
+        />
 
         <ReportButton text="저장하기" />
       </div>

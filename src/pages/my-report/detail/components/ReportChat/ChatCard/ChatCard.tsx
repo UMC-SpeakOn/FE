@@ -1,4 +1,4 @@
-import type { ChatLog } from '@/pages/my-report/detail/types/report.type';
+import type { ChatLog } from '@/pages/my-report/detail/types/myreport.type';
 
 import ItemChat from './ItemChat';
 // import LockedOverlay from './LockedOverlay';

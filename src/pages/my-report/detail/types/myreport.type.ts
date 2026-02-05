@@ -1,12 +1,4 @@
-export type ChatRole = 'ai' | 'user';
-
-export type ReportMeta = {
-  time: string;
-  sentenceCount: string;
-  difficulty: number;
-  review: string;
-};
-
+// InsightTab UI
 export type InsightTab = '핵심요약' | '톤 분석' | '근거' | '교정';
 
 export type SummaryInsightItem = {
@@ -50,17 +42,11 @@ export type InsightCard = {
   items: InsightItem[];
 };
 
-export type ChatLog = {
+// ChatLog UI
+export interface ChatLog {
   id: number;
-  role: ChatRole;
+  role: string;
   speakerName: string;
   avatarUrl: string;
   message: string;
-};
-
-export type ReportData = {
-  interviewTitle: string;
-  meta: ReportMeta;
-  insightCard: InsightCard;
-  chatLogs: ChatLog[];
-};
+}

@@ -1,4 +1,4 @@
-import type { SummaryInsightItem } from '@/pages/my-report/detail/types/report.type';
+import type { SummaryInsightItem } from '@/pages/my-report/detail/types/myreport.type';
 
 const Summary = ({ item }: { item: SummaryInsightItem }) => (
   <>

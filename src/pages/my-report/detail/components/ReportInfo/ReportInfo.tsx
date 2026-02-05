@@ -1,28 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import type { ReportData } from '../../types/report.type';
+import type { ReportDetailResult } from '@/types/api/myreport.type';
+
 import ReportSection from '../common/ReportSection/ReportSection';
 import DifficultyCard from './DifficultyCard/DifficultyCard';
 import InfoCard from './InfoCard/InfoCard';
 import ReviewCard from './ReviewCard/ReviewCard';
 
 interface ReportInfoProps {
-  data: ReportData;
+  data: ReportDetailResult['sessionSummary'];
+  reflection: string;
 }
 
-const ReportInfo = ({ data }: ReportInfoProps) => {
-  const [difficulty, setDifficulty] = useState<number>(data.meta.difficulty);
-  const [review, setReview] = useState(data.meta.review);
+const ReportInfo = ({ data, reflection }: ReportInfoProps) => {
+  const [difficulty, setDifficulty] = useState<number>(data.difficulty);
+  const [review, setReview] = useState(reflection);
+
+  useEffect(() => {
+    setDifficulty(data.difficulty);
+  }, [data.difficulty]);
+
+  useEffect(() => {
+    setReview(reflection);
+  }, [reflection]);
 
   return (
     <div className="flex flex-col gap-[2.8rem]">
       <div className="grid grid-cols-2 gap-[1.7rem]">
         <ReportSection title="시간">
-          <InfoCard text={data.meta.time} />
+          <InfoCard text={data.totalTime} />
         </ReportSection>
 
         <ReportSection title="문장 수">
-          <InfoCard text={data.meta.sentenceCount} />
+          <InfoCard text={`${data.sentenceCount}문장`} />
         </ReportSection>
       </div>
 

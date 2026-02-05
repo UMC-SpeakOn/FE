@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import type { InsightTab } from '../../../../types/report.type';
+import type { InsightTab } from '../../../../types/myreport.type';
 
 interface ItemTabProps {
   tab: InsightTab;

@@ -1,19 +1,19 @@
 import clsx from 'clsx';
 
-import type { ChatLog } from '../../../types/report.type';
+import type { ChatLog } from '../../../types/myreport.type';
 
 interface ItemChatProps {
   chat: ChatLog;
 }
 
 const ItemChat = ({ chat }: ItemChatProps) => {
-  const isAI = chat.role === 'ai';
+  const isAI = chat.role.toUpperCase() === 'AI';
 
   return (
     <div className="w-full flex">
       <div
         className={clsx(
-          'flex gap-[1.2rem] items-start max-w-full',
+          'flex gap-[1.2rem] items-start w-full',
           isAI ? 'mr-auto' : 'ml-auto flex-row-reverse',
         )}
       >
