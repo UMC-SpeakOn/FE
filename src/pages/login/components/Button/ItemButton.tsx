@@ -1,19 +1,22 @@
 import { getKakaoLogin } from '@/pages/login/utils/kakao/getKakaoLogin';
 
 import type { LoginItem } from '../../types/login.type';
+import { getGoogleLogin } from '../../utils/google/getGoogleLogin';
 
 interface ItemButtonProps {
   item: LoginItem;
 }
 
+const loginHandlers = {
+  kakao: getKakaoLogin,
+  google: getGoogleLogin,
+} as const;
+
 const ItemButton = ({ item }: ItemButtonProps) => {
   const { icon, text, alt, bgColor, provider } = item;
 
   const handleClick = () => {
-    if (provider === 'kakao') {
-      getKakaoLogin();
-      return;
-    }
+    loginHandlers[provider]();
   };
 
   return (
