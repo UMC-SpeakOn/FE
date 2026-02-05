@@ -9,6 +9,7 @@ export interface OAuthLoginResult {
   userId: number;
   accessToken: string;
   refreshToken: string;
+  isOnboarded: boolean;
 }
 
 export type OAuthProvider = 'kakao' | 'google';
