@@ -42,13 +42,8 @@ const Detail = () => {
     initialDifficulty !== null &&
     (difficulty !== initialDifficulty || review !== initialReview);
 
-  if (isLoading || isLogsLoading || difficulty === null) {
-    return <div>로딩 중...</div>;
-  }
-
-  if (isError || !report) {
-    return <div>리포트를 불러올 수 없습니다.</div>;
-  }
+  const isReady =
+    !isLoading && !isLogsLoading && !isError && report && difficulty !== null;
 
   const handleSave = async () => {
     if (difficulty === null) return;
@@ -70,34 +65,48 @@ const Detail = () => {
   return (
     <>
       <PrevNavbar
-        title={`${report.sessionSummary.job} 직무 ${report.sessionSummary.situation}`}
+        title={
+          report
+            ? `${report.sessionSummary.job} 직무 ${report.sessionSummary.situation}`
+            : ''
+        }
         path="/my-report"
       />
 
       <div className="white-pageContainer pr-[1.597rem] gap-[3.3rem]">
-        <ReportInfo
-          data={report.sessionSummary}
-          difficulty={difficulty}
-          review={review}
-          onChangeDifficulty={setDifficulty}
-          onChangeReview={setReview}
-        />
+        {!isError && isReady && (
+          <>
+            <ReportInfo
+              data={report.sessionSummary}
+              difficulty={difficulty}
+              review={review}
+              onChangeDifficulty={setDifficulty}
+              onChangeReview={setReview}
+            />
 
-        <ReportBar />
-        <ReportAI data={report.aiInsightCard} />
-        <ReportBar />
+            <ReportBar />
+            <ReportAI data={report.aiInsightCard} />
+            <ReportBar />
 
-        <ReportChat
-          data={logs}
-          aiAvatarUrl={report.sessionSummary.avatarImgUrl}
-        />
+            <ReportChat
+              data={logs}
+              aiAvatarUrl={report.sessionSummary.avatarImgUrl}
+            />
 
-        {isDirty && (
-          <ReportButton
-            text={isSaving ? '저장 중...' : '저장하기'}
-            onClick={handleSave}
-            disabled={isSaving}
-          />
+            {isDirty && (
+              <ReportButton
+                text={isSaving ? '저장 중...' : '저장하기'}
+                onClick={handleSave}
+                disabled={isSaving}
+              />
+            )}
+          </>
+        )}
+
+        {isError && (
+          <div className="flex justify-center items-center py-[6rem] text-gray-400">
+            리포트를 불러올 수 없습니다.
+          </div>
         )}
       </div>
     </>
