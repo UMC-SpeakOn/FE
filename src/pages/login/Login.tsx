@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { DECORATIONS1, DECORATIONS2, DECORATIONS3 } from '@/mocks/loginData';
-import { getKakaoCode } from '@/pages/login/utils/kakao/getKakaoCode';
 import { getRedirectUri } from '@/pages/login/utils/kakao/getRedirectUri';
 
 import ListButton from './components/Button/ListButton';
 import ListDecoration from './components/Decoration/ListDecoration';
 import { useKakaoLogin } from './hooks/useKakaoLogin';
+import { getOAuthCode } from './utils/getOAuthCode';
 
 const Login = () => {
   const location = useLocation();
@@ -17,7 +17,7 @@ const Login = () => {
   useEffect(() => {
     if (called.current) return;
 
-    const code = getKakaoCode();
+    const code = getOAuthCode();
     if (!code) return;
 
     called.current = true;
