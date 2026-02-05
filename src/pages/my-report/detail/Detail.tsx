@@ -50,20 +50,29 @@ const Detail = () => {
     return <div>리포트를 불러올 수 없습니다.</div>;
   }
 
-  const handleSave = () => {
-    updateReflection({
+  const handleSave = async () => {
+    if (difficulty === null) return;
+
+    const result = await updateReflection({
       reportId,
       feedback: review,
       difficulty,
     });
 
-    setInitialDifficulty(difficulty);
-    setInitialReview(review);
+    if (result !== null) {
+      setInitialDifficulty(difficulty);
+      setInitialReview(review);
+
+      alert('저장되었습니다.');
+    }
   };
 
   return (
     <>
-      <PrevNavbar title={report.sessionSummary.job} path="/my-report" />
+      <PrevNavbar
+        title={`${report.sessionSummary.job} 직무 ${report.sessionSummary.situation}`}
+        path="/my-report"
+      />
 
       <div className="white-pageContainer pr-[1.597rem] gap-[3.3rem]">
         <ReportInfo
