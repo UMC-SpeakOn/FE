@@ -30,11 +30,12 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <LoginPage /> },
           {
-            path: 'oauth2/code/kakao',
+            path: 'oauth2/code/:provider',
             element: <LoginPage />,
           },
         ],
       },
+
       {
         path: 'my-role',
         element: <MyRolePage />,

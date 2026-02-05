@@ -1,25 +1,26 @@
 import { useMutation } from '@/hooks/useApi';
 import useNavigation from '@/hooks/useNavigation';
 import type {
-  KakaoLoginRequest,
-  KakaoLoginResult,
+  OAuthLoginRequest,
+  OAuthLoginResult,
+  OAuthProvider,
 } from '@/types/api/login.type';
 import type { ServerApiResponse } from '@/types/api/server.type';
 import { tokenManager } from '@/utils/apiClient';
 
-export const useKakaoLogin = () => {
+export const useLogin = (provider: OAuthProvider) => {
   const { navigateTo } = useNavigation();
 
-  return useMutation<ServerApiResponse<KakaoLoginResult>, KakaoLoginRequest>(
+  return useMutation<ServerApiResponse<OAuthLoginResult>, OAuthLoginRequest>(
     (data) => ({
       method: 'POST',
-      url: '/auth/kakao',
+      url: `/auth/${provider}`,
       data,
       authRequired: false,
     }),
     {
       onSuccess: (response) => {
-        const data = response as ServerApiResponse<KakaoLoginResult>;
+        const data = response as ServerApiResponse<OAuthLoginResult>;
 
         if (!data.isSuccess) {
           console.error(data.message);
@@ -32,12 +33,11 @@ export const useKakaoLogin = () => {
         tokenManager.setRefreshToken(refreshToken);
         localStorage.setItem('userId', String(userId));
 
-        // console.log('카카오 로그인 성공, userId:', userId);
         navigateTo('/my-role');
       },
 
       onError: (error) => {
-        console.error('카카오 로그인 실패', error);
+        console.error(`${provider} 로그인 실패`, error);
       },
     },
   );
