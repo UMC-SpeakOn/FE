@@ -15,12 +15,7 @@ const Subscribe = ({ user }: SubscribeProps) => {
   const isSubscribed = user.isSubscribed === true;
 
   const handleSubscribeClick = () => {
-    navigateTo('/profile/subscription', {
-      state: {
-        isSubscribed,
-        expiredAt: user.subscriptionExpiredAt,
-      },
-    });
+    navigateTo('/profile/subscription');
   };
 
   return (

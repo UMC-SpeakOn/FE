@@ -1,24 +1,19 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import ProfileModal from '@/components/Modal/ProfileModal';
 import PrevNavbar from '@/components/Navbar/PrevNavbar';
 
+import { useUserProfile } from '../account/hooks/useUserProfile';
 import NotSubscription from './components/NotSubscription/NotSubscription';
 import Pay from './components/Pay';
 import PlanCard from './components/PlanCard';
 
-interface SubscriptionLocationState {
-  isSubscribed?: boolean;
-  expiredAt?: string | null;
-}
-
 const Subscription = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const { user } = useUserProfile();
 
-  const { isSubscribed = false, expiredAt = null } =
-    (location.state as SubscriptionLocationState) ?? {};
+  const isSubscribed = user?.isSubscribed === true;
+  const expiredAt = user?.subscriptionExpiredAt ?? null;
 
   const handleOpenModal = () => {
     setIsOpen(true);
