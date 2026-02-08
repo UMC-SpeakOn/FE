@@ -37,6 +37,7 @@ const Subscribe = ({ user }: SubscribeProps) => {
         <SubscribeCard
           data={paymentsData}
           nextPaymentDate={user.subscriptionExpiredAt}
+          isCancelled={user.isSubscriptionCancelled}
         />
       ) : (
         <NotSubscribe />

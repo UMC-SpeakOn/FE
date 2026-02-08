@@ -9,6 +9,7 @@ export interface UserApi {
   createdAt: string | null;
   isSubscribed: boolean | null;
   subscriptionExpiredAt: string | null;
+  isSubscriptionCancelled: boolean | null;
 }
 
 // 유저 프로필 수정 요청

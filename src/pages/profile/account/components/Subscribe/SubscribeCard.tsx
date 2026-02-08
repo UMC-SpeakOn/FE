@@ -4,10 +4,15 @@ import type { PaymentsItem } from '../../../payments/types/payments.type';
 
 interface SubscribeCardProps {
   data: PaymentsItem;
+  isCancelled: boolean | null;
   nextPaymentDate: string | null;
 }
 
-const SubscribeCard = ({ data, nextPaymentDate }: SubscribeCardProps) => {
+const SubscribeCard = ({
+  data,
+  nextPaymentDate,
+  isCancelled,
+}: SubscribeCardProps) => {
   return (
     <div className="w-full p-[2.1rem] border-[0.1rem] border-gray-100 rounded-[1rem]">
       <div className="flex flex-col gap-[2.7rem]">
@@ -18,13 +23,17 @@ const SubscribeCard = ({ data, nextPaymentDate }: SubscribeCardProps) => {
         <div className="flex gap-[2.7rem] items-center">
           <div className="flex flex-col gap-[1.4rem] min-w-[6.9rem] text-[1.5rem] font-bold leading-none text-black">
             <p>결제 내역</p>
-            <p>다음 결제일</p>
+            <p>{isCancelled ? '이용 종료일' : '다음 결제일'}</p>
             <p>결제 수단</p>
           </div>
 
           <div className="flex flex-col gap-[1.6rem] text-[1.3rem] font-medium leading-none text-gray-600">
             <p>₩ {data.price.toLocaleString()} /월</p>
-            <p>{formatDate(nextPaymentDate)}</p>
+            <p>
+              {isCancelled
+                ? `${formatDate(nextPaymentDate)} 까지 이용 가능`
+                : `${formatDate(nextPaymentDate)}`}
+            </p>
             <p>{data.paymentMethod}</p>
           </div>
         </div>
