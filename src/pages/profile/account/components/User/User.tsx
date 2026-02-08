@@ -5,14 +5,35 @@ import ProfileImg from '@/assets/images/icons/profile.svg';
 import type { UserApi } from '@/types/api/account.type';
 import { formatDate } from '@/utils/date';
 
+import { useEditProfile } from '../../hooks/useEditProfile';
 import EditModal from '../Modal/EditModal';
 
 interface UserProps {
   user: UserApi;
+  profileUpdated: () => void;
 }
 
-const User = ({ user }: UserProps) => {
+const User = ({ user, profileUpdated }: UserProps) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const { editProfile } = useEditProfile();
+
+  const handleEditSubmit = async ({
+    name,
+    image,
+  }: {
+    name: string;
+    image?: File;
+  }) => {
+    await editProfile({
+      nickname: name,
+      profileImage: image,
+    });
+
+    alert('프로필이 수정되었습니다.');
+
+    await profileUpdated();
+    setIsEditOpen(false);
+  };
 
   return (
     <>
@@ -79,10 +100,7 @@ const User = ({ user }: UserProps) => {
           defaultName={user.nickname}
           defaultImage={user.profileImgUrl ?? undefined}
           onClose={() => setIsEditOpen(false)}
-          onSubmit={(data) => {
-            console.log('프로필 수정 값', data);
-            setIsEditOpen(false);
-          }}
+          onSubmit={handleEditSubmit}
         />
       )}
     </>

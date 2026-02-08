@@ -1,3 +1,4 @@
+// 유저 정보
 export interface UserApi {
   userId: number;
   nickname: string;
@@ -8,4 +9,18 @@ export interface UserApi {
   createdAt: string | null;
   isSubscribed: boolean | null;
   subscriptionExpiredAt: string | null;
+}
+
+// 유저 프로필 수정 요청
+export interface EditProfileRequest {
+  nickname: string;
+  profileImage?: File;
+}
+
+// 유저 프로필 수정 응답
+export interface EditProfileResponse {
+  userId: number;
+  nickname: string;
+  profileImgUrl: string;
+  message: string;
 }

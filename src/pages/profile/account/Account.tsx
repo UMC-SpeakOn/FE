@@ -9,7 +9,7 @@ import { useUserProfile } from './hooks/useUserProfile';
 
 const Account = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isLoading, isError } = useUserProfile();
+  const { user, isLoading, isError, refetch } = useUserProfile();
 
   const handleOpenDeleteModal = () => {
     setIsOpen(true);
@@ -33,7 +33,8 @@ const Account = () => {
 
   return (
     <div className="white-pageContainer gap-[3.6rem] pr-[1.462rem]">
-      <User user={user} />
+      <User user={user} profileUpdated={refetch} />
+
       <Subscribe user={user} />
 
       <Setting onDeleteAccount={handleOpenDeleteModal} />
