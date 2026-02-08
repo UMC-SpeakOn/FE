@@ -11,6 +11,7 @@ import type {
   UploadSTTRequest,
   UploadSTTResponse,
 } from "@/types/api/myspeak.type";
+import type { ServerApiResponse } from "@/types/api/server.type";
 import apiClient, { type CustomAxiosRequestConfig } from "@/utils/apiClient";
 
 
@@ -21,16 +22,13 @@ import apiClient, { type CustomAxiosRequestConfig } from "@/utils/apiClient";
 export const getSessionOpener = async (
   sessionId: number
 ): Promise<GetSessionOpenerResponse> => {
-  const response = await apiClient.get<{
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result: {
+  const response = await apiClient.get<
+    ServerApiResponse<{
       questionText: string;
       base64Audio: string;
       messageType: 'OPENING';
-    };
-  }>(
+    }>
+  >(
     `/myspeak/sessions/${sessionId}/opener`,
     { authRequired: true } as CustomAxiosRequestConfig
   );
@@ -128,16 +126,13 @@ export const sendConversationTurnText = async (
     body: requestBody,
   });
 
-  const response = await apiClient.post<{
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result: {
+  const response = await apiClient.post<
+    ServerApiResponse<{
       questionText: string;
       base64Audio: string;
       messageType: "MAIN" | "FOLLOW" | "CLOSING";
-    };
-  }>(
+    }>
+  >(
     `/myspeak/sessions/${sessionId}/turns/text`,
     requestBody,
     { authRequired: true } as CustomAxiosRequestConfig
