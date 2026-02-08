@@ -5,29 +5,36 @@ import ProfileModal from '@/components/Modal/ProfileModal';
 import Setting from './components/Setting/Setting';
 import Subscribe from './components/Subscribe/Subscribe';
 import User from './components/User/User';
+import { useUserProfile } from './hooks/useUserProfile';
 
 const Account = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isLoading, isError } = useUserProfile();
 
   const handleOpenDeleteModal = () => {
-    console.log('계정삭제 버튼 클릭');
     setIsOpen(true);
   };
 
   const handleDeleteAccount = () => {
-    console.log('계정 삭제 확정');
     setIsOpen(false);
   };
 
   const handleCancel = () => {
-    console.log('계정 삭제 취소');
     setIsOpen(false);
   };
 
+  if (isLoading) {
+    return <div className="white-pageContainer">로딩 중...</div>;
+  }
+
+  if (isError || !user) {
+    return <div className="white-pageContainer">에러 발생</div>;
+  }
+
   return (
     <div className="white-pageContainer gap-[3.6rem] pr-[1.462rem]">
-      <User />
-      <Subscribe />
+      <User user={user} />
+      <Subscribe user={user} />
 
       <Setting onDeleteAccount={handleOpenDeleteModal} />
 

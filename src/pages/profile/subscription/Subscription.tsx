@@ -1,13 +1,24 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import ProfileModal from '@/components/Modal/ProfileModal';
 import PrevNavbar from '@/components/Navbar/PrevNavbar';
 
+import NotSubscription from './components/NotSubscription/NotSubscription';
 import Pay from './components/Pay';
 import PlanCard from './components/PlanCard';
 
+interface SubscriptionLocationState {
+  isSubscribed?: boolean;
+  expiredAt?: string | null;
+}
+
 const Subscription = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  const { isSubscribed = false } =
+    (location.state as SubscriptionLocationState) ?? {};
 
   const handleOpenModal = () => {
     setIsOpen(true);
@@ -29,15 +40,21 @@ const Subscription = () => {
 
       <div className="white-pageContainer pr-[1.462rem]">
         <div className="flex flex-col gap-[3.6rem]">
-          <PlanCard />
-          <Pay />
+          {isSubscribed ? (
+            <>
+              <PlanCard />
+              <Pay />
 
-          <button
-            onClick={handleOpenModal}
-            className="w-full py-[1.4rem] rounded-[1rem] bg-gray-50 font-semibold text-gray-300 leading-none text-[1.6rem]"
-          >
-            구독 해지하기
-          </button>
+              <button
+                onClick={handleOpenModal}
+                className="w-full py-[1.4rem] rounded-[1rem] bg-gray-50 font-semibold text-gray-300 text-[1.6rem]"
+              >
+                구독 해지하기
+              </button>
+            </>
+          ) : (
+            <NotSubscription />
+          )}
         </div>
       </div>
 

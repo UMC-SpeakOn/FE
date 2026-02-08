@@ -2,19 +2,26 @@ import { useState } from 'react';
 
 import PencilImg from '@/assets/images/icons/pencil.svg';
 import ProfileImg from '@/assets/images/icons/profile.svg';
-import { userData } from '@/mocks/userData';
+import type { UserApi } from '@/types/api/account.type';
 
 import EditModal from '../Modal/EditModal';
 
-const User = () => {
+interface UserProps {
+  user: UserApi;
+}
+
+const User = ({ user }: UserProps) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const formatDate = (iso?: string | null) =>
+    iso ? new Date(iso).toLocaleDateString('ko-KR') : '-';
 
   return (
     <>
       <section className="flex flex-col gap-[1.323rem]">
         <header>
           <h1 className="font-bold text-black text-[2.4rem] leading-none">
-            Hi, {userData.nickname}!
+            Hi, {user.nickname}!
           </h1>
         </header>
 
@@ -22,8 +29,8 @@ const User = () => {
           <div className="flex gap-[4.9rem] items-center">
             <figure className="flex flex-col gap-[1.4rem] items-center">
               <img
-                src={userData.profileImgUrl || ProfileImg}
-                alt={`${userData.nickname} 프로필 이미지`}
+                src={user.profileImgUrl || ProfileImg}
+                alt={`${user.nickname} 프로필 이미지`}
                 onError={(e) => {
                   e.currentTarget.src = ProfileImg;
                 }}
@@ -50,7 +57,7 @@ const User = () => {
                   서비스 가입일
                 </h2>
                 <p className="mt-4 font-medium text-[1.3rem] leading-none text-gray-600">
-                  {userData.name}
+                  {formatDate(user.createdAt)}
                 </p>
               </div>
 
@@ -59,9 +66,9 @@ const User = () => {
                   로그인 정보
                 </h2>
                 <address className="mt-4 not-italic font-medium text-[1.3rem] leading-[1.25] text-gray-600">
-                  {userData.socialType} 계정으로 로그인됨
+                  {user.socialType} 계정으로 로그인됨
                   <br />
-                  {userData.email}
+                  {user.email}
                 </address>
               </div>
             </section>
@@ -71,8 +78,8 @@ const User = () => {
 
       {isEditOpen && (
         <EditModal
-          defaultName={userData.nickname}
-          defaultImage={userData.profileImgUrl}
+          defaultName={user.nickname}
+          defaultImage={user.profileImgUrl ?? undefined}
           onClose={() => setIsEditOpen(false)}
           onSubmit={(data) => {
             console.log('프로필 수정 값', data);
