@@ -1,6 +1,6 @@
 import { formatDate } from '@/utils/date';
 
-import type { PaymentsItem } from '../../types/account.type';
+import type { PaymentsItem } from '../../../payments/types/payments.type';
 
 interface SubscribeCardProps {
   data: PaymentsItem;
