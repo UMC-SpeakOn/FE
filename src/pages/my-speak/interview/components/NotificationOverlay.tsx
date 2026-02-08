@@ -7,7 +7,7 @@
  */
 const NotificationOverlay = () => {
   return (
-    <div className="absolute inset-0 bg-black/70 flex items-center justify-center px-6">
+    <div className="absolute inset-0 bg-black/70 flex items-center justify-center px-6 z-30">
       <p className="text-white text-2xl font-bold text-center">
         AI의 마무리 멘트가 한 턴 추가됩니다.
       </p>

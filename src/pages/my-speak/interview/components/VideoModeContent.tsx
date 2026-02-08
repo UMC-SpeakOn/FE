@@ -90,6 +90,19 @@ const VideoModeContent = ({
       {/* Step 1: 알림 오버레이 (부분 화면) */}
       {finishStep === 'notification' && <NotificationOverlay />}
 
+      {/* Step 3: 로딩 오버레이 (전체 화면) */}
+      <div
+        className={`
+          absolute inset-0 bg-black/70 flex items-center justify-center z-30 px-6
+          transition-opacity duration-300 ease-in-out
+          ${finishStep === 'loading' ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        `}
+      >
+        <p className="text-white text-2xl font-bold text-center">
+          결과를 불러오는 중...
+        </p>
+      </div>
+
       {/* 자막 오버레이 */}
       <div
         className={`

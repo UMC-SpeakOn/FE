@@ -26,6 +26,7 @@ interface MessageBubbleProps {
  */
 const MessageBubble = ({ message, interviewer }: MessageBubbleProps) => {
   const isAI = message.type === 'AI';
+  const isLoading = message.id === 'loading';
 
   return (
     <div
@@ -39,7 +40,7 @@ const MessageBubble = ({ message, interviewer }: MessageBubbleProps) => {
           <img
             src={interviewer.imgUrl}
             alt={interviewer.name}
-            className="w-12 h-12 rounded-full flex-shrink-0"
+            className={`w-12 h-12 rounded-full flex-shrink-0 ${isLoading ? 'opacity-70' : ''}`}
           />
         )}
 
@@ -47,10 +48,21 @@ const MessageBubble = ({ message, interviewer }: MessageBubbleProps) => {
           {/* 말풍선 */}
           <div
             className={`px-4 py-3 rounded-xl text-gray-900 ${isAI ? 'bg-purple-200 ' : 'bg-gray-100'
-              }`}
+              } ${isLoading ? 'opacity-70 animate-pulse' : ''}`}
           >
             <p className="text-xl font-medium leading-relaxed whitespace-pre-wrap break-all">
-              {message.content}
+              {isLoading ? (
+                <span className="inline-flex items-center gap-1">
+                  응답 중
+                  <span className="inline-flex gap-0.5">
+                    <span className="inline-block w-1 h-1 bg-gray-900 rounded-full animate-bounce [animation-delay:0ms]"></span>
+                    <span className="inline-block w-1 h-1 bg-gray-900 rounded-full animate-bounce [animation-delay:150ms]"></span>
+                    <span className="inline-block w-1 h-1 bg-gray-900 rounded-full animate-bounce [animation-delay:300ms]"></span>
+                  </span>
+                </span>
+              ) : (
+                message.content
+              )}
             </p>
           </div>
 

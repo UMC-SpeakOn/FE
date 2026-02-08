@@ -56,7 +56,7 @@ export interface ConversationTurnResponse {
 
 // 세션 완료
 export interface CompleteSessionRequest {
-  endedAt: string; // ISO 8601 format (LocalDateTime)
+  endedAt: string; // ISO 8601 format (LocalDateTime) - 실제 백엔드 스펙
   totalTime: number; // 초 단위
 }
 
@@ -65,6 +65,14 @@ export interface CompleteSessionResponse {
   totalTime: number; // 초 단위
   sentenceCount: number; // 문장 수
   closingTtsBase64: string; // 마무리 TTS
+  closingText?: string; // 마무리 텍스트 (선택적)
+}
+
+// 오프너 조회 (세션 기반)
+export interface GetSessionOpenerResponse {
+  questionText: string; // 오프닝 질문 텍스트
+  base64Audio: string; // base64 인코딩된 오디오
+  messageType: 'OPENING'; // 메시지 타입
 }
 
 // TTS 캐시 조회

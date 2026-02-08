@@ -8,6 +8,7 @@ import InterviewTimer from "./VideoSection/InterviewTimer";
 interface ChatModeContentProps {
   messages: ChatMessage[];
   isLoading: boolean;
+  isAIResponding?: boolean; // AI 응답 대기 중 상태
   onPlayAudio: (message: ChatMessage) => void;
   formattedTime: string;
   onSendMessage: (message: string) => void;
@@ -32,6 +33,7 @@ interface ChatModeContentProps {
 const ChatModeContent = ({
   messages,
   isLoading,
+  isAIResponding,
   onPlayAudio,
   formattedTime,
   onSendMessage,
@@ -46,13 +48,26 @@ const ChatModeContent = ({
     onSendMessage(message);
     clearTranscript?.();
   };
+
+  // AI 응답 대기 중일 때 로딩 메시지 추가
+  const loadingMessage: ChatMessage = {
+    id: 'loading',
+    type: 'AI',
+    content: '응답 중...',
+    timestamp: new Date(),
+  };
+
+  const displayMessages = isAIResponding
+    ? [...messages, loadingMessage]
+    : messages;
+
   return (
     <div className="relative h-[65vh] bg-white rounded-2xl overflow-hidden flex flex-col">
 
-      <MessageList messages={messages} onPlayAudio={onPlayAudio} interviewer={interviewer} />
+      <MessageList messages={displayMessages} onPlayAudio={onPlayAudio} interviewer={interviewer} />
       <ChatInput
         onSend={handleSend}
-        disabled={isLoading}
+        disabled={isLoading || isAIResponding}
         value={inputValue}
         onChange={onInputChange}
       />
@@ -73,6 +88,19 @@ const ChatModeContent = ({
 
       {/* Step 1: 알림 오버레이 (부분 화면) */}
       {finishStep === "notification" && <NotificationOverlay />}
+
+      {/* Step 3: 로딩 오버레이 (전체 화면) */}
+      <div
+        className={`
+          absolute inset-0 bg-black/70 flex items-center justify-center z-40 px-6
+          transition-opacity duration-300 ease-in-out
+          ${finishStep === 'loading' ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        `}
+      >
+        <p className="text-white text-2xl font-bold text-center">
+          결과를 불러오는 중...
+        </p>
+      </div>
     </div>
   );
 };
