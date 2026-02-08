@@ -40,7 +40,7 @@ const MessageBubble = ({ message, interviewer }: MessageBubbleProps) => {
           <img
             src={interviewer.imgUrl}
             alt={interviewer.name}
-            className={`w-12 h-12 rounded-full flex-shrink-0 ${isLoading ? 'opacity-70' : ''}`}
+            className={`w-12 h-12 rounded-full flex-shrink-0 object-cover ${isLoading ? 'opacity-70' : ''}`}
           />
         )}
 

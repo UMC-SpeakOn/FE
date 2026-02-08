@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 import { getSessionOpener, sendConversationTurnText } from "@/api/myspeak";
 import navIcon from "@/assets/images/icons/nav.svg";
 import Spinner from "@/components/Spinner/Spinner";
 import useNavigation from "@/hooks/useNavigation";
+import { useRoleProfile } from "@/hooks/role-profile/useRoleProfile";
 
 import ChatModeContent from "./components/ChatModeContent";
 import ControlButtons from "./components/ControlButtons";
@@ -39,11 +40,14 @@ import type { FinishStep } from "./types/finish.type";
 const InterviewPage = () => {
   const { navigateTo } = useNavigation();
   const { sessionId: sessionIdFromUrl } = useParams<{ sessionId: string }>();
-  // const location = useLocation();
-
-  // state에서 roleId 가져오기 (기본값: 1)
-  // const myRoleId = (location.state as { myRoleId?: number })?.myRoleId ?? 1;
+  const location = useLocation();
   const sessionIdNumber = sessionIdFromUrl ? Number(sessionIdFromUrl) : null;
+
+  // state에서 myRoleId 가져오기
+  const myRoleIdFromState = (location.state as { myRoleId?: number })?.myRoleId;
+
+  // Role Profile 조회 (interviewer 정보 가져오기)
+  const { profiles, isLoading: isLoadingProfiles } = useRoleProfile();
 
   // 뷰 모드 상태 (video | chat)
   const [viewMode, setViewMode] = useState<'video' | 'chat'>('video');
@@ -74,12 +78,36 @@ const InterviewPage = () => {
   // 초기화 완료 여부 추적 (마운트 시 1회만 실행)
   const hasInitialized = useRef(false);
 
-  // 면접관 데이터 (기본값)
-  const interviewer = {
-    name: "AI 면접관",
-    nationality: "AI",
-    imgUrl: "/images/default-interviewer.png",
-  };
+  // 면접관 데이터 (API로부터 가져오기)
+  const interviewer = useMemo(() => {
+    if (!myRoleIdFromState || !profiles.length) {
+      // 기본값 (로딩 중이거나 데이터가 없을 때)
+      return {
+        name: "AI Interviewer",
+        nationality: "AI",
+        imgUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23a855f7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E",
+      };
+    }
+
+    // myRoleId로 profile 찾기
+    const profile = profiles.find((p) => p.id === myRoleIdFromState);
+
+    if (!profile) {
+      console.warn(`[InterviewPage] Profile not found for myRoleId: ${myRoleIdFromState}`);
+      return {
+        name: "AI Interviewer",
+        nationality: "AI",
+        imgUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23a855f7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E",
+      };
+    }
+
+    // Profile에서 interviewer 정보 추출
+    return {
+      name: profile.name,
+      nationality: profile.city, // city = nationality
+      imgUrl: profile.imageUrl,
+    };
+  }, [myRoleIdFromState, profiles]);
 
   // 세션 관리 훅
   const { sessionId, setSessionId, complete: completeSession } = useSession();
@@ -380,8 +408,8 @@ const InterviewPage = () => {
     }
   };
 
-  // 초기 로딩 중
-  if (isInitializing) {
+  // 초기 로딩 중 (세션 초기화 또는 프로필 로딩)
+  if (isInitializing || isLoadingProfiles) {
     return (
       <div className="relative flex flex-col items-center justify-center w-full h-full flex-1 bg-purple-500">
         <Spinner />
