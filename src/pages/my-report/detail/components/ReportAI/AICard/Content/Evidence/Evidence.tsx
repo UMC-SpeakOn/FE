@@ -1,4 +1,4 @@
-import type { EvidenceInsightItem } from '@/pages/my-report/detail/types/report.type';
+import type { EvidenceInsightItem } from '@/pages/my-report/detail/types/myreport.type';
 
 const Evidence = ({ item }: { item: EvidenceInsightItem }) => {
   return (

@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 
 import { LOCK, SWIPE } from '../constants/gesture';
-import type { InsightTab } from '../types/report.type';
+import type { InsightTab } from '../types/myreport.type';
 
 export const useSwipe = (
   tabs: InsightTab[],

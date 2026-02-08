@@ -1,4 +1,4 @@
-import type { InsightItem } from '@/pages/my-report/detail/types/report.type';
+import type { InsightItem } from '@/pages/my-report/detail/types/myreport.type';
 
 import Correction from './Correction/Correction';
 import Evidence from './Evidence/Evidence';

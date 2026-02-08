@@ -1,4 +1,4 @@
-import type { InsightTab } from '../../../../types/report.type';
+import type { InsightTab } from '../../../../types/myreport.type';
 import ItemTab from './ItemTab';
 
 interface ListTabProps {

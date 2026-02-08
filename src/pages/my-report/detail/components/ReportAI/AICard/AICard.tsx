@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { useSwipe } from '../../../hooks/useSwipe';
-import type { InsightCard, InsightTab } from '../../../types/report.type';
+import type { InsightCard, InsightTab } from '../../../types/myreport.type';
 import Content from './Content/Content';
 import Pagination from './Pagination/Pagination';
 import ListTab from './Tab/ListTab';

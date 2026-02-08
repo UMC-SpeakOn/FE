@@ -1,4 +1,4 @@
-import type { CorrectionInsightItem } from '@/pages/my-report/detail/types/report.type';
+import type { CorrectionInsightItem } from '@/pages/my-report/detail/types/myreport.type';
 
 const Correction = ({ item }: { item: CorrectionInsightItem }) => {
   return (
