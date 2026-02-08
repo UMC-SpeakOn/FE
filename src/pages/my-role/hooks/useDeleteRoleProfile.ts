@@ -3,7 +3,7 @@ import type { ServerApiResponse } from '@/types/api/server.type';
 
 export const useDeleteRoleProfile = () => {
   return useMutation<ServerApiResponse<{ myRoleId: number }>, number>((id) => ({
-    method: 'DELETE',
+    method: 'PATCH',
     url: `/my-role/${id}`,
   }));
 };
