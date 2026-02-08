@@ -14,7 +14,6 @@ import MySpeakSettingPage from '@/pages/my-speak/setting/Setting';
 import AccountPage from '@/pages/profile/account/Account';
 import PaymentsPage from '@/pages/profile/payments/Payments';
 import PaymentsFailPage from '@/pages/profile/payments/PaymentsFail';
-import PaymentsSuccessPage from '@/pages/profile/payments/PaymentsSuccess';
 import SubscriptionPage from '@/pages/profile/subscription/Subscription';
 
 const router = createBrowserRouter([
@@ -68,7 +67,6 @@ const router = createBrowserRouter([
           { path: 'account', element: <AccountPage /> },
           { path: 'subscription', element: <SubscriptionPage /> },
           { path: 'payments', element: <PaymentsPage /> },
-          { path: 'payments/success', element: <PaymentsSuccessPage /> },
           { path: 'payments/fail', element: <PaymentsFailPage /> },
         ],
       },

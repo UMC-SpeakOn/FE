@@ -19,7 +19,7 @@ const Pay = () => {
       amount: paymentsData.price,
       orderId: `order_${Date.now()}`,
       orderName: paymentsData.name,
-      successUrl: `${window.location.origin}/profile/payments/success`,
+      successUrl: `${window.location.origin}/profile/payments`,
       failUrl: `${window.location.origin}/profile/payments/fail`,
     });
   };
