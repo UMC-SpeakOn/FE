@@ -17,7 +17,7 @@ const Subscription = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  const { isSubscribed = false } =
+  const { isSubscribed = false, expiredAt = null } =
     (location.state as SubscriptionLocationState) ?? {};
 
   const handleOpenModal = () => {
@@ -42,12 +42,12 @@ const Subscription = () => {
         <div className="flex flex-col gap-[3.6rem]">
           {isSubscribed ? (
             <>
-              <PlanCard />
+              <PlanCard expiredAt={expiredAt} />
               <Pay />
 
               <button
                 onClick={handleOpenModal}
-                className="w-full py-[1.4rem] rounded-[1rem] bg-gray-50 font-semibold text-gray-300 text-[1.6rem]"
+                className="w-full py-[1.4rem] rounded-[1rem] bg-gray-50 font-semibold text-gray-300 text-[1.6rem] mt-[17rem]"
               >
                 구독 해지하기
               </button>

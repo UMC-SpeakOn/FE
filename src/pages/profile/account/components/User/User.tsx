@@ -3,6 +3,7 @@ import { useState } from 'react';
 import PencilImg from '@/assets/images/icons/pencil.svg';
 import ProfileImg from '@/assets/images/icons/profile.svg';
 import type { UserApi } from '@/types/api/account.type';
+import { formatDate } from '@/utils/date';
 
 import EditModal from '../Modal/EditModal';
 
@@ -12,9 +13,6 @@ interface UserProps {
 
 const User = ({ user }: UserProps) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
-
-  const formatDate = (iso?: string | null) =>
-    iso ? new Date(iso).toLocaleDateString('ko-KR') : '-';
 
   return (
     <>

@@ -38,7 +38,14 @@ const Subscribe = ({ user }: SubscribeProps) => {
         </button>
       </div>
 
-      {isSubscribed ? <SubscribeCard data={paymentsData} /> : <NotSubscribe />}
+      {isSubscribed ? (
+        <SubscribeCard
+          data={paymentsData}
+          nextPaymentDate={user.subscriptionExpiredAt}
+        />
+      ) : (
+        <NotSubscribe />
+      )}
     </div>
   );
 };

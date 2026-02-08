@@ -1,6 +1,13 @@
+import { formatDate } from '@/utils/date';
+
 import type { PaymentsItem } from '../../types/account.type';
 
-const SubscribeCard = ({ data }: { data: PaymentsItem }) => {
+interface SubscribeCardProps {
+  data: PaymentsItem;
+  nextPaymentDate: string | null;
+}
+
+const SubscribeCard = ({ data, nextPaymentDate }: SubscribeCardProps) => {
   return (
     <div className="w-full p-[2.1rem] border-[0.1rem] border-gray-100 rounded-[1rem]">
       <div className="flex flex-col gap-[2.7rem]">
@@ -17,7 +24,7 @@ const SubscribeCard = ({ data }: { data: PaymentsItem }) => {
 
           <div className="flex flex-col gap-[1.6rem] text-[1.3rem] font-medium leading-none text-gray-600">
             <p>₩ {data.price.toLocaleString()} /월</p>
-            <p>{data.nextPaymentDate}</p>
+            <p>{formatDate(nextPaymentDate)}</p>
             <p>{data.paymentMethod}</p>
           </div>
         </div>

@@ -4,22 +4,24 @@ import { useState } from 'react';
 import Toss from '@/assets/images/icons/toss.svg';
 import { paymentsData } from '@/mocks/subscribeData';
 
-import SuccessModal from '../../../../components/Modal/SuccessModal';
+import { useTossPayment } from '../hooks/useTossPayment';
 
 const Pay = () => {
   const [isSelected, setIsSelected] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { requestPayment } = useTossPayment();
 
   const handleSelectMethod = () => {
     setIsSelected(true);
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handlePay = async () => {
+    await requestPayment({
+      amount: paymentsData.price,
+      orderId: `order_${Date.now()}`,
+      orderName: paymentsData.name,
+      successUrl: `${window.location.origin}/profile/payments/success`,
+      failUrl: `${window.location.origin}/profile/payments/fail`,
+    });
   };
 
   return (
@@ -46,24 +48,13 @@ const Pay = () => {
         {isSelected && (
           <button
             type="button"
-            onClick={handleOpenModal}
-            className="flex justify-center py-[1.4rem] bg-purple-700 rounded-[1rem] font-semibold text-[1.6rem] leading-none text-white"
+            onClick={handlePay}
+            className="flex justify-center py-[1.4rem] bg-purple-700 rounded-[1rem] font-semibold text-[1.6rem] text-white"
           >
             ₩ {paymentsData.price.toLocaleString()} 결제하기
           </button>
         )}
       </div>
-      {isModalOpen && (
-        <SuccessModal
-          open={isModalOpen}
-          onClose={handleCloseModal}
-          title="결제 완료"
-          descriptions={[
-            '이제부터 내가 말한 대화 기록을 저장하고',
-            '언제든지 다시 확인할 수 있어요',
-          ]}
-        />
-      )}
     </div>
   );
 };

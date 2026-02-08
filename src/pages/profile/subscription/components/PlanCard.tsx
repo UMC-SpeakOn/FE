@@ -1,6 +1,11 @@
 import { paymentsData } from '@/mocks/subscribeData';
+import { formatDate } from '@/utils/date';
 
-const PlanCard = () => {
+interface PlanCardProps {
+  expiredAt: string | null;
+}
+
+const PlanCard = ({ expiredAt }: PlanCardProps) => {
   return (
     <div className="flex flex-col gap-[1rem]">
       <p className="font-bold text-[1.9rem] leading-none text-black">
@@ -29,7 +34,7 @@ const PlanCard = () => {
 
         <div className="flex gap-[1.7rem] items-center font-medium text-[1.3rem] leading-none text-gray-600">
           <p>다음 결제일</p>
-          <p>{paymentsData.nextPaymentDate}</p>
+          <p>{formatDate(expiredAt)}</p>
         </div>
       </div>
     </div>
