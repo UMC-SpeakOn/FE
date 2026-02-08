@@ -25,6 +25,7 @@ const Result = () => {
   }, [location.state, navigateTo]);
 
   const { createReport, isLoading: isCreating } = useCreateReport(() => {
+    alert('리포트가 생성되었습니다.');
     navigateTo(`/my-report/${sessionId}`);
   });
 
