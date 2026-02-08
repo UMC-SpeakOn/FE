@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { getSessionOpener, sendConversationTurnText } from "@/api/myspeak";
 import navIcon from "@/assets/images/icons/nav.svg";
