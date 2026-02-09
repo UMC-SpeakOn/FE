@@ -48,8 +48,23 @@ export const useSession = () => {
       if (!sessionId) {
         throw new Error("Session ID is not available");
       }
-      const endedAt = new Date().toISOString();
-      return await completeSessionMutation({ endedAt, totalTime });
+      const endedAt = new Date().toISOString(); // 실제 백엔드: endedAt 필드 사용
+
+      // 디버깅: 실제 요청 데이터 로그
+      console.log('[useSession.complete] Request:', {
+        url: `/myspeak/sessions/${sessionId}/complete`,
+        body: { endedAt, totalTime },
+      });
+
+      const response = await completeSessionMutation({ endedAt, totalTime });
+
+      // API 응답이 래핑되어 있는 경우 언래핑
+      if (response && typeof response === 'object' && 'result' in response) {
+        console.log('[useSession.complete] Unwrapping response.result');
+        return (response as any).result as CompleteSessionResponse;
+      }
+
+      return response;
     },
     [sessionId, completeSessionMutation]
   );

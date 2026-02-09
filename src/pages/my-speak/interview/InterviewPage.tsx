@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
-import { getAIOpener } from "@/api/ai";
-import { sendConversationTurnText } from "@/api/myspeak";
+import { getSessionOpener, sendConversationTurnText } from "@/api/myspeak";
 import navIcon from "@/assets/images/icons/nav.svg";
 import Spinner from "@/components/Spinner/Spinner";
 import useNavigation from "@/hooks/useNavigation";
+import { useRoleProfile } from "@/hooks/role-profile/useRoleProfile";
 
 import ChatModeContent from "./components/ChatModeContent";
 import ControlButtons from "./components/ControlButtons";
@@ -41,10 +41,13 @@ const InterviewPage = () => {
   const { navigateTo } = useNavigation();
   const { sessionId: sessionIdFromUrl } = useParams<{ sessionId: string }>();
   const location = useLocation();
-
-  // state에서 roleId 가져오기 (기본값: 1)
-  const myRoleId = (location.state as { myRoleId?: number })?.myRoleId ?? 1;
   const sessionIdNumber = sessionIdFromUrl ? Number(sessionIdFromUrl) : null;
+
+  // state에서 myRoleId 가져오기
+  const myRoleIdFromState = (location.state as { myRoleId?: number })?.myRoleId;
+
+  // Role Profile 조회 (interviewer 정보 가져오기)
+  const { profiles, isLoading: isLoadingProfiles } = useRoleProfile();
 
   // 뷰 모드 상태 (video | chat)
   const [viewMode, setViewMode] = useState<'video' | 'chat'>('video');
@@ -69,15 +72,42 @@ const InterviewPage = () => {
   // 채팅 입력 상태 (음성 인식 텍스트 표시용)
   const [chatInput, setChatInput] = useState('');
 
+  // AI 응답 대기 중 상태
+  const [isAIResponding, setIsAIResponding] = useState(false);
+
   // 초기화 완료 여부 추적 (마운트 시 1회만 실행)
   const hasInitialized = useRef(false);
 
-  // 면접관 데이터 (기본값)
-  const interviewer = {
-    name: "AI 면접관",
-    nationality: "AI",
-    imgUrl: "/images/default-interviewer.png",
-  };
+  // 면접관 데이터 (API로부터 가져오기)
+  const interviewer = useMemo(() => {
+    if (!myRoleIdFromState || !profiles.length) {
+      // 기본값 (로딩 중이거나 데이터가 없을 때)
+      return {
+        name: "AI Interviewer",
+        nationality: "AI",
+        imgUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23a855f7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E",
+      };
+    }
+
+    // myRoleId로 profile 찾기
+    const profile = profiles.find((p) => p.id === myRoleIdFromState);
+
+    if (!profile) {
+      console.warn(`[InterviewPage] Profile not found for myRoleId: ${myRoleIdFromState}`);
+      return {
+        name: "AI Interviewer",
+        nationality: "AI",
+        imgUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23a855f7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E",
+      };
+    }
+
+    // Profile에서 interviewer 정보 추출
+    return {
+      name: profile.name,
+      nationality: profile.city, // city = nationality
+      imgUrl: profile.imageUrl,
+    };
+  }, [myRoleIdFromState, profiles]);
 
   // 세션 관리 훅
   const { sessionId, setSessionId, complete: completeSession } = useSession();
@@ -136,28 +166,41 @@ const InterviewPage = () => {
         // 3. 타이머 시작
         start();
 
-        // 4. AI 오프너 로드
-        const opener = await getAIOpener(myRoleId);
+        // 4. 세션 오프너 로드
+        const opener = await getSessionOpener(sessionIdNumber);
 
-        // 5. 오프닝 메시지 추가 (텍스트만, 오디오 없음)
+        // 5. 오프닝 메시지 추가
         const firstMessage: ChatMessage = {
           id: "opener",
           type: "AI",
-          content: opener.result, // Swagger 응답 result 필드 사용
+          content: opener.questionText,
           timestamp: new Date(),
         };
         addMessage(firstMessage);
+
+        // 6. 로딩 완료 (TTS보다 먼저 화면 표시)
+        setIsInitializing(false);
+
+        // 7. 오프닝 TTS 재생 (백그라운드, 로딩 완료 후)
+        if (opener.base64Audio) {
+          // await 제거 - 백그라운드에서 재생
+          playAudio(opener.base64Audio).catch((audioError: any) => {
+            // Autoplay 정책으로 인한 실패는 치명적 에러가 아니므로 로그만 출력
+            console.warn("[InterviewPage] TTS autoplay blocked by browser policy. User interaction required.");
+            console.warn("[InterviewPage] Audio error:", audioError);
+            // 사용자가 페이지와 상호작용(버튼 클릭 등)한 후 TTS가 재생됩니다.
+          });
+        }
       } catch (error) {
         console.error("[InterviewPage] Failed to initialize session:", error);
+        setIsInitializing(false); // 에러 시에도 로딩 해제
         alert("면접 세션을 시작하는데 실패했습니다. 다시 시도해주세요.");
         navigateTo("/my-speak/setting");
-      } finally {
-        setIsInitializing(false);
       }
     };
 
     initializeSession();
-  }, [sessionIdNumber, setSessionId, start, myRoleId, addMessage, navigateTo]);
+  }, [sessionIdNumber, setSessionId, start, addMessage, navigateTo, playAudio]);
 
   // 음성 인식 transcript를 chatInput에 실시간 반영
   useEffect(() => {
@@ -182,7 +225,10 @@ const InterviewPage = () => {
       };
       addMessage(userMessage);
 
-      // 2. AI 응답 요청 (텍스트 전용 API 사용)
+      // 2. AI 응답 대기 시작
+      setIsAIResponding(true);
+
+      // 3. AI 응답 요청 (텍스트 전용 API 사용)
       const response = await sendConversationTurnText(
         sessionId!,
         transcript.trim(),
@@ -196,7 +242,7 @@ const InterviewPage = () => {
         return;
       }
 
-      // 3. AI 메시지 추가
+      // 4. AI 메시지 추가
       const aiMessage: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         type: "AI",
@@ -205,13 +251,21 @@ const InterviewPage = () => {
       };
       addMessage(aiMessage);
 
-      // 4. TTS 오디오 재생 (영상 모드일 때)
-      if (viewMode === "video" && response.base64Audio) {
-        await playAudio(response.base64Audio);
+      // 5. AI 응답 대기 종료 (메시지 추가 직후)
+      setIsAIResponding(false);
+
+      // 6. TTS 오디오 재생 (백그라운드, await 제거)
+      if (response.base64Audio) {
+        playAudio(response.base64Audio).catch((audioError) => {
+          console.warn("[InterviewPage] TTS playback failed:", audioError);
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("[InterviewPage] Failed to send turn:", error);
-      alert("대화 중 오류가 발생했습니다. 다시 시도해주세요.");
+      console.error("[InterviewPage] Error response:", error.response?.data);
+      const errorMessage = error.response?.data?.message || "대화 중 오류가 발생했습니다.";
+      setIsAIResponding(false); // 에러 시에도 로딩 해제
+      alert(`${errorMessage}\n\n다시 시도해주세요.`);
     }
   };
 
@@ -277,26 +331,65 @@ const InterviewPage = () => {
 
   /**
    * 마무리하기 핸들러
-   * - 플로우: 세션 완료 API → 마무리 TTS 재생 → 결과 페이지 이동
+   * - 플로우: 알림(1초) → API 호출 → 마무리 멘트 + TTS(2초) → 로딩(0.5초) → 결과 페이지
    */
   const handleFinish = async () => {
     try {
-      // 1. 로딩 상태 표시
-      setFinishStep('loading');
+      // 1. 알림 표시: "AI의 마무리 멘트가 한 턴 추가됩니다." (1초)
+      setFinishStep('notification');
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 2. 세션 완료 API 호출
-      const result = await completeSession(seconds); // 총 시간(초) 전달
+      // 2. API 호출하여 마무리 멘트 가져오기 (오버레이 없이)
+      setFinishStep('idle');
+      console.log('[handleFinish] Step 2: Calling completeSession API...');
+      const result = await completeSession(seconds);
 
       if (!result) {
         throw new Error("Session completion failed: no result");
       }
 
-      // 3. 마무리 TTS 재생 (영상 모드일 때)
-      if (viewMode === 'video' && result.closingTtsBase64) {
-        await playAudio(result.closingTtsBase64);
-      }
+      console.log('[handleFinish] Full API Response:', result);
+      console.log('[handleFinish] API Response Summary:', {
+        closingText: result.closingText,
+        hasClosingTts: !!result.closingTtsBase64,
+        closingTtsLength: result.closingTtsBase64?.length || 0,
+        allFields: Object.keys(result),
+      });
 
-      // 4. 결과 페이지로 이동 (세션 완료 데이터를 state로 전달)
+      // 3. 마무리 메시지 추가 및 TTS 재생 (2초 동안 표시)
+      const closingText = result.closingText || "Great job! The interview is complete.";
+      const closingMessage: ChatMessage = {
+        id: `closing-${Date.now()}`,
+        type: "AI",
+        content: closingText,
+        timestamp: new Date(),
+      };
+      addMessage(closingMessage);
+      setFinishStep('ai_message');
+      console.log('[handleFinish] Step 3: Added closing message and set finishStep to ai_message');
+
+      // TTS 재생 (재생이 완료될 때까지 대기)
+      if (result.closingTtsBase64) {
+        console.log('[handleFinish] Starting TTS playback...');
+        try {
+          await playAudio(result.closingTtsBase64);
+          console.log('[handleFinish] TTS playback completed successfully');
+        } catch (audioError) {
+          console.error('[handleFinish] TTS playback failed:', audioError);
+          // TTS 실패해도 계속 진행
+        }
+      } else {
+        console.warn('[handleFinish] No closingTtsBase64 - skipping TTS playback');
+        // TTS가 없으면 최소 2초 대기 (메시지를 읽을 시간 제공)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      console.log('[handleFinish] Step 3 completed (TTS playback finished)');
+
+      // 4. 결과 로딩 표시 (0.5초)
+      setFinishStep('loading');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 5. 결과 페이지로 이동
       navigateTo('/my-speak/result', {
         state: {
           sessionId: result.sessionId,
@@ -304,17 +397,19 @@ const InterviewPage = () => {
           sentenceCount: result.sentenceCount,
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("[InterviewPage] Failed to complete session:", error);
+      console.error("[InterviewPage] Error response:", error.response?.data);
       setFinishStep('idle'); // 로딩 상태 해제
-      alert("세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.");
+      const errorMessage = error.response?.data?.message || "세션 종료 중 오류가 발생했습니다.";
+      alert(`${errorMessage}\n\n다시 시도해주세요.`);
     } finally {
       setFinishStep('idle'); // 로딩 상태 초기화
     }
   };
 
-  // 초기 로딩 중
-  if (isInitializing) {
+  // 초기 로딩 중 (세션 초기화 또는 프로필 로딩)
+  if (isInitializing || isLoadingProfiles) {
     return (
       <div className="relative flex flex-col items-center justify-center w-full h-full flex-1 bg-purple-500">
         <Spinner />
@@ -364,6 +459,7 @@ const InterviewPage = () => {
               messages={messages}
               formattedTime={formattedTime}
               isLoading={isLoading}
+              isAIResponding={isAIResponding}
               onPlayAudio={() => { }}
               onSendMessage={handleUserResponse}
               finishStep={finishStep}
