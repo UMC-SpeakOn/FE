@@ -32,10 +32,12 @@ const Detail = () => {
 
   // 최초 렌더 초기화
   if (report && difficulty === null) {
+    const safeReview = report.userReflection ?? '';
+
     setDifficulty(report.sessionSummary.difficulty);
-    setReview(report.userReflection);
+    setReview(safeReview);
     setInitialDifficulty(report.sessionSummary.difficulty);
-    setInitialReview(report.userReflection);
+    setInitialReview(safeReview);
   }
 
   const isDirty =

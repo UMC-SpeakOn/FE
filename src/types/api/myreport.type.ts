@@ -25,9 +25,9 @@ export interface ReportDetailResult {
     aiSummary: string;
 
     toneAnalysis: {
-      userTone: string;
-      expectedTone: string;
-    };
+      userTone: string | null;
+      expectedTone: string | null;
+    } | null;
 
     aiReason: string[];
 
@@ -38,7 +38,7 @@ export interface ReportDetailResult {
     }[];
   };
 
-  userReflection: string;
+  userReflection: string | null;
 
   conversationLog: ReportLogResult[];
 }
