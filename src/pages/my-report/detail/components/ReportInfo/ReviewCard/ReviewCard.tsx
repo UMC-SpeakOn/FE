@@ -17,9 +17,10 @@ const ReviewCard = ({
 }: ReviewCardProps) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  const safeText = text ?? '';
   const countText = useMemo(
-    () => `${Math.min(text.length, maxLength)}/${maxLength}`,
-    [text, maxLength],
+    () => `${Math.min(safeText.length, maxLength)}/${maxLength}`,
+    [safeText, maxLength],
   );
 
   const handleChange = (v: string) => {

@@ -11,6 +11,12 @@ interface ReportAIProps {
 }
 
 const ReportAI = ({ data }: ReportAIProps) => {
+  console.log(data);
+  const toneAnalysis = data.toneAnalysis ?? {
+    userTone: null,
+    expectedTone: null,
+  };
+
   const insightCard: InsightCard = {
     tabs: ['핵심요약', '톤 분석', '근거', '교정'],
     items: [
@@ -25,11 +31,11 @@ const ReportAI = ({ data }: ReportAIProps) => {
         tones: [
           {
             label: '나의 대화 톤',
-            value: data.toneAnalysis.userTone,
+            value: toneAnalysis.userTone ?? 'None',
           },
           {
             label: '상황에 기대된 톤',
-            value: data.toneAnalysis.expectedTone,
+            value: toneAnalysis.expectedTone ?? 'None',
           },
         ],
       },
