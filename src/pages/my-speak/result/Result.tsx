@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 import RightArrow from '@/assets/images/icons/right-arrow.svg';
 import useNavigation from '@/hooks/useNavigation';
+import { formatTime } from '@/utils/date';
 
 import StarRating from '../../../components/StarRating/StarRating';
 import ListCard from './components/Card/ListCard/ListCard';
@@ -26,7 +27,7 @@ const Result = () => {
 
   const { createReport, isLoading: isCreating } = useCreateReport(() => {
     alert('리포트가 생성되었습니다.');
-    navigateTo(`/my-report/${sessionId}`);
+    navigateTo('/my-report/');
   });
 
   const { save, isLoading: isSaving } = useSave(() => {
@@ -46,7 +47,10 @@ const Result = () => {
     <div className="flex flex-col w-full px-[1.55rem] pb-[17.72rem]">
       <Header />
 
-      <ListCard timeText={totalTime} sentenceText={sentenceCount}>
+      <ListCard
+        timeText={formatTime(totalTime)}
+        sentenceText={`${sentenceCount} 문장`}
+      >
         <StarRating value={rating} onChange={setRating} />
       </ListCard>
 
