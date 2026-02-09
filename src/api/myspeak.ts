@@ -6,12 +6,40 @@ import type {
   ConversationTurnResponse,
   GenerateTTSRequest,
   GenerateTTSResponse,
+  GetSessionOpenerResponse,
   GetTTSCacheResponse,
   UploadSTTRequest,
   UploadSTTResponse,
 } from "@/types/api/myspeak.type";
+import type { ServerApiResponse } from "@/types/api/server.type";
 import apiClient, { type CustomAxiosRequestConfig } from "@/utils/apiClient";
 
+
+/**
+ * 세션 오프너(첫 질문) 조회 API
+ * Swagger 명세: GET /api/myspeak/sessions/{sessionId}/opener
+ */
+export const getSessionOpener = async (
+  sessionId: number
+): Promise<GetSessionOpenerResponse> => {
+  const response = await apiClient.get<
+    ServerApiResponse<{
+      questionText: string;
+      base64Audio: string;
+      messageType: 'OPENING';
+    }>
+  >(
+    `/myspeak/sessions/${sessionId}/opener`,
+    { authRequired: true } as CustomAxiosRequestConfig
+  );
+
+  // 백엔드 응답 구조 매핑
+  return {
+    questionText: response.data.result.questionText,
+    base64Audio: response.data.result.base64Audio,
+    messageType: response.data.result.messageType,
+  };
+};
 
 /**
  * TTS 생성 API
@@ -77,6 +105,8 @@ export const sendConversationTurn = async (
 
 /**
  * 대화 턴 전송 API (텍스트 전용)
+ * 실제 백엔드: Request Body { answerText, languageCode, messageType }
+ * 주의: Swagger 문서와 실제 구현이 다름!
  */
 export const sendConversationTurnText = async (
   sessionId: number,
@@ -84,22 +114,27 @@ export const sendConversationTurnText = async (
   messageType: "MAIN" | "FOLLOW" | "CLOSING" = "MAIN",
   languageCode: string = "en-US"
 ): Promise<ConversationTurnResponse> => {
-  const response = await apiClient.post<{
-    isSuccess: boolean;
-    code: string;
-    message: string;
-    result: {
+  const requestBody = {
+    answerText, // 실제 백엔드: "answerText" 필드 사용 (Swagger 문서와 다름)
+    languageCode,
+    messageType,
+  };
+
+  // 디버깅: 실제 요청 데이터 로그
+  console.log('[sendConversationTurnText] Request:', {
+    url: `/myspeak/sessions/${sessionId}/turns/text`,
+    body: requestBody,
+  });
+
+  const response = await apiClient.post<
+    ServerApiResponse<{
       questionText: string;
       base64Audio: string;
       messageType: "MAIN" | "FOLLOW" | "CLOSING";
-    };
-  }>(
+    }>
+  >(
     `/myspeak/sessions/${sessionId}/turns/text`,
-    {
-      languageCode,
-      answerText,
-      messageType,
-    },
+    requestBody,
     { authRequired: true } as CustomAxiosRequestConfig
   );
 
