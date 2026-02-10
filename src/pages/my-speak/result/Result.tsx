@@ -25,9 +25,9 @@ const Result = () => {
     }
   }, [location.state, navigateTo]);
 
-  const { createReport, isLoading: isCreating } = useCreateReport(() => {
+  const { createReport, isLoading: isCreating } = useCreateReport((data) => {
     alert('리포트가 생성되었습니다.');
-    navigateTo('/my-report/');
+    navigateTo(`/my-report/${data.reportId}`);
   });
 
   const { save, isLoading: isSaving } = useSave(() => {
