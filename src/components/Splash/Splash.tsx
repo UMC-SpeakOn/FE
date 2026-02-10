@@ -14,7 +14,7 @@ const Splash = () => {
   });
 
   return (
-    <div className="pageContainer">
+    <div className="pageContainer min-h-dvh">
       <div className="pt-[23.64rem] flex justify-center relative">
         <div ref={bgRef} className="relative z-0" />
 

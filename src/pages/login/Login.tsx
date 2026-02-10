@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
+import Spinner from '@/components/Spinner/Spinner';
 import { DECORATIONS1, DECORATIONS2, DECORATIONS3 } from '@/mocks/loginData';
 import { getRedirectUri } from '@/pages/login/utils/getRedirectUri';
 import type { OAuthProvider } from '@/types/api/login.type';
@@ -33,7 +34,7 @@ const Login = () => {
 
   if (!provider) {
     return (
-      <div className="pageContainer h-screen px-[1.6rem] relative flex flex-col items-center">
+      <div className="pageContainer min-h-dvh px-[1.6rem] relative flex flex-col items-center">
         <div className="relative z-10 mt-[30%] flex flex-col gap-[6.827rem] text-center text-white font-bold leading-none">
           <p className="font-unbounded text-[3.866rem]">SpeakOn</p>
           <p className="text-[1.5rem]">
@@ -60,12 +61,14 @@ const Login = () => {
     );
   }
 
-  if (login.isLoading)
+  if (login.isLoading) {
     return (
-      <div className="pageContainer h-screen flex items-center justify-center">
-        <p>로그인 처리 중...</p>
+      <div className="pageContainer h-screen flex flex-col items-center justify-center gap-[1.6rem]">
+        <Spinner color="var(--color-purple-700)" />
       </div>
     );
+  }
+
   if (login.isError)
     return (
       <div className="pageContainer h-screen flex items-center justify-center">
