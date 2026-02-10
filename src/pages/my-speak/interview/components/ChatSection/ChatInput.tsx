@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import sandMessageIcon from '@/assets/images/icons/sand-message.svg';
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -32,6 +33,7 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [internalMessage, setInternalMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight();
 
   // Controlled mode: 외부에서 value와 onChange 제공
   // Uncontrolled mode: 내부 상태 사용
@@ -66,7 +68,17 @@ const ChatInput = ({
   };
 
   return (
-    <div className="flex items-end gap-3 px-4 py-3 bg-white">
+    <div
+      className={`flex items-end gap-3 px-4 bg-white transition-all duration-300 ease-in-out ${isKeyboardVisible
+        ? 'fixed left-0 bottom-0 w-full border-t border-gray-300 py-4 z-50'
+        : 'py-3'
+        }`}
+      style={{
+        transform: isKeyboardVisible
+          ? `translateY(-${keyboardHeight}px)`
+          : undefined,
+      }}
+    >
       <textarea
         ref={textareaRef}
         value={message}
