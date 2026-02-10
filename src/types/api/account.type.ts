@@ -25,3 +25,9 @@ export interface EditProfileResponse {
   profileImgUrl: string;
   message: string;
 }
+
+// 유저 탈퇴 결과
+export interface DeleteProfileResult {
+  userId: number;
+  message: string;
+}

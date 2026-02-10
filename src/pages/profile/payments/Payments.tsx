@@ -35,7 +35,7 @@ const Payments = () => {
 
   return (
     <>
-      <PrevNavbar title="구독" back />
+      <PrevNavbar title="구독" path="/profile/subscription" />
 
       <div className="white-pageContainer pr-[1.462rem]">
         <PlanCard />
