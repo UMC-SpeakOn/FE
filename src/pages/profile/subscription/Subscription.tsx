@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import ProfileModal from '@/components/Modal/ProfileModal';
 import PrevNavbar from '@/components/Navbar/PrevNavbar';
+import Spinner from '@/components/Spinner/Spinner';
 import useNavigation from '@/hooks/useNavigation';
 
 import { useUserProfile } from '../account/hooks/useUserProfile';
@@ -20,6 +21,7 @@ const Subscription = () => {
   const isSubscribed = user?.isSubscribed === true;
   const isCancelled = user?.isSubscriptionCancelled === true;
   const expiredAt = user?.subscriptionExpiredAt ?? null;
+  const isPageLoading = !user || isLoading;
 
   const handleOpenModal = () => {
     setIsOpen(true);
@@ -42,7 +44,7 @@ const Subscription = () => {
 
   return (
     <>
-      <PrevNavbar title="구독" back />
+      <PrevNavbar title="구독" path="/profile/account" />
 
       <div className="white-pageContainer pr-[1.462rem]">
         <div className="flex flex-col gap-[3.6rem]">
@@ -85,6 +87,12 @@ const Subscription = () => {
             <NotSubscription />
           )}
         </div>
+
+        {isPageLoading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white">
+            <Spinner color="var(--color-purple-700)" />
+          </div>
+        )}
       </div>
 
       {isOpen && (
