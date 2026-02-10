@@ -39,13 +39,13 @@ const User = ({ user, profileUpdated }: UserProps) => {
     <>
       <section className="flex flex-col gap-[1.323rem]">
         <header>
-          <h1 className="font-bold text-black text-[2.4rem] leading-none">
+          <h1 className="font-bold text-black leading-none text-[clamp(1.8rem,4.5vw,2.4rem)]">
             Hi, {user.nickname}!
           </h1>
         </header>
 
-        <article className="w-full py-[2.6rem] px-[2.2rem] border-[0.1rem] border-gray-100 rounded-[1rem]">
-          <div className="flex gap-[4.9rem] items-center">
+        <article className="w-full px-[clamp(1.6rem,4vw,2.2rem)] py-[clamp(2rem,4.5vw,2.6rem)] border-[0.1rem] border-gray-100 rounded-[1rem]">
+          <div className="flex gap-[clamp(2rem,6vw,4.9rem)] items-center">
             <figure className="flex flex-col gap-[1.4rem] items-center">
               <img
                 src={user.profileImgUrl || ProfileImg}
@@ -53,17 +53,17 @@ const User = ({ user, profileUpdated }: UserProps) => {
                 onError={(e) => {
                   e.currentTarget.src = ProfileImg;
                 }}
-                className="w-[10rem] h-[10rem] rounded-full object-cover"
+                className="w-[clamp(8rem,22vw,10rem)] h-[clamp(8rem,22vw,10rem)] rounded-full object-cover"
               />
 
               <figcaption>
                 <button
                   type="button"
-                  className="flex items-center gap-[0.7rem]"
+                  className="flex items-center gap-[clamp(0.5rem,1.8vw,0.7rem)]"
                   onClick={() => setIsEditOpen(true)}
                 >
                   <img src={PencilImg} alt="" className="w-[1.2rem]" />
-                  <span className="font-medium text-gray-300 text-[1.2rem] leading-none">
+                  <span className="font-medium text-gray-300 leading-none text-[clamp(1.1rem,3vw,1.2rem)]">
                     프로필 수정
                   </span>
                 </button>
@@ -72,19 +72,20 @@ const User = ({ user, profileUpdated }: UserProps) => {
 
             <section className="flex flex-col gap-[2.5rem]">
               <div>
-                <h2 className="font-bold text-[1.5rem] leading-none text-black">
+                <h2 className="font-bold leading-none text-black text-[clamp(1.3rem,3.5vw,1.5rem)]">
                   서비스 가입일
                 </h2>
-                <p className="mt-4 font-medium text-[1.3rem] leading-none text-gray-600">
+
+                <p className="mt-4 font-medium leading-none text-gray-600 text-[clamp(1.2rem,3.2vw,1.3rem)]">
                   {formatDate(user.createdAt)}
                 </p>
               </div>
 
               <div>
-                <h2 className="font-bold text-[1.5rem] leading-none text-black">
+                <h2 className="font-bold text-[clamp(1.3rem,3.5vw,1.5rem)] leading-none text-black">
                   로그인 정보
                 </h2>
-                <address className="mt-4 not-italic font-medium text-[1.3rem] leading-[1.25] text-gray-600">
+                <address className="mt-4 not-italic font-medium leading-[1.3] text-gray-600 text-[clamp(1.2rem,3.2vw,1.3rem)]">
                   {user.socialType} 계정으로 로그인됨
                   <br />
                   {user.email}
