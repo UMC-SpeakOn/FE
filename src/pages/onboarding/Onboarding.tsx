@@ -28,12 +28,12 @@ const Onboarding = () => {
 
   const goToStep4 = () => {
     if (!containerRef.current || !step4Ref.current) return;
-    scroll(containerRef.current, step4Ref.current, 500);
+    scroll(containerRef.current, step4Ref.current, 300);
   };
 
   const goToStep5 = () => {
     if (!containerRef.current || !step5Ref.current) return;
-    scroll(containerRef.current, step5Ref.current, 500);
+    scroll(containerRef.current, step5Ref.current, 300);
   };
 
   return (
