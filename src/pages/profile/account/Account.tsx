@@ -1,38 +1,60 @@
 import { useState } from 'react';
 
 import ProfileModal from '@/components/Modal/ProfileModal';
+import Spinner from '@/components/Spinner/Spinner';
+import useNavigation from '@/hooks/useNavigation';
+import { tokenManager } from '@/utils/apiClient';
 
 import Setting from './components/Setting/Setting';
 import Subscribe from './components/Subscribe/Subscribe';
 import User from './components/User/User';
+import { useDeleteProfile } from './hooks/useDeleteProfile';
 import { useUserProfile } from './hooks/useUserProfile';
 
 const Account = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { navigateTo } = useNavigation();
+
   const { user, isLoading, isError, refetch } = useUserProfile();
+  const { deleteProfile, isLoading: isDeleting } = useDeleteProfile();
 
   const handleOpenDeleteModal = () => {
     setIsOpen(true);
-  };
-
-  const handleDeleteAccount = () => {
-    setIsOpen(false);
   };
 
   const handleCancel = () => {
     setIsOpen(false);
   };
 
-  if (isLoading) {
-    return <div className="white-pageContainer">로딩 중...</div>;
-  }
+  const handleDeleteAccount = async () => {
+    if (isDeleting) return;
 
-  if (isError || !user) {
-    return <div className="white-pageContainer">에러 발생</div>;
+    try {
+      const res = await deleteProfile();
+
+      if (res?.result) {
+        alert(res.result.message);
+        tokenManager.clearTokens();
+        localStorage.clear();
+        navigateTo('/', { replace: true });
+      }
+    } catch {
+      alert('회원 탈퇴에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsOpen(false);
+    }
+  };
+
+  if (isLoading || isError || !user) {
+    return (
+      <div className="white-pageContainer flex items-center justify-center">
+        <Spinner color="var(--color-purple-700)" />
+      </div>
+    );
   }
 
   return (
-    <div className="white-pageContainer gap-[3.6rem] pr-[1.462rem]">
+    <div className="white-pageContainer gap-[3.6rem] pr-[1.462rem] relative">
       <User user={user} profileUpdated={refetch} />
 
       <Subscribe user={user} />
@@ -47,7 +69,7 @@ const Account = () => {
             '계정을 삭제하면 남아 있는 구독도 함께 해지돼요',
           ]}
           cancelText="취소"
-          confirmText="삭제하기"
+          confirmText={isDeleting ? '삭제 중...' : '삭제하기'}
           onCancel={handleCancel}
           onConfirm={handleDeleteAccount}
           onClose={handleCancel}
