@@ -1,11 +1,3 @@
-export interface ReportLogResult {
-  messageId: number;
-  senderRole: 'AI' | 'USER';
-  content: string;
-  audioUrl?: string;
-  createdAt: string;
-}
-
 // 리포트 상세 조회 응답
 export interface ReportDetailResult {
   reportId: number;
@@ -41,6 +33,7 @@ export interface ReportDetailResult {
   userReflection: string | null;
 
   conversationLog: ReportLogResult[];
+  isLogLocked: boolean;
 }
 
 export interface ReportLogResult {

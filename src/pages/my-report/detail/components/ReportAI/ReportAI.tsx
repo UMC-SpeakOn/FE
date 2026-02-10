@@ -11,7 +11,7 @@ interface ReportAIProps {
 }
 
 const ReportAI = ({ data }: ReportAIProps) => {
-  console.log(data);
+  // console.log(data);
   const toneAnalysis = data.toneAnalysis ?? {
     userTone: null,
     expectedTone: null,
@@ -59,7 +59,7 @@ const ReportAI = ({ data }: ReportAIProps) => {
     <div className="w-full flex flex-col gap-[2.8rem]">
       <ReportSection
         title="AI Insight Card"
-        description="이번 대화를 SpeakOn AI가 정리했어요"
+        description="이번 대화를 AI가 정리했어요"
       >
         <AICard data={insightCard} />
       </ReportSection>
