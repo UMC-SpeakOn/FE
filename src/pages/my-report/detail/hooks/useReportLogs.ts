@@ -4,13 +4,18 @@ import { useQuery } from '@/hooks/useApi';
 import type { ReportLogsApiResult } from '@/types/api/myreport.type';
 import type { ServerApiResponse } from '@/types/api/server.type';
 
+import { getOrCreateViewUUID } from '../utils/viewUuid';
+
 export const useReportLogs = (reportId?: number) => {
   const queryConfig = useMemo(() => {
     if (!reportId) return null;
 
+    const viewUUID = getOrCreateViewUUID(`report-${reportId}`);
+
     return {
       method: 'GET',
       url: `/reports/${reportId}/logs`,
+      params: { viewUUID },
     };
   }, [reportId]);
 

@@ -25,9 +25,9 @@ const Result = () => {
     }
   }, [location.state, navigateTo]);
 
-  const { createReport, isLoading: isCreating } = useCreateReport(() => {
+  const { createReport, isLoading: isCreating } = useCreateReport((data) => {
     alert('리포트가 생성되었습니다.');
-    navigateTo('/my-report/');
+    navigateTo(`/my-report/${data.reportId}`);
   });
 
   const { save, isLoading: isSaving } = useSave(() => {
@@ -42,6 +42,8 @@ const Result = () => {
       userDifficulty: rating,
     });
   };
+
+  const isLoading = isSaving || isCreating;
 
   return (
     <div className="flex flex-col w-full px-[1.55rem] pb-[17.72rem]">
@@ -59,7 +61,7 @@ const Result = () => {
         disabled={rating === 0 || isSaving || isCreating}
         onClick={handleReportClick}
       >
-        리포트 확인하기
+        {isLoading ? '리포트 생성 중...' : '리포트 확인하기'}
         <img src={RightArrow} alt="right" className="w-2" />
       </button>
     </div>
