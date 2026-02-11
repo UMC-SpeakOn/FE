@@ -43,6 +43,8 @@ const Result = () => {
     });
   };
 
+  const isLoading = isSaving || isCreating;
+
   return (
     <div className="flex flex-col w-full px-[1.55rem] pb-[17.72rem]">
       <Header />
@@ -59,7 +61,7 @@ const Result = () => {
         disabled={rating === 0 || isSaving || isCreating}
         onClick={handleReportClick}
       >
-        리포트 확인하기
+        {isLoading ? '리포트 생성 중...' : '리포트 확인하기'}
         <img src={RightArrow} alt="right" className="w-2" />
       </button>
     </div>
