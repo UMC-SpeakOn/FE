@@ -32,7 +32,7 @@ const OnboardingVideo = ({
       muted
       playsInline
       loop
-      preload="metadata"
+      preload="auto"
       controls={false}
       disablePictureInPicture
       controlsList="nodownload nofullscreen noremoteplayback"
