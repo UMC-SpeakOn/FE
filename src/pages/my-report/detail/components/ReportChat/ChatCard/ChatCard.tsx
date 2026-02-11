@@ -14,8 +14,8 @@ const ChatCard = ({ data, isLocked, isLoading }: ChatCardProps) => {
   return (
     <div className="relative w-full h-[49rem] rounded-2xl border border-gray-100 bg-white overflow-hidden [overflow-anchor:none] will-change-transform translate-z-0">
       <div className="h-full overflow-y-auto flex flex-col gap-8 px-[1.25rem] py-[1.492rem]">
-        {data.map((chat) => (
-          <ItemChat key={chat.id} chat={chat} />
+        {data.map((chat, index) => (
+          <ItemChat key={`${chat.id ?? 'chat'}-${index}`} chat={chat} />
         ))}
       </div>
 
