@@ -33,7 +33,10 @@ export interface ReportDetailResult {
   userReflection: string | null;
 
   conversationLog: ReportLogResult[];
+
   isLogLocked: boolean;
+  usedLogViewCount: number;
+  maxLogViewCount: number;
 }
 
 export interface ReportLogResult {
@@ -49,6 +52,10 @@ export interface ReportLogsApiResult {
   reportId: number;
   totalMessageCount: number;
   messages: ReportLogResult[];
+
+  isLogLocked: boolean;
+  usedLogViewCount: number;
+  maxLogViewCount: number;
 }
 
 // 리포트 난이도/소감 수정 요청

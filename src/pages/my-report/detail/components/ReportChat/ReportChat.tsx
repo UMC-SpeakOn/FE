@@ -1,7 +1,8 @@
+import { useReportDetailStore } from '@/stores/my-report/detail.store';
+
+import { useReportLogs } from '../../hooks/useReportLogs';
 import ReportSection from '../common/ReportSection/ReportSection';
 import ChatCard from './ChatCard/ChatCard';
-import { useReportDetailStore } from '@/stores/my-report/detail.store';
-import { useReportLogs } from '../../hooks/useReportLogs';
 
 const ReportChat = () => {
   const { report } = useReportDetailStore();
@@ -23,7 +24,7 @@ const ReportChat = () => {
   return (
     <ReportSection
       title="대화 로그"
-      description="무료 로그 열람 5/5회 사용 완료"
+      description={`무료 로그 열람 ${report?.usedLogViewCount}/${report?.maxLogViewCount}회 사용 완료`}
     >
       <ChatCard
         data={chatLogs}

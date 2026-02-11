@@ -21,7 +21,7 @@ const LockedOverlay = () => {
         </p>
 
         <button
-          onClick={() => navigateTo('/my-profile')}
+          onClick={() => navigateTo('/profile/subscription')}
           className="flex items-center gap-[1.1rem] border-b border-white text-[1.4rem] font-medium"
         >
           구독하러 가기

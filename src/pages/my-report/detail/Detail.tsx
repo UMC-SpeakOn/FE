@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useReportDetailStore } from '@/stores/my-report/detail.store';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Spinner from '@/components/Spinner/Spinner';
 
 import PrevNavbar from '@/components/Navbar/PrevNavbar';
+import Spinner from '@/components/Spinner/Spinner';
+import { useReportDetailStore } from '@/stores/my-report/detail.store';
 
 import ReportBar from './components/common/ReportBar/ReportBar';
 import ReportButton from './components/common/ReportButton/ReportButton';
@@ -15,112 +15,93 @@ import { useReportUpdate } from './hooks/useReportUpdate';
 
 const Detail = () => {
   const { id } = useParams<{ id: string }>();
-  const reportId = Number(id);
+  const reportId = id ? Number(id) : undefined;
 
   const { report, isLoading, isError } = useReportDetail(reportId);
   const { mutate: updateReflection, isLoading: isSaving } = useReportUpdate();
-
   const { setReport, reset } = useReportDetailStore();
+
+  const [draft, setDraft] = useState<{
+    difficulty?: number;
+    review?: string;
+  }>({});
 
   useEffect(() => {
     if (report) setReport(report);
-  }, [report, setReport]);
-
-  useEffect(() => {
     return () => reset();
-  }, [reset]);
-
-  // 편집 상태
-  const [difficulty, setDifficulty] = useState<number | null>(null);
-  const [review, setReview] = useState('');
-
-  // 초기 체크
-  const [initialDifficulty, setInitialDifficulty] = useState<number | null>(
-    null,
-  );
-  const [initialReview, setInitialReview] = useState('');
-
-  // 최초 렌더 초기화
-  useEffect(() => {
-    if (report && difficulty === null) {
-      const safeReview = report.userReflection ?? '';
-
-      setDifficulty(report.sessionSummary.difficulty);
-      setReview(safeReview);
-      setInitialDifficulty(report.sessionSummary.difficulty);
-      setInitialReview(safeReview);
-    }
-  }, [report, difficulty]);
-
-  const isDirty =
-    initialDifficulty !== null &&
-    (difficulty !== initialDifficulty || review !== initialReview);
-
-  const isReady = !isLoading && !isError && report && difficulty !== null;
+  }, [report, setReport, reset]);
 
   const handleSave = async () => {
-    if (difficulty === null) return;
+    if (!report || difficulty === undefined) return;
 
     const result = await updateReflection({
-      reportId,
+      reportId: report.reportId,
       feedback: review,
       difficulty,
     });
 
     if (result !== null) {
-      setInitialDifficulty(difficulty);
-      setInitialReview(review);
       alert('저장되었습니다.');
+      setDraft({});
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Spinner color="var(--color-purple-700)" />
+      </div>
+    );
+  }
+
+  if (isError || !report) {
+    return (
+      <div className="flex justify-center items-center py-[6rem] text-gray-400">
+        리포트를 불러올 수 없습니다.
+      </div>
+    );
+  }
+
+  const difficulty = draft.difficulty ?? report.sessionSummary.difficulty;
+
+  const review = draft.review ?? report.userReflection ?? '';
+
+  const isDirty =
+    difficulty !== report.sessionSummary.difficulty ||
+    review !== (report.userReflection ?? '');
 
   return (
     <>
       <PrevNavbar
-        title={
-          report
-            ? `${report.sessionSummary.job} 직무 ${report.sessionSummary.situation}`
-            : ''
-        }
+        title={`${report.sessionSummary.job} 직무 ${report.sessionSummary.situation}`}
         path="/my-report"
       />
 
       <div className="white-pageContainer pr-[1.597rem] gap-[3.3rem]">
-        {isLoading && (
-          <div className="flex justify-center items-center min-h-[60vh]">
-            <Spinner color="var(--color-purple-700)" />
-          </div>
-        )}
-        {!isLoading && !isError && isReady && (
-          <>
-            <ReportInfo
-              data={report.sessionSummary}
-              difficulty={difficulty}
-              review={review}
-              onChangeDifficulty={setDifficulty}
-              onChangeReview={setReview}
-            />
+        <ReportInfo
+          data={report.sessionSummary}
+          difficulty={difficulty}
+          review={review}
+          onChangeDifficulty={(value) =>
+            setDraft((prev) => ({ ...prev, difficulty: value }))
+          }
+          onChangeReview={(value) =>
+            setDraft((prev) => ({ ...prev, review: value }))
+          }
+        />
 
-            <ReportBar />
-            <ReportAI data={report.aiInsightCard} />
-            <ReportBar />
+        <ReportBar />
+        <ReportAI data={report.aiInsightCard} />
+        <ReportBar />
 
-            <ReportChat />
+        <ReportChat />
 
-            {isDirty && (
-              <ReportButton
-                text={isSaving ? '저장 중...' : '저장하기'}
-                onClick={handleSave}
-                disabled={isSaving}
-              />
-            )}
-          </>
-        )}
-
-        {!isLoading && isError && (
-          <div className="flex justify-center items-center py-[6rem] text-gray-400">
-            리포트를 불러올 수 없습니다.
-          </div>
+        {isDirty && (
+          <ReportButton
+            text={isSaving ? '저장 중...' : '저장하기'}
+            onClick={handleSave}
+            disabled={isSaving}
+          />
         )}
       </div>
     </>

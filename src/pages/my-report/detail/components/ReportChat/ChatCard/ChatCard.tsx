@@ -1,5 +1,5 @@
-import type { ChatLog } from '@/pages/my-report/detail/types/myreport.type';
 import Spinner from '@/components/Spinner/Spinner';
+import type { ChatLog } from '@/pages/my-report/detail/types/myreport.type';
 
 import ItemChat from './ItemChat';
 import LockedOverlay from './LockedOverlay';

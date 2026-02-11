@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import type { ReportDetailResult } from '@/types/api/myreport.type';
 
 interface ReportDetailState {
@@ -9,6 +10,9 @@ interface ReportDetailState {
 
 export const useReportDetailStore = create<ReportDetailState>((set) => ({
   report: null,
-  setReport: (report) => set({ report }),
+  setReport: (report) =>
+    set((state) =>
+      state.report?.reportId === report.reportId ? state : { report },
+    ),
   reset: () => set({ report: null }),
 }));
