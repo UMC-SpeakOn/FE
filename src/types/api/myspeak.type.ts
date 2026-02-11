@@ -49,6 +49,7 @@ export interface ConversationTurnRequest {
 }
 
 export interface ConversationTurnResponse {
+  answerText?: string; // 사용자 답변 텍스트 (음성 파일 전송 시에만 포함)
   questionText: string; // AI 질문 텍스트
   base64Audio: string; // base64 인코딩된 mp3
   messageType: 'MAIN' | 'FOLLOW' | 'CLOSING';

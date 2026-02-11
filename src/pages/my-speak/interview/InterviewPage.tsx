@@ -121,14 +121,18 @@ const InterviewPage = () => {
   // 채팅 훅 (초기 메시지는 AI 오프너 로드 후 추가)
   const { messages, isLoading, addMessage } = useChat();
 
-  // 음성 인식 훅
+  // 음성 인식 훅 (하이브리드: PC는 Web Speech API, 모바일은 서버 STT)
   const {
     startListening,
     stopListening,
     clearTranscript,
     audioLevel,
     transcript,
-  } = useSpeechRecognition();
+    aiResponse,
+  } = useSpeechRecognition({
+    sessionId: sessionId ? Number(sessionId) : undefined,
+    messageType: 'MAIN',
+  });
 
   // 비디오 스왑 훅
   const { isUserInMain, swapLayout } = useVideoSwap();
@@ -208,6 +212,41 @@ const InterviewPage = () => {
       setChatInput(transcript);
     }
   }, [transcript, viewMode]);
+
+  // 모바일 환경: 서버 STT 응답 처리
+  useEffect(() => {
+    if (aiResponse) {
+      // 0. 로딩 상태 해제
+      setIsAIResponding(false);
+
+      // 1. 사용자 메시지 추가 (STT 결과가 있는 경우만)
+      if (aiResponse.answerText) {
+        const userMessage: ChatMessage = {
+          id: `msg-${Date.now()}`,
+          type: 'User',
+          content: aiResponse.answerText,
+          timestamp: new Date(),
+        };
+        addMessage(userMessage);
+      }
+
+      // 2. AI 메시지 추가
+      const aiMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        type: 'AI',
+        content: aiResponse.questionText,
+        timestamp: new Date(),
+      };
+      addMessage(aiMessage);
+
+      // TTS 재생 (있는 경우)
+      if (aiResponse.base64Audio) {
+        playAudio(aiResponse.base64Audio).catch((err) => {
+          console.warn('[InterviewPage] Mobile TTS playback failed:', err);
+        });
+      }
+    }
+  }, [aiResponse, addMessage, playAudio]);
 
   /**
    * 사용자 응답 처리 (텍스트 → AI 응답 → TTS 재생)
@@ -297,6 +336,8 @@ const InterviewPage = () => {
    * - 채팅 모드: 말하기 완료 시 입력창에만 입력 (사용자가 전송 버튼으로 컨트롤)
    */
   const handleSpeak = () => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     if (speakState === 'ready') {
       setSpeakState('speaking');
       setChatInput(''); // 입력 필드 초기화
@@ -304,15 +345,28 @@ const InterviewPage = () => {
     } else if (speakState === 'speaking') {
       setSpeakState('done');
 
-      // 카메라 모드일 경우 API를 통해 즉시 전송
-      if (viewMode === 'video' && transcript.trim()) {
-        handleUserResponse(transcript.trim());
-        setChatInput(''); // 전송 후 입력 필드 초기화
-        clearTranscript(); // transcript도 초기화
+      if (isMobile) {
+        // 모바일 환경: stopListening()이 서버에 음성 파일 전송
+        // transcript가 없는 것이 정상 (서버 STT 사용)
+        setIsAIResponding(true);
+      } else {
+        // PC 환경: Web Speech API 사용
+        if (viewMode === 'video') {
+          // 카메라 모드: 즉시 API 호출
+          if (transcript.trim()) {
+            handleUserResponse(transcript.trim());
+            clearTranscript();
+          }
+        } else {
+          // 채팅 모드: 입력창에만 설정 (사용자가 전송 버튼으로 컨트롤)
+          if (transcript.trim()) {
+            setChatInput(transcript.trim());
+            clearTranscript();
+          }
+        }
       }
 
       // 음성 인식 중지
-      // 채팅 모드일 경우 chatInput은 유지되어 사용자가 전송 버튼으로 컨트롤
       stopListening();
     } else {
       setSpeakState('ready');
