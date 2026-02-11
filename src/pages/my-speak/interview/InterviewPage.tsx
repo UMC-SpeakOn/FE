@@ -384,7 +384,10 @@ const InterviewPage = () => {
       // 음성 인식 중지
       stopListening().catch((error) => {
         console.error('[InterviewPage] stopListening failed:', error);
-        setIsAIResponding(false);
+        // 모바일 환경에서만 로딩 해제 (PC는 handleUserResponse가 관리)
+        if (isMobile) {
+          setIsAIResponding(false);
+        }
       });
     } else {
       setSpeakState('ready');
