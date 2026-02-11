@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useReportDetailStore } from '@/stores/my-report/detail.store';
 
 import { useReportLogs } from '../../hooks/useReportLogs';
@@ -9,6 +11,16 @@ const ReportChat = () => {
   const reportId = report?.reportId;
 
   const { logs, isLoading } = useReportLogs(reportId);
+
+  useEffect(() => {
+    if (!reportId) return;
+
+    const key = `report-${reportId}`;
+
+    return () => {
+      sessionStorage.removeItem(key);
+    };
+  }, [reportId]);
 
   const chatLogs = logs.map((log) => ({
     id: log.messageId,

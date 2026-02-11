@@ -6,7 +6,7 @@ const LockedOverlay = () => {
   const { navigateTo } = useNavigation();
 
   return (
-    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
+    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="flex flex-col items-center text-white">
         <img
           src={Lock}
