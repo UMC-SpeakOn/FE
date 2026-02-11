@@ -9,6 +9,7 @@ import ControlButton from "./Controls/ControlButton";
 interface ControlButtonsProps {
   viewMode: "video" | "chat";
   isPaused: boolean;
+  isFinishing?: boolean;
   onFinish: () => void;
   onPauseToggle: () => void;
   onToggleMode: () => void;
@@ -23,6 +24,7 @@ interface ControlButtonsProps {
 const ControlButtons = ({
   viewMode,
   isPaused,
+  isFinishing = false,
   onFinish,
   onPauseToggle,
   onToggleMode,
@@ -34,6 +36,7 @@ const ControlButtons = ({
         label="마무리하기"
         onClick={onFinish}
         iconSize="w-5 h-5"
+        disabled={isFinishing}
       />
 
       <ControlButton

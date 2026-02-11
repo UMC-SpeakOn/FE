@@ -560,6 +560,7 @@ const InterviewPage = () => {
         <ControlButtons
           viewMode={viewMode}
           isPaused={isPaused}
+          isFinishing={finishStep !== 'idle'}
           onFinish={handleFinish}
           onPauseToggle={handlePauseToggle}
           onToggleMode={handleToggleMode}
