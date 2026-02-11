@@ -3,7 +3,7 @@ import type { SummaryInsightItem } from '@/pages/my-report/detail/types/myreport
 const Summary = ({ item }: { item: SummaryInsightItem }) => (
   <>
     <p className="font-bold text-[1.5rem] text-purple-900">{item.title}</p>
-    <p className="text-[1.4rem] leading-[1.5]">{item.summary}</p>
+    <p className="text-[1.4rem] leading-[1.5] font-medium">{item.summary}</p>
   </>
 );
 
