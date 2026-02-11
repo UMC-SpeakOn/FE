@@ -398,6 +398,9 @@ const InterviewPage = () => {
    */
   const handleFinish = async () => {
     try {
+      // 0. 타이머 중지
+      pause();
+
       // 1. 알림 표시: "AI의 마무리 멘트가 한 턴 추가됩니다." (1초)
       setFinishStep('notification');
       await new Promise(resolve => setTimeout(resolve, 1000));
