@@ -129,6 +129,7 @@ const InterviewPage = () => {
     audioLevel,
     transcript,
     aiResponse,
+    error: speechError,
   } = useSpeechRecognition({
     sessionId: sessionId ? Number(sessionId) : undefined,
     messageType: 'MAIN',
@@ -247,6 +248,14 @@ const InterviewPage = () => {
       }
     }
   }, [aiResponse, addMessage, playAudio]);
+
+  // 음성 인식 에러 감지 (모바일 환경에서 음성 전송 실패 시)
+  useEffect(() => {
+    if (speechError) {
+      setIsAIResponding(false);
+      console.error('[InterviewPage] Speech recognition error:', speechError);
+    }
+  }, [speechError]);
 
   /**
    * 사용자 응답 처리 (텍스트 → AI 응답 → TTS 재생)

@@ -303,10 +303,24 @@ export const useSpeechRecognition = ({
       source.connect(analyserRef.current);
       measureAudioLevel();
 
+      // MIME 타입 결정 (iOS Safari 대응)
+      let mimeType = 'audio/webm';
+      if (!MediaRecorder.isTypeSupported('audio/webm')) {
+        // iOS Safari는 audio/webm 미지원, audio/mp4 사용
+        if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          mimeType = 'audio/mp4';
+        } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+          mimeType = 'audio/aac';
+        } else {
+          mimeType = ''; // 브라우저 기본값 사용
+        }
+      }
+
       // MediaRecorder 초기화
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm',
-      });
+      const mediaRecorder = new MediaRecorder(
+        stream,
+        mimeType ? { mimeType } : undefined
+      );
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -345,8 +359,9 @@ export const useSpeechRecognition = ({
    */
   const stopListeningPC = useCallback(() => {
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
+      const recognition = recognitionRef.current;
+      recognitionRef.current = null; // 먼저 null로 설정하여 onend에서 재시작 방지
+      recognition.stop();
     }
 
     if (animationFrameRef.current) {
@@ -392,12 +407,16 @@ export const useSpeechRecognition = ({
             streamRef.current = null;
           }
 
-          // Blob을 File로 변환
+          // Blob을 File로 변환 (실제 사용된 MIME 타입 사용)
+          const mimeType = mediaRecorderRef.current!.mimeType || 'audio/webm';
+          const extension = mimeType.includes('mp4') ? 'mp4' :
+                           mimeType.includes('aac') ? 'aac' : 'webm';
+
           const audioBlob = new Blob(audioChunksRef.current, {
-            type: 'audio/webm',
+            type: mimeType,
           });
-          const audioFile = new File([audioBlob], 'recording.webm', {
-            type: 'audio/webm',
+          const audioFile = new File([audioBlob], `recording.${extension}`, {
+            type: mimeType,
           });
 
           // 실제 서버에 음성 파일 전송
