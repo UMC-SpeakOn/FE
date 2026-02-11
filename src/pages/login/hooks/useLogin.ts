@@ -27,16 +27,13 @@ export const useLogin = (provider: OAuthProvider) => {
           return;
         }
 
-        // 추후 온보딩 개발되면 주석 풀기
-        // const { userId, accessToken, refreshToken, isOnboarded } = data.result;
-        const { userId, accessToken, refreshToken } = data.result;
+        const { userId, accessToken, refreshToken, isOnboarded } = data.result;
 
         tokenManager.setAccessToken(accessToken);
         tokenManager.setRefreshToken(refreshToken);
         localStorage.setItem('userId', String(userId));
 
-        // navigateTo(isOnboarded ? '/my-role' : '/onboarding');
-        navigateTo('/my-role');
+        navigateTo(isOnboarded ? '/my-role' : '/onboarding');
       },
 
       onError: (error) => {

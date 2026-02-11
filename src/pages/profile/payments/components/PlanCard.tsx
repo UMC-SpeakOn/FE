@@ -25,7 +25,7 @@ const PlanCard = () => {
       </div>
 
       <div className="p-[2.2rem] w-full bg-gray-50">
-        <p className="font-bold text-[1.3rem] leading-[1.4] text-gray-500">
+        <p className="font-bold text-[clamp(1.2rem,3.2vw,1.3rem)] leading-[1.4] text-gray-500">
           구독을 시작하면 내가 말한 대화 문장들을 저장하고
           <br />
           언제든 다시 꺼내 볼 수 있어요
