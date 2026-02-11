@@ -79,7 +79,7 @@ export const uploadSTT = async (
 };
 
 /**
- * 대화 턴 전송 API
+ * 대화 턴 전송 API (음성 파일)
  */
 export const sendConversationTurn = async (
   sessionId: number,
@@ -91,22 +91,34 @@ export const sendConversationTurn = async (
   formData.append("languageCode", metadata.languageCode || "en-US");
   formData.append("messageType", metadata.messageType);
 
-  const response = await apiClient.post<ApiResponse<ConversationTurnResponse>>(
+  const response = await apiClient.post<
+    ServerApiResponse<{
+      answerText: string;
+      questionText: string;
+      base64Audio: string;
+      messageType: "MAIN" | "FOLLOW" | "CLOSING";
+    }>
+  >(
     `/myspeak/sessions/${sessionId}/turns`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
-      authRequired: false,
+      authRequired: true,
     } as CustomAxiosRequestConfig
   );
 
-  return response.data.data;
+  // 백엔드 응답 구조 { result: { answerText, questionText, base64Audio, messageType } }를 매핑
+  return {
+    answerText: response.data.result.answerText,
+    questionText: response.data.result.questionText,
+    base64Audio: response.data.result.base64Audio,
+    messageType: response.data.result.messageType,
+  };
 };
 
 /**
  * 대화 턴 전송 API (텍스트 전용)
  * 실제 백엔드: Request Body { answerText, languageCode, messageType }
- * 주의: Swagger 문서와 실제 구현이 다름!
  */
 export const sendConversationTurnText = async (
   sessionId: number,
@@ -119,12 +131,6 @@ export const sendConversationTurnText = async (
     languageCode,
     messageType,
   };
-
-  // 디버깅: 실제 요청 데이터 로그
-  console.log('[sendConversationTurnText] Request:', {
-    url: `/myspeak/sessions/${sessionId}/turns/text`,
-    body: requestBody,
-  });
 
   const response = await apiClient.post<
     ServerApiResponse<{

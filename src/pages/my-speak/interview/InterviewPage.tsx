@@ -78,6 +78,9 @@ const InterviewPage = () => {
   // 초기화 완료 여부 추적 (마운트 시 1회만 실행)
   const hasInitialized = useRef(false);
 
+  // 처리된 AI 응답 추적 (중복 메시지 방지)
+  const lastProcessedResponseRef = useRef<typeof aiResponse>(null);
+
   // 면접관 데이터 (API로부터 가져오기)
   const interviewer = useMemo(() => {
     if (!myRoleIdFromState || !profiles.length) {
@@ -121,14 +124,19 @@ const InterviewPage = () => {
   // 채팅 훅 (초기 메시지는 AI 오프너 로드 후 추가)
   const { messages, isLoading, addMessage } = useChat();
 
-  // 음성 인식 훅
+  // 음성 인식 훅 (하이브리드: PC는 Web Speech API, 모바일은 서버 STT)
   const {
     startListening,
     stopListening,
     clearTranscript,
     audioLevel,
     transcript,
-  } = useSpeechRecognition();
+    aiResponse,
+    error: speechError,
+  } = useSpeechRecognition({
+    sessionId: sessionId ? Number(sessionId) : undefined,
+    messageType: 'MAIN',
+  });
 
   // 비디오 스왑 훅
   const { isUserInMain, swapLayout } = useVideoSwap();
@@ -208,6 +216,52 @@ const InterviewPage = () => {
       setChatInput(transcript);
     }
   }, [transcript, viewMode]);
+
+  // 모바일 환경: 서버 STT 응답 처리
+  useEffect(() => {
+    // 중복 처리 방지: 이미 처리된 응답이면 무시
+    if (aiResponse && aiResponse !== lastProcessedResponseRef.current) {
+      lastProcessedResponseRef.current = aiResponse;
+
+      // 0. 로딩 상태 해제
+      setIsAIResponding(false);
+
+      // 1. 사용자 메시지 추가 (STT 결과가 있는 경우만)
+      if (aiResponse.answerText) {
+        const userMessage: ChatMessage = {
+          id: `msg-${Date.now()}`,
+          type: 'User',
+          content: aiResponse.answerText,
+          timestamp: new Date(),
+        };
+        addMessage(userMessage);
+      }
+
+      // 2. AI 메시지 추가
+      const aiMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        type: 'AI',
+        content: aiResponse.questionText,
+        timestamp: new Date(),
+      };
+      addMessage(aiMessage);
+
+      // TTS 재생 (있는 경우)
+      if (aiResponse.base64Audio) {
+        playAudio(aiResponse.base64Audio).catch((err) => {
+          console.warn('[InterviewPage] Mobile TTS playback failed:', err);
+        });
+      }
+    }
+  }, [aiResponse, addMessage, playAudio]);
+
+  // 음성 인식 에러 감지 (모바일 환경에서 음성 전송 실패 시)
+  useEffect(() => {
+    if (speechError) {
+      setIsAIResponding(false);
+      console.error('[InterviewPage] Speech recognition error:', speechError);
+    }
+  }, [speechError]);
 
   /**
    * 사용자 응답 처리 (텍스트 → AI 응답 → TTS 재생)
@@ -297,6 +351,8 @@ const InterviewPage = () => {
    * - 채팅 모드: 말하기 완료 시 입력창에만 입력 (사용자가 전송 버튼으로 컨트롤)
    */
   const handleSpeak = () => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     if (speakState === 'ready') {
       setSpeakState('speaking');
       setChatInput(''); // 입력 필드 초기화
@@ -304,16 +360,35 @@ const InterviewPage = () => {
     } else if (speakState === 'speaking') {
       setSpeakState('done');
 
-      // 카메라 모드일 경우 API를 통해 즉시 전송
-      if (viewMode === 'video' && transcript.trim()) {
-        handleUserResponse(transcript.trim());
-        setChatInput(''); // 전송 후 입력 필드 초기화
-        clearTranscript(); // transcript도 초기화
+      if (isMobile) {
+        // 모바일 환경: stopListening()이 서버에 음성 파일 전송
+        // transcript가 없는 것이 정상 (서버 STT 사용)
+        setIsAIResponding(true);
+      } else {
+        // PC 환경: Web Speech API 사용
+        if (viewMode === 'video') {
+          // 카메라 모드: 즉시 API 호출
+          if (transcript.trim()) {
+            handleUserResponse(transcript.trim());
+            clearTranscript();
+          }
+        } else {
+          // 채팅 모드: 입력창에만 설정 (사용자가 전송 버튼으로 컨트롤)
+          if (transcript.trim()) {
+            setChatInput(transcript.trim());
+            clearTranscript();
+          }
+        }
       }
 
       // 음성 인식 중지
-      // 채팅 모드일 경우 chatInput은 유지되어 사용자가 전송 버튼으로 컨트롤
-      stopListening();
+      stopListening().catch((error) => {
+        console.error('[InterviewPage] stopListening failed:', error);
+        // 모바일 환경에서만 로딩 해제 (PC는 handleUserResponse가 관리)
+        if (isMobile) {
+          setIsAIResponding(false);
+        }
+      });
     } else {
       setSpeakState('ready');
     }
@@ -335,6 +410,9 @@ const InterviewPage = () => {
    */
   const handleFinish = async () => {
     try {
+      // 0. 타이머 중지
+      pause();
+
       // 1. 알림 표시: "AI의 마무리 멘트가 한 턴 추가됩니다." (1초)
       setFinishStep('notification');
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -482,6 +560,7 @@ const InterviewPage = () => {
         <ControlButtons
           viewMode={viewMode}
           isPaused={isPaused}
+          isFinishing={finishStep !== 'idle'}
           onFinish={handleFinish}
           onPauseToggle={handlePauseToggle}
           onToggleMode={handleToggleMode}
