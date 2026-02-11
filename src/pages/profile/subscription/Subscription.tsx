@@ -1,13 +1,27 @@
+import clsx from 'clsx';
 import { useState } from 'react';
 
 import ProfileModal from '@/components/Modal/ProfileModal';
 import PrevNavbar from '@/components/Navbar/PrevNavbar';
+import Spinner from '@/components/Spinner/Spinner';
+import useNavigation from '@/hooks/useNavigation';
 
+import { useUserProfile } from '../account/hooks/useUserProfile';
+import NotSubscription from './components/NotSubscription/NotSubscription';
 import Pay from './components/Pay';
 import PlanCard from './components/PlanCard';
+import { useCancel } from './hooks/useCancel';
 
 const Subscription = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, refetch } = useUserProfile();
+  const { cancel, isLoading } = useCancel();
+  const { navigateTo } = useNavigation();
+
+  const isSubscribed = user?.isSubscribed === true;
+  const isCancelled = user?.isSubscriptionCancelled === true;
+  const expiredAt = user?.subscriptionExpiredAt ?? null;
+  const isPageLoading = !user || isLoading;
 
   const handleOpenModal = () => {
     setIsOpen(true);
@@ -17,28 +31,68 @@ const Subscription = () => {
     setIsOpen(false);
   };
 
-  const handleConfirm = () => {
-    console.log('구독 해지');
-
-    setIsOpen(false);
+  const handleConfirm = async () => {
+    try {
+      await cancel();
+      alert('구독이 해지되었습니다.');
+      await refetch();
+      setIsOpen(false);
+    } catch {
+      alert('구독 해지에 실패했어요. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   return (
     <>
-      <PrevNavbar title="구독" back />
+      <PrevNavbar title="구독" path="/profile/account" />
 
       <div className="white-pageContainer pr-[1.462rem]">
         <div className="flex flex-col gap-[3.6rem]">
-          <PlanCard />
-          <Pay />
+          {isSubscribed ? (
+            <>
+              <PlanCard expiredAt={expiredAt} isCancelled={isCancelled} />
+              <Pay />
 
-          <button
-            onClick={handleOpenModal}
-            className="w-full py-[1.4rem] rounded-[1rem] bg-gray-50 font-semibold text-gray-300 leading-none text-[1.6rem]"
-          >
-            구독 해지하기
-          </button>
+              {isSubscribed && !isCancelled && (
+                <button
+                  onClick={handleOpenModal}
+                  disabled={isLoading}
+                  className={clsx(
+                    'w-full py-[1.4rem] rounded-[1rem] font-semibold text-[1.6rem] mt-[17rem]',
+                    'bg-gray-50 text-gray-300',
+                    {
+                      'opacity-50 cursor-not-allowed': isLoading,
+                    },
+                  )}
+                >
+                  구독 해지하기
+                </button>
+              )}
+
+              {!isSubscribed && (
+                <button
+                  onClick={() => {
+                    navigateTo('/profile/payments');
+                  }}
+                  className={clsx(
+                    'w-full py-[1.4rem] rounded-[1rem] font-semibold text-[1.6rem] mt-[17rem]',
+                    'bg-purple-700 text-white',
+                  )}
+                >
+                  다시 구독하기
+                </button>
+              )}
+            </>
+          ) : (
+            <NotSubscription />
+          )}
         </div>
+
+        {isPageLoading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white">
+            <Spinner color="var(--color-purple-700)" />
+          </div>
+        )}
       </div>
 
       {isOpen && (

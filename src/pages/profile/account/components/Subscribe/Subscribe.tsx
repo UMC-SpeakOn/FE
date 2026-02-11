@@ -1,12 +1,18 @@
 import RightArrow2 from '@/assets/images/icons/right-arrow2.svg';
 import useNavigation from '@/hooks/useNavigation';
-import { paymentsData, subscribeData } from '@/mocks/subscribeData';
+import { paymentsData } from '@/mocks/subscribeData';
+import type { UserApi } from '@/types/api/account.type';
 
 import NotSubscribe from './NotSubscribe';
 import SubscribeCard from './SubscribeCard';
 
-const Subscribe = () => {
+interface SubscribeProps {
+  user: UserApi;
+}
+
+const Subscribe = ({ user }: SubscribeProps) => {
   const { navigateTo } = useNavigation();
+  const isSubscribed = user.isSubscribed === true;
 
   const handleSubscribeClick = () => {
     navigateTo('/profile/subscription');
@@ -27,8 +33,12 @@ const Subscribe = () => {
         </button>
       </div>
 
-      {subscribeData.isSubscribed ? (
-        <SubscribeCard data={paymentsData} />
+      {isSubscribed ? (
+        <SubscribeCard
+          data={paymentsData}
+          nextPaymentDate={user.subscriptionExpiredAt}
+          isCancelled={user.isSubscriptionCancelled}
+        />
       ) : (
         <NotSubscribe />
       )}

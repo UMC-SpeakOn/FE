@@ -1,6 +1,15 @@
 import { paymentsData } from '@/mocks/subscribeData';
+import { formatDate } from '@/utils/date';
 
-const PlanCard = () => {
+interface PlanCardProps {
+  expiredAt: string | null;
+  isCancelled: boolean | null;
+}
+
+const PlanCard = ({ expiredAt, isCancelled }: PlanCardProps) => {
+  const formattedDate = formatDate(expiredAt);
+  const cancelled = isCancelled === true;
+
   return (
     <div className="flex flex-col gap-[1rem]">
       <p className="font-bold text-[1.9rem] leading-none text-black">
@@ -28,8 +37,17 @@ const PlanCard = () => {
         </div>
 
         <div className="flex gap-[1.7rem] items-center font-medium text-[1.3rem] leading-none text-gray-600">
-          <p>다음 결제일</p>
-          <p>{paymentsData.nextPaymentDate}</p>
+          {cancelled ? (
+            <>
+              <p>이용 종료일</p>
+              <p>{formattedDate} 까지 이용 가능</p>
+            </>
+          ) : (
+            <>
+              <p>다음 결제일</p>
+              <p>{formattedDate}</p>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ const ItemChat = ({ chat }: ItemChatProps) => {
           <img
             src={chat.avatarUrl}
             alt={chat.speakerName}
-            className="w-16 h-16 rounded-full border-[0.1rem] border-gray-100 shrink-0"
+            className="w-16 h-16 rounded-full border-[0.1rem] border-gray-100 shrink-0 object-cover"
           />
         )}
 

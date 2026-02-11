@@ -18,7 +18,7 @@ const ItemRoleProfile = ({
   onClick,
   onDelete,
 }: ItemRoleProfileProps) => {
-  const isLongJob = item.job === '일반 비즈니스';
+  const isLongJob = item.job === '일반 비지니스';
 
   return (
     <div

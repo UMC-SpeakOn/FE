@@ -85,3 +85,9 @@ export interface TTSCacheItem {
 export interface GetTTSCacheResponse {
   cachedAudios: TTSCacheItem[];
 }
+
+// 결과 - 난이도 저장 요청
+export interface SaveRequest {
+  sessionId: number;
+  userDifficulty: number;
+}
