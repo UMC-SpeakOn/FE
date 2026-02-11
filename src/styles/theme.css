@@ -26,8 +26,8 @@
   --gradient-purple-onboarding2: linear-gradient(
     180deg,
     var(--color-white) 19%,
-    var(--color-purple-100) 89%,
-    var(--color-purple-500) 112%
+    var(--color-purple-100) 87%,
+    var(--color-purple-500) 100%
   );
 
   /* gray */
