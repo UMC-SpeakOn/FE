@@ -11,6 +11,7 @@ import MyRolePage from '@/pages/my-role/My-Role';
 import InterviewPage from '@/pages/my-speak/interview/InterviewPage';
 import MySpeakResultPage from '@/pages/my-speak/result/Result';
 import MySpeakSettingPage from '@/pages/my-speak/setting/Setting';
+import OnboardingPage from '@/pages/onboarding/Onboarding';
 import AccountPage from '@/pages/profile/account/Account';
 import PaymentsPage from '@/pages/profile/payments/Payments';
 import PaymentsFailPage from '@/pages/profile/payments/PaymentsFail';
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
+          { path: 'onboarding', element: <OnboardingPage /> },
           { path: 'my-role', element: <MyRolePage /> },
           { path: 'my-speak/setting', element: <MySpeakSettingPage /> },
           { path: 'my-speak/interview/:sessionId', element: <InterviewPage /> },

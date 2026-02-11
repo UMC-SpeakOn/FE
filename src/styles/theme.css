@@ -17,6 +17,19 @@
   --color-purple-800: #472be2;
   --color-purple-900: #3419c9;
 
+  --gradient-purple-onboarding: linear-gradient(
+    180deg,
+    var(--color-purple-600) 82.69%,
+    var(--color-purple-500) 100%
+  );
+
+  --gradient-purple-onboarding2: linear-gradient(
+    180deg,
+    var(--color-white) 19%,
+    var(--color-purple-100) 89%,
+    var(--color-purple-500) 112%
+  );
+
   /* gray */
   --color-gray-50: #eff2f9;
   --color-gray-100: #e1e6f0;

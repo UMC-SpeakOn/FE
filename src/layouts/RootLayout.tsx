@@ -23,9 +23,14 @@ const RootLayout = () => {
 
   const isSplash = useMatch('/');
   const isLogin = pathname.startsWith('/login');
+  const isOnboarding = useMatch('/onboarding');
 
-  if (isSplash || isLogin) {
-    return <Outlet />;
+  if (isSplash || isLogin || isOnboarding) {
+    return (
+      <div className="pageContainer">
+        <Outlet />
+      </div>
+    );
   }
 
   return (
