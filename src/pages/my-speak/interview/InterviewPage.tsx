@@ -376,7 +376,10 @@ const InterviewPage = () => {
       }
 
       // 음성 인식 중지
-      stopListening();
+      stopListening().catch((error) => {
+        console.error('[InterviewPage] stopListening failed:', error);
+        setIsAIResponding(false);
+      });
     } else {
       setSpeakState('ready');
     }
