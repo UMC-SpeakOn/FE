@@ -3,6 +3,7 @@ interface ControlButtonProps {
     label: string;
     onClick: () => void;
     iconSize?: string;
+    disabled?: boolean;
 }
 
 /**
@@ -15,9 +16,14 @@ const ControlButton = ({
     icon,
     label,
     onClick,
+    disabled = false,
 }: ControlButtonProps) => {
     return (
-        <button onClick={onClick} className="flex flex-col items-center gap-3">
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={`flex flex-col items-center gap-3 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
             <div className="h-23 w-23 rounded-full bg-white flex items-center justify-center">
                 <img src={icon} alt={label} />
             </div>
