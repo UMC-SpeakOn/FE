@@ -78,6 +78,9 @@ const InterviewPage = () => {
   // 초기화 완료 여부 추적 (마운트 시 1회만 실행)
   const hasInitialized = useRef(false);
 
+  // 처리된 AI 응답 추적 (중복 메시지 방지)
+  const lastProcessedResponseRef = useRef<typeof aiResponse>(null);
+
   // 면접관 데이터 (API로부터 가져오기)
   const interviewer = useMemo(() => {
     if (!myRoleIdFromState || !profiles.length) {
@@ -216,7 +219,10 @@ const InterviewPage = () => {
 
   // 모바일 환경: 서버 STT 응답 처리
   useEffect(() => {
-    if (aiResponse) {
+    // 중복 처리 방지: 이미 처리된 응답이면 무시
+    if (aiResponse && aiResponse !== lastProcessedResponseRef.current) {
+      lastProcessedResponseRef.current = aiResponse;
+
       // 0. 로딩 상태 해제
       setIsAIResponding(false);
 
