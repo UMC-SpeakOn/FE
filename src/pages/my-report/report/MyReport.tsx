@@ -14,6 +14,8 @@ import {
   SITUATION_FILTERS,
 } from './constants/myreport';
 
+const REMOVED_IDS_KEY = 'myreport_removed_ids';
+
 const MyReport = () => {
   const { navigateTo } = useNavigation();
 
@@ -36,9 +38,34 @@ const MyReport = () => {
 
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
+  const [removedIds, setRemovedIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(REMOVED_IDS_KEY);
+      const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+      return Array.isArray(parsed)
+        ? parsed.filter((v) => typeof v === 'string')
+        : [];
+    } catch {
+      return [];
+    }
+  });
+
   const handleCardClick = (reportId: string) => {
-    console.log('➡️ navigate with reportId:', reportId);
     navigateTo(`/my-report/${reportId}`);
+  };
+
+  const handleDeleted = (id: string) => {
+    setRemovedIds((prev) => {
+      if (prev.includes(id)) return prev;
+
+      const next = [...prev, id];
+      try {
+        localStorage.setItem(REMOVED_IDS_KEY, JSON.stringify(next));
+      } catch {
+        // localStorage 실패해도 UI는 유지
+      }
+      return next;
+    });
   };
 
   return (
@@ -83,15 +110,16 @@ const MyReport = () => {
 
             {!isLoading &&
               !error &&
-              dateItems.map((item) => {
-                return (
+              dateItems
+                .filter((item) => !removedIds.includes(item.id))
+                .map((item) => (
                   <ReportCard
                     key={item.id}
                     item={item}
                     onClick={() => handleCardClick(item.id)}
+                    onDeleted={handleDeleted}
                   />
-                );
-              })}
+                ))}
           </div>
         </div>
       )}
@@ -133,17 +161,16 @@ const MyReport = () => {
 
           <div className="w-full flex flex-col gap-[1.8rem]">
             {!isLoading &&
-              activeJobItems.map((item) => {
-                console.log('📌 reportId from API (job):', item.id);
-
-                return (
+              activeJobItems
+                .filter((item) => !removedIds.includes(item.id))
+                .map((item) => (
                   <ReportCard
                     key={item.id}
                     item={item}
                     onClick={() => handleCardClick(item.id)}
+                    onDeleted={handleDeleted}
                   />
-                );
-              })}
+                ))}
           </div>
         </div>
       )}
@@ -185,17 +212,16 @@ const MyReport = () => {
 
           <div className="w-full flex flex-col gap-[1.8rem]">
             {!isLoading &&
-              activeSituationItems.map((item) => {
-                console.log('📌 reportId from API (situation):', item.id);
-
-                return (
+              activeSituationItems
+                .filter((item) => !removedIds.includes(item.id))
+                .map((item) => (
                   <ReportCard
                     key={item.id}
                     item={item}
                     onClick={() => handleCardClick(item.id)}
+                    onDeleted={handleDeleted}
                   />
-                );
-              })}
+                ))}
           </div>
         </div>
       )}
