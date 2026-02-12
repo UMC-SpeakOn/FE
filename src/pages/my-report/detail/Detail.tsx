@@ -17,7 +17,9 @@ const Detail = () => {
   const { id } = useParams<{ id: string }>();
   const reportId = id ? Number(id) : undefined;
 
-  const { report, isLoading, isError, refetch } = useReportDetail(reportId);
+  const { report, viewUUID, isLoading, isError, refetch } =
+    useReportDetail(reportId);
+
   const { mutate: updateReflection, isLoading: isSaving } = useReportUpdate();
   const { setReport, reset } = useReportDetailStore();
 
@@ -112,7 +114,7 @@ const Detail = () => {
                   <ReportBar />
                   <ReportAI data={report.aiInsightCard} />
                   <ReportBar />
-                  <ReportChat />
+                  <ReportChat viewUUID={viewUUID} />
 
                   {isDirty && (
                     <ReportButton
