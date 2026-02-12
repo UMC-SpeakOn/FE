@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-type OnboardingVideoProps = {
-  webmSrc?: string;
-  mp4Src?: string;
+type VideoSource =
+  | { webmSrc: string; mp4Src?: string }
+  | { webmSrc?: string; mp4Src: string };
+
+type OnboardingVideoProps = VideoSource & {
   fallbackSrc: string;
   isActive: boolean;
   widthClass?: string;
@@ -66,7 +68,7 @@ const OnboardingVideo = ({
       className={`${widthClass} h-auto`}
       onError={() => setHasError(true)}
     >
-      <source src={webmSrc} type="video/webm" />
+      {webmSrc && <source src={webmSrc} type="video/webm" />}
       {mp4Src && <source src={mp4Src} type="video/mp4" />}
     </video>
   );
