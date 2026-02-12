@@ -6,18 +6,6 @@ import ProfileModal from '@/components/Modal/ProfileModal';
 import type { ReportItem } from '../../types/myreport.type';
 import Chip from '../Chip/Chip';
 
-const profileImages = import.meta.glob(
-  '@/assets/images/myreport/profile*.png',
-  {
-    eager: true,
-    import: 'default',
-  },
-);
-
-const profiles = Object.entries(profileImages)
-  .sort(([a], [b]) => a.localeCompare(b))
-  .map(([, v]) => v as string);
-
 const ReportCard = ({
   item,
   onClick,
@@ -28,9 +16,6 @@ const ReportCard = ({
   onDeleted?: (id: string) => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const idx = Number(item.id) % profiles.length;
-  const profileImg = profiles[idx] ?? profiles[0];
 
   return (
     <>
@@ -72,7 +57,7 @@ const ReportCard = ({
 
         <div className="flex items-center gap-[1.8rem]">
           <img
-            src={profileImg}
+            src={item.avatarImgUrl}
             alt="profile"
             className="w-[8.0rem] h-[8.0rem] rounded-full object-cover border border-[#DDE6F2] shrink-0"
           />
