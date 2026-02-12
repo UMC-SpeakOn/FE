@@ -1,6 +1,5 @@
 import downArrow1 from '@/assets/images/onboarding/down-arrow1.svg';
 import step1Default from '@/assets/images/onboarding/step1-default.svg';
-import step1Video from '@/assets/videos/step1.mp4';
 
 import OnboardingVideo from '../OnboardingVideo';
 
@@ -13,10 +12,13 @@ const Step1 = ({ onNext }: Step1Props) => {
     <div className="relative h-screen w-full flex flex-col items-center overflow-hidden">
       <div className="flex-1 flex items-center justify-center w-full">
         <OnboardingVideo
-          src={step1Video}
+          webmSrc={
+            'https://myspeak-audio-storage.s3.ap-northeast-2.amazonaws.com/onboarding/step1.webm'
+          }
           fallbackSrc={step1Default}
           isActive={true}
-          widthClass="w-[76%]"
+          widthClass="w-full"
+          fallbackWidthClass="w-[70%]"
         />
       </div>
 

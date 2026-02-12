@@ -1,6 +1,5 @@
 import downArrow2 from '@/assets/images/onboarding/down-arrow2.svg';
 import step3Default from '@/assets/images/onboarding/step3-default.svg';
-import step3Video from '@/assets/videos/step3.mp4';
 
 import OnboardingVideo from '../OnboardingVideo';
 
@@ -30,7 +29,9 @@ const Step3 = ({ onNext }: Step3Props) => {
       <div className="mt-[3.3rem] flex-1 flex flex-col items-center bg-white rounded-t-[3rem] px-[2.7rem] pt-[3.2rem] overflow-hidden">
         <div className="w-full rounded-[1rem] overflow-hidden">
           <OnboardingVideo
-            src={step3Video}
+            mp4Src={
+              'https://myspeak-audio-storage.s3.ap-northeast-2.amazonaws.com/onboarding/%E1%84%8B%E1%85%A9%E1%86%AB%E1%84%87%E1%85%A9%E1%84%83%E1%85%B5%E1%86%BC+Speak_%E1%84%8E%E1%85%AC%E1%84%8C%E1%85%A9%E1%86%BC.mp4'
+            }
             fallbackSrc={step3Default}
             isActive={true}
             widthClass="w-full"
