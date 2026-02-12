@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useQuery } from '@/hooks/useApi';
 
@@ -38,13 +38,14 @@ const JOB_TO_API: Record<(typeof JOB_FILTERS)[number], string> = {
   '일반 비즈니스': 'BUSINESS',
 };
 
+// 인서 수정
 const API_TO_JOB: Record<string, (typeof JOB_FILTERS)[number]> = {
-  MARKETING: '마케팅',
-  DEVELOPMENT: '개발',
-  DESIGN: '디자인',
-  PLANNING: '기획',
-  SALES: '영업',
-  BUSINESS: '일반 비즈니스',
+  마케팅: '마케팅',
+  개발: '개발',
+  디자인: '디자인',
+  기획: '기획',
+  영업: '영업',
+  '일반 비지니스': '일반 비즈니스',
 };
 
 const SITUATION_TO_API: Record<(typeof SITUATION_FILTERS)[number], string> = {
@@ -53,10 +54,11 @@ const SITUATION_TO_API: Record<(typeof SITUATION_FILTERS)[number], string> = {
   '1:1 미팅': 'ONE_ON_ONE_MEETING',
 };
 
+// 인서 수정
 const API_TO_SITUATION: Record<string, (typeof SITUATION_FILTERS)[number]> = {
-  INTERVIEW: '면접',
-  MEETING: '회의',
-  ONE_ON_ONE_MEETING: '1:1 미팅',
+  면접: '면접',
+  회의: '회의',
+  '1:1미팅': '1:1 미팅',
 };
 
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'] as const;
@@ -124,6 +126,10 @@ export const useMyReportViewModel = () => {
   );
 
   const { data, isLoading, error } = useQuery<ReportListResponse>(queryConfig);
+
+  useEffect(() => {
+    console.log('📦 /reports raw response:', data);
+  }, [data]);
 
   const items = useMemo((): ReportItem[] => {
     const list = data?.result?.reportList ?? [];
