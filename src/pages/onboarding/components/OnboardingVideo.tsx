@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-type VideoSource =
-  | { webmSrc: string; mp4Src?: string }
-  | { webmSrc?: string; mp4Src: string };
-
-type OnboardingVideoProps = VideoSource & {
+type OnboardingVideoProps = {
+  webmSrc: string;
   fallbackSrc: string;
   isActive: boolean;
   widthClass?: string;
@@ -13,7 +10,6 @@ type OnboardingVideoProps = VideoSource & {
 
 const OnboardingVideo = ({
   webmSrc,
-  mp4Src,
   fallbackSrc,
   isActive,
   widthClass = 'w-full',
@@ -22,16 +18,9 @@ const OnboardingVideo = ({
   const ref = useRef<HTMLVideoElement>(null);
   const [hasError, setHasError] = useState(false);
 
-  const isSafari =
-    typeof navigator !== 'undefined' &&
-    navigator.userAgent.includes('Safari') &&
-    !navigator.userAgent.includes('Chrome') &&
-    !navigator.userAgent.includes('CriOS') &&
-    !navigator.userAgent.includes('FxiOS');
-
   useEffect(() => {
     const video = ref.current;
-    if (!video || hasError || isSafari) return;
+    if (!video || hasError) return;
 
     if (isActive) {
       video.currentTime = 0;
@@ -41,9 +30,9 @@ const OnboardingVideo = ({
     } else {
       video.pause();
     }
-  }, [isActive, hasError, isSafari]);
+  }, [isActive, hasError]);
 
-  if (isSafari || hasError) {
+  if (hasError) {
     return (
       <img
         src={fallbackSrc}
@@ -68,8 +57,7 @@ const OnboardingVideo = ({
       className={`${widthClass} h-auto`}
       onError={() => setHasError(true)}
     >
-      {webmSrc && <source src={webmSrc} type="video/webm" />}
-      {mp4Src && <source src={mp4Src} type="video/mp4" />}
+      <source src={webmSrc} type="video/webm" />
     </video>
   );
 };
