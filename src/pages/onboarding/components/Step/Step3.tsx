@@ -1,4 +1,5 @@
 import downArrow2 from '@/assets/images/onboarding/down-arrow2.svg';
+import step3Default from '@/assets/images/onboarding/step3-default.svg';
 import step3Video from '@/assets/videos/step3.mp4';
 
 import OnboardingVideo from '../OnboardingVideo';
@@ -30,6 +31,7 @@ const Step3 = ({ onNext }: Step3Props) => {
         <div className="w-full rounded-[1rem] overflow-hidden">
           <OnboardingVideo
             src={step3Video}
+            fallbackSrc={step3Default}
             isActive={true}
             widthClass="w-full"
           />
