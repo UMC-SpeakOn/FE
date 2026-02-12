@@ -11,7 +11,7 @@ const ListStep1 = ({ selectedId, onSelect }: ListStep1Props) => {
   const { avatars } = useAvatar();
 
   return (
-    <div className="w-full flex gap-3 overflow-x-auto">
+    <div className="w-full flex gap-3 overflow-x-auto scroll">
       {avatars?.map((avatar) => (
         <ItemStep1
           key={avatar.id}

@@ -4,6 +4,7 @@ import RoleProfileList from '@/components/RoleProfile/ListRoleProfile';
 import { useRoleProfile } from '@/hooks/role-profile/useRoleProfile';
 import useNavigation from '@/hooks/useNavigation';
 import { goalData } from '@/mocks/settingData';
+import NotFavs from '@/pages/my-role/components/Favs/NotFavs';
 import { useCreateSession } from '@/pages/my-speak/setting/hooks/useCreateSession';
 
 import ListGoal from './Step/Goal/ListGoal';
@@ -49,11 +50,17 @@ const ChatSetting = () => {
           title="AI 롤 선택"
           done={selectedAIId !== null}
         >
-          <RoleProfileList
-            data={profiles}
-            selectedId={selectedAIId}
-            onSelect={setSelectedAIId}
-          />
+          {!profiles || profiles.length === 0 ? (
+            <div className="w-full pr-[1.462rem]">
+              <NotFavs locationText="My Role에서" moveTo="/my-role" />
+            </div>
+          ) : (
+            <RoleProfileList
+              data={profiles}
+              selectedId={selectedAIId}
+              onSelect={setSelectedAIId}
+            />
+          )}
         </StepSection>
 
         {selectedAIId !== null && (
