@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 type OnboardingVideoProps = {
-  webmSrc: string;
+  webmSrc?: string;
   mp4Src?: string;
   fallbackSrc: string;
   isActive: boolean;
