@@ -1,55 +1,59 @@
 import { useEffect, useRef, useState } from 'react';
 
 type OnboardingVideoProps = {
-  src: string;
+  webmSrc: string;
+  mp4Src?: string;
   fallbackSrc: string;
   isActive: boolean;
   widthClass?: string;
+  fallbackWidthClass?: string;
 };
 
 const OnboardingVideo = ({
-  src,
+  webmSrc,
+  mp4Src,
   fallbackSrc,
   isActive,
   widthClass = 'w-full',
+  fallbackWidthClass,
 }: OnboardingVideoProps) => {
   const ref = useRef<HTMLVideoElement>(null);
   const [hasError, setHasError] = useState(false);
 
+  const isSafari =
+    typeof navigator !== 'undefined' &&
+    navigator.userAgent.includes('Safari') &&
+    !navigator.userAgent.includes('Chrome') &&
+    !navigator.userAgent.includes('CriOS') &&
+    !navigator.userAgent.includes('FxiOS');
+
   useEffect(() => {
     const video = ref.current;
-    if (!video || hasError) return;
+    if (!video || hasError || isSafari) return;
 
     if (isActive) {
       video.currentTime = 0;
-
-      const tryPlay = async () => {
-        try {
-          await video.play();
-        } catch {
-          setHasError(true);
-          return;
-        }
-
-        setTimeout(() => {
-          if (video.readyState < 2) {
-            setHasError(true);
-          }
-        }, 1000);
-      };
-
-      tryPlay();
+      video.play().catch(() => {
+        setHasError(true);
+      });
     } else {
       video.pause();
     }
-  }, [isActive, hasError]);
+  }, [isActive, hasError, isSafari]);
 
-  return hasError ? (
-    <img src={fallbackSrc} alt="fallback" className={`${widthClass} h-auto`} />
-  ) : (
+  if (isSafari || hasError) {
+    return (
+      <img
+        src={fallbackSrc}
+        alt="fallback"
+        className={`${fallbackWidthClass ?? widthClass} h-auto`}
+      />
+    );
+  }
+
+  return (
     <video
       ref={ref}
-      src={src}
       poster={fallbackSrc}
       muted
       playsInline
@@ -61,7 +65,10 @@ const OnboardingVideo = ({
       controlsList="nodownload nofullscreen noremoteplayback"
       className={`${widthClass} h-auto`}
       onError={() => setHasError(true)}
-    />
+    >
+      <source src={webmSrc} type="video/webm" />
+      {mp4Src && <source src={mp4Src} type="video/mp4" />}
+    </video>
   );
 };
 

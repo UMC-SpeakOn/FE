@@ -1,5 +1,4 @@
 import step5Default from '@/assets/images/onboarding/step1-default.svg';
-import step5Video from '@/assets/videos/step5.mp4';
 import useNavigation from '@/hooks/useNavigation';
 
 import { useComplete } from '../../hooks/useComplete';
@@ -21,7 +20,9 @@ const Step5 = () => {
     <div className="relative h-screen w-full flex flex-col items-center overflow-hidden">
       <div className="flex-1 flex flex-col gap-[2rem] items-center justify-center w-full">
         <OnboardingVideo
-          src={step5Video}
+          webmSrc={
+            'https://myspeak-audio-storage.s3.ap-northeast-2.amazonaws.com/onboarding/step5.webm'
+          }
           fallbackSrc={step5Default}
           isActive={true}
           widthClass="w-[76%]"
