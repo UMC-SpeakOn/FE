@@ -6,11 +6,15 @@ import { useReportLogs } from '../../hooks/useReportLogs';
 import ReportSection from '../common/ReportSection/ReportSection';
 import ChatCard from './ChatCard/ChatCard';
 
-const ReportChat = () => {
+interface Props {
+  viewUUID: string | null;
+}
+
+const ReportChat = ({ viewUUID }: Props) => {
   const { report } = useReportDetailStore();
   const reportId = report?.reportId;
 
-  const { logs, isLoading } = useReportLogs(reportId);
+  const { logs, isLoading } = useReportLogs(reportId, viewUUID);
 
   useEffect(() => {
     if (!reportId) return;
