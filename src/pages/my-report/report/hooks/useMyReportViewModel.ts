@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useQuery } from '@/hooks/useApi';
 
@@ -13,6 +13,8 @@ type ReportListItemDto = {
   userReflection: string;
   createdAt: string;
   difficulty: number;
+  // 인서 추가
+  avatarImgUrl: string;
 };
 
 type ReportListResponse = {
@@ -81,6 +83,8 @@ const toReportItem = (dto: ReportListItemDto): ReportItem => {
     situation,
     title: `${job} 직무 ${situation}`,
     summary: dto.userReflection,
+    // 인서 추가
+    avatarImgUrl: dto.avatarImgUrl,
   };
 };
 
@@ -126,10 +130,6 @@ export const useMyReportViewModel = () => {
   );
 
   const { data, isLoading, error } = useQuery<ReportListResponse>(queryConfig);
-
-  useEffect(() => {
-    console.log('📦 /reports raw response:', data);
-  }, [data]);
 
   const items = useMemo((): ReportItem[] => {
     const list = data?.result?.reportList ?? [];

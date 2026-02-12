@@ -8,6 +8,8 @@ export type ReportItem = {
   situation: string;
   title: string;
   summary: string;
+  // 인서 추가
+  avatarImgUrl: string;
 };
 
 export type ReportGroup = {
