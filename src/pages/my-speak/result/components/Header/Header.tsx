@@ -10,7 +10,7 @@ const NAV_ITEMS = [
 
 const Header = () => {
   return (
-    <div className="w-full flex justify-center mt-[9.858rem] mb-[8.482rem]">
+    <div className="w-full flex justify-center mt-[clamp(3rem,10vh,9.858rem)] mb-[clamp(2.5rem,8vh,8.482rem)]">
       <p className="relative font-bold text-[2.4rem] text-white">
         수고하셨어요!
         {NAV_ITEMS.map((item, idx) => (

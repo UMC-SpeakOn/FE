@@ -46,7 +46,7 @@ const Result = () => {
   const isLoading = isSaving || isCreating;
 
   return (
-    <div className="flex flex-col w-full px-[1.55rem] pb-[17.72rem]">
+    <div className="flex flex-col w-full px-[1.55rem]">
       <Header />
 
       <ListCard
