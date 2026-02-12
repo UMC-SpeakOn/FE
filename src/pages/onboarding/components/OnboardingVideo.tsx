@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 type OnboardingVideoProps = {
-  webmSrc: string;
+  webmSrc?: string;
+  mp4Src?: string;
   fallbackSrc: string;
   isActive: boolean;
   widthClass?: string;
@@ -10,6 +11,7 @@ type OnboardingVideoProps = {
 
 const OnboardingVideo = ({
   webmSrc,
+  mp4Src,
   fallbackSrc,
   isActive,
   widthClass = 'w-full',
@@ -24,9 +26,12 @@ const OnboardingVideo = ({
 
     if (isActive) {
       video.currentTime = 0;
-      video.play().catch(() => {
-        setHasError(true);
-      });
+      video
+        .play()
+        .then(() => {})
+        .catch(() => {
+          setHasError(true);
+        });
     } else {
       video.pause();
     }
@@ -57,7 +62,9 @@ const OnboardingVideo = ({
       className={`${widthClass} h-auto`}
       onError={() => setHasError(true)}
     >
-      <source src={webmSrc} type="video/webm" />
+      {webmSrc && <source src={webmSrc} type="video/webm" />}
+      {mp4Src && <source src={mp4Src} type="video/mp4" />}
+      <img src={fallbackSrc} alt="fallback" />
     </video>
   );
 };
