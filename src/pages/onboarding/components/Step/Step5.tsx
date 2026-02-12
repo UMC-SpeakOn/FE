@@ -21,7 +21,7 @@ const Step5 = () => {
       <div className="flex-1 flex flex-col gap-[2rem] items-center justify-center w-full">
         <OnboardingVideo
           webmSrc={
-            'https://myspeak-audio-storage.s3.ap-northeast-2.amazonaws.com/onboarding/step5.webm'
+            'https://myspeak-audio-storage.s3.ap-northeast-2.amazonaws.com/onboarding/step3.webm'
           }
           fallbackSrc={step5Default}
           isActive={true}

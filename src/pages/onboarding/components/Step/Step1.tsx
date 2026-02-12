@@ -17,8 +17,8 @@ const Step1 = ({ onNext }: Step1Props) => {
           }
           fallbackSrc={step1Default}
           isActive={true}
-          widthClass="w-full"
-          fallbackWidthClass="w-[70%]"
+          widthClass="w-[100%]"
+          fallbackWidthClass="w-[80%]"
         />
       </div>
 
