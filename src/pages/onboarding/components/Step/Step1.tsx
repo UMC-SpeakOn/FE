@@ -1,5 +1,6 @@
 import downArrow1 from '@/assets/images/onboarding/down-arrow1.svg';
 import step1Default from '@/assets/images/onboarding/step1-default.svg';
+import step1Video from '@/assets/videos/step1.mp4';
 
 import OnboardingVideo from '../OnboardingVideo';
 
@@ -15,6 +16,7 @@ const Step1 = ({ onNext }: Step1Props) => {
           webmSrc={
             'https://myspeak-audio-storage.s3.ap-northeast-2.amazonaws.com/onboarding/step1.webm'
           }
+          mp4Src={step1Video}
           fallbackSrc={step1Default}
           isActive={true}
           widthClass="w-[100%]"
