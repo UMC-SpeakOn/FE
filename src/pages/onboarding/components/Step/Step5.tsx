@@ -32,7 +32,7 @@ const Step5 = () => {
             onClick={complete}
             disabled={isLoading}
           >
-            {isLoading ? '처리 중...' : '시작하기'}
+            시작하기
           </button>
         </div>
       </div>
