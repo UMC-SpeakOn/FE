@@ -43,9 +43,10 @@ const InterviewPage = () => {
   const location = useLocation();
   const sessionIdNumber = sessionIdFromUrl ? Number(sessionIdFromUrl) : null;
 
-  // state에서 myRoleId, targetQuestionCount 가져오기
-  const myRoleIdFromState = (location.state as { myRoleId?: number; targetQuestionCount?: number })?.myRoleId;
-  const targetQuestionCount = (location.state as { myRoleId?: number; targetQuestionCount?: number })?.targetQuestionCount;
+  // state에서 myRoleId, targetQuestionCount, situation 가져오기
+  const myRoleIdFromState = (location.state as { myRoleId?: number; targetQuestionCount?: number; situation?: string })?.myRoleId;
+  const targetQuestionCount = (location.state as { myRoleId?: number; targetQuestionCount?: number; situation?: string })?.targetQuestionCount;
+  const situationFromState = (location.state as { myRoleId?: number; targetQuestionCount?: number; situation?: string })?.situation;
 
   // Role Profile 조회 (interviewer 정보 가져오기)
   const { profiles, isLoading: isLoadingProfiles } = useRoleProfile();
@@ -98,6 +99,7 @@ const InterviewPage = () => {
       return {
         name: "AI Interviewer",
         nationality: "AI",
+        situation: "Interview Practice",
         imgUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23a855f7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E",
       };
     }
@@ -110,6 +112,7 @@ const InterviewPage = () => {
       return {
         name: "AI Interviewer",
         nationality: "AI",
+        situation: "Interview Practice",
         imgUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23a855f7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='20' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E",
       };
     }
@@ -118,6 +121,7 @@ const InterviewPage = () => {
     return {
       name: profile.name,
       nationality: profile.city, // city = nationality
+      situation: `${profile.job} | ${profile.situation}`, // "직무 | 상황" 형식
       imgUrl: profile.imageUrl,
     };
   }, [myRoleIdFromState, profiles]);
@@ -627,7 +631,7 @@ const InterviewPage = () => {
       {/* 상단 헤더 */}
       <header className="flex flex-col items-center px-4 gap-10 mb-5">
         <p className="text-white text-xl">
-          {interviewer.nationality} 면접 연습
+          {situationFromState || interviewer.situation || "Interview Practice"}
         </p>
       </header>
 

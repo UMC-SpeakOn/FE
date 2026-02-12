@@ -25,10 +25,18 @@ const ChatSetting = () => {
       alert('대화 세션이 생성되었습니다.');
 
       const selectedGoal = goalData.find((goal) => goal.id === selectedGoalId);
+      const selectedProfile = profiles.find((profile) => profile.id === selectedAIId);
+
+      // "직무 | 상황" 형식으로 조합
+      const situationText = selectedProfile
+        ? `${selectedProfile.job} | ${selectedProfile.situation}`
+        : undefined;
+
       navigateTo(`/my-speak/interview/${sessionId}`, {
         state: {
           myRoleId: selectedAIId,
           targetQuestionCount: selectedGoal?.targetQuestionCount,
+          situation: situationText,
         },
       });
     },
