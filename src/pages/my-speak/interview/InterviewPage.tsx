@@ -88,6 +88,9 @@ const InterviewPage = () => {
   // 질문 수 제한 도달 여부 추적 (설정한 질문 수 도달 시 1회만 실행)
   const hasTriggeredQuestionLimit = useRef(false);
 
+  // 마무리 처리 중 여부 추적 (동시성 제어 - handleFinish와 CLOSING 경로 충돌 방지)
+  const isFinishing = useRef(false);
+
   // 면접관 데이터 (API로부터 가져오기)
   const interviewer = useMemo(() => {
     if (!myRoleIdFromState || !profiles.length) {
@@ -161,6 +164,13 @@ const InterviewPage = () => {
    * - 플로우: 알림(1초) → API 호출 → 마무리 멘트 + TTS(2초) → 로딩(0.5초) → 결과 페이지
    */
   const handleFinish = useCallback(async () => {
+    // 동시성 가드: 이미 마무리 처리 중이면 스킵
+    if (isFinishing.current) {
+      console.log('[handleFinish] Already finishing - skipping duplicate call');
+      return;
+    }
+    isFinishing.current = true;
+
     try {
       // 0. 타이머 중지
       pause();
@@ -231,6 +241,7 @@ const InterviewPage = () => {
     } catch (error: any) {
       console.error("[InterviewPage] Failed to complete session:", error);
       console.error("[InterviewPage] Error response:", error.response?.data);
+      isFinishing.current = false; // 에러 발생 시 ref 초기화 (재시도 가능하도록)
       setFinishStep('idle'); // 로딩 상태 해제
       const errorMessage = error.response?.data?.message || "세션 종료 중 오류가 발생했습니다.";
       alert(`${errorMessage}\n\n다시 시도해주세요.`);
@@ -348,6 +359,13 @@ const InterviewPage = () => {
       // 3. 백엔드가 CLOSING 응답을 보낸 경우 자동 종료 (모바일 환경)
       // 이미 마무리 멘트가 추가되었으므로 handleFinish 대신 직접 처리
       if (aiResponse.messageType === 'CLOSING') {
+        // 동시성 가드: 이미 마무리 처리 중이면 스킵
+        if (isFinishing.current) {
+          console.log('[InterviewPage] Already finishing - skipping CLOSING handler (mobile)');
+          return;
+        }
+        isFinishing.current = true;
+
         console.log('[InterviewPage] Backend sent CLOSING messageType (mobile) - completing session');
         pause(); // 타이머 중지
 
@@ -367,6 +385,7 @@ const InterviewPage = () => {
             }
           } catch (error: any) {
             console.error('[InterviewPage] Failed to complete session after CLOSING (mobile):', error);
+            isFinishing.current = false; // 에러 발생 시 ref 초기화
             setFinishStep('idle');
             alert('세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
           }
@@ -471,6 +490,13 @@ const InterviewPage = () => {
       // 7. 백엔드가 CLOSING 응답을 보낸 경우 자동 종료
       // 이미 마무리 멘트가 추가되었으므로 handleFinish 대신 직접 처리
       if (response.messageType === 'CLOSING') {
+        // 동시성 가드: 이미 마무리 처리 중이면 스킵
+        if (isFinishing.current) {
+          console.log('[InterviewPage] Already finishing - skipping CLOSING handler');
+          return;
+        }
+        isFinishing.current = true;
+
         console.log('[InterviewPage] Backend sent CLOSING messageType - completing session');
         pause(); // 타이머 중지
 
@@ -490,6 +516,7 @@ const InterviewPage = () => {
             }
           } catch (error: any) {
             console.error('[InterviewPage] Failed to complete session after CLOSING:', error);
+            isFinishing.current = false; // 에러 발생 시 ref 초기화
             setFinishStep('idle');
             alert('세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
           }
