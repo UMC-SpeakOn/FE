@@ -1,4 +1,4 @@
-import type { ApiResponse } from "@/types/api/common.type";
+import type { ApiResponse } from '@/types/api/common.type';
 import type {
   CompleteSessionRequest,
   CompleteSessionResponse,
@@ -10,17 +10,16 @@ import type {
   GetTTSCacheResponse,
   UploadSTTRequest,
   UploadSTTResponse,
-} from "@/types/api/myspeak.type";
-import type { ServerApiResponse } from "@/types/api/server.type";
-import apiClient, { type CustomAxiosRequestConfig } from "@/utils/apiClient";
-
+} from '@/types/api/myspeak.type';
+import type { ServerApiResponse } from '@/types/api/server.type';
+import apiClient, { type CustomAxiosRequestConfig } from '@/utils/apiClient';
 
 /**
  * 세션 오프너(첫 질문) 조회 API
  * Swagger 명세: GET /api/myspeak/sessions/{sessionId}/opener
  */
 export const getSessionOpener = async (
-  sessionId: number
+  sessionId: number,
 ): Promise<GetSessionOpenerResponse> => {
   const response = await apiClient.get<
     ServerApiResponse<{
@@ -28,10 +27,9 @@ export const getSessionOpener = async (
       base64Audio: string;
       messageType: 'OPENING';
     }>
-  >(
-    `/myspeak/sessions/${sessionId}/opener`,
-    { authRequired: true } as CustomAxiosRequestConfig
-  );
+  >(`/myspeak/sessions/${sessionId}/opener`, {
+    authRequired: true,
+  } as CustomAxiosRequestConfig);
 
   // 백엔드 응답 구조 매핑
   return {
@@ -45,12 +43,12 @@ export const getSessionOpener = async (
  * TTS 생성 API
  */
 export const generateTTS = async (
-  data: GenerateTTSRequest
+  data: GenerateTTSRequest,
 ): Promise<GenerateTTSResponse> => {
   const response = await apiClient.post<ApiResponse<GenerateTTSResponse>>(
-    "/myspeak/tts",
+    '/myspeak/tts',
     data,
-    { authRequired: false } as CustomAxiosRequestConfig
+    { authRequired: false } as CustomAxiosRequestConfig,
   );
   return response.data.data;
 };
@@ -59,21 +57,21 @@ export const generateTTS = async (
  * STT 업로드 API
  */
 export const uploadSTT = async (
-  data: UploadSTTRequest
+  data: UploadSTTRequest,
 ): Promise<UploadSTTResponse> => {
   const formData = new FormData();
-  formData.append("file", data.file);
-  formData.append("meta", JSON.stringify(data.meta));
+  formData.append('file', data.file);
+  formData.append('meta', JSON.stringify(data.meta));
 
   const response = await apiClient.post<ApiResponse<UploadSTTResponse>>(
-    "/myspeak/stt",
+    '/myspeak/stt',
     formData,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
       authRequired: false,
-    } as CustomAxiosRequestConfig
+    } as CustomAxiosRequestConfig,
   );
   return response.data.data;
 };
@@ -84,28 +82,24 @@ export const uploadSTT = async (
 export const sendConversationTurn = async (
   sessionId: number,
   audioFile: File,
-  metadata: ConversationTurnRequest
+  metadata: ConversationTurnRequest,
 ): Promise<ConversationTurnResponse> => {
   const formData = new FormData();
-  formData.append("file", audioFile);
-  formData.append("languageCode", metadata.languageCode || "en-US");
-  formData.append("messageType", metadata.messageType);
+  formData.append('file', audioFile);
+  formData.append('languageCode', metadata.languageCode || 'en-US');
+  formData.append('messageType', metadata.messageType);
 
   const response = await apiClient.post<
     ServerApiResponse<{
       answerText: string;
       questionText: string;
       base64Audio: string;
-      messageType: "MAIN" | "FOLLOW" | "CLOSING";
+      messageType: 'MAIN' | 'FOLLOW' | 'CLOSING';
     }>
-  >(
-    `/myspeak/sessions/${sessionId}/turns`,
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-      authRequired: true,
-    } as CustomAxiosRequestConfig
-  );
+  >(`/myspeak/sessions/${sessionId}/turns`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    authRequired: true,
+  } as CustomAxiosRequestConfig);
 
   // 백엔드 응답 구조 { result: { answerText, questionText, base64Audio, messageType } }를 매핑
   return {
@@ -123,8 +117,8 @@ export const sendConversationTurn = async (
 export const sendConversationTurnText = async (
   sessionId: number,
   answerText: string,
-  messageType: "MAIN" | "FOLLOW" | "CLOSING" = "MAIN",
-  languageCode: string = "en-US"
+  messageType: 'MAIN' | 'FOLLOW' | 'CLOSING' = 'MAIN',
+  languageCode: string = 'en-US',
 ): Promise<ConversationTurnResponse> => {
   const requestBody = {
     answerText, // 실제 백엔드: "answerText" 필드 사용 (Swagger 문서와 다름)
@@ -136,13 +130,11 @@ export const sendConversationTurnText = async (
     ServerApiResponse<{
       questionText: string;
       base64Audio: string;
-      messageType: "MAIN" | "FOLLOW" | "CLOSING";
+      messageType: 'MAIN' | 'FOLLOW' | 'CLOSING';
     }>
-  >(
-    `/myspeak/sessions/${sessionId}/turns/text`,
-    requestBody,
-    { authRequired: true } as CustomAxiosRequestConfig
-  );
+  >(`/myspeak/sessions/${sessionId}/turns/text`, requestBody, {
+    authRequired: true,
+  } as CustomAxiosRequestConfig);
 
   // 백엔드 응답 구조 { result: { questionText, base64Audio, messageType } }를 매핑
   return {
@@ -157,12 +149,12 @@ export const sendConversationTurnText = async (
  */
 export const completeSession = async (
   sessionId: number,
-  data: CompleteSessionRequest
+  data: CompleteSessionRequest,
 ): Promise<CompleteSessionResponse> => {
   const response = await apiClient.post<ApiResponse<CompleteSessionResponse>>(
     `/myspeak/sessions/${sessionId}/complete`,
     data,
-    { authRequired: false } as CustomAxiosRequestConfig
+    { authRequired: false } as CustomAxiosRequestConfig,
   );
   return response.data.data;
 };
@@ -171,14 +163,28 @@ export const completeSession = async (
  * TTS 캐시 조회 API
  */
 export const getTTSCache = async (
-  userId: number
+  userId: number,
 ): Promise<GetTTSCacheResponse> => {
   const response = await apiClient.get<ApiResponse<GetTTSCacheResponse>>(
-    "/myspeak/ttsCache",
+    '/myspeak/ttsCache',
     {
       params: { userId },
       authRequired: false,
-    } as CustomAxiosRequestConfig
+    } as CustomAxiosRequestConfig,
   );
   return response.data.data;
+};
+/**
+ * 리포트 삭제 API
+ * DELETE /api/reports/{reportId}
+ */
+export const deleteReport = async (reportId: number) => {
+  const response = await apiClient.delete<
+    ServerApiResponse<{
+      reportId: number;
+      deletedAt: string;
+    }>
+  >(`/reports/${reportId}`, { authRequired: true } as CustomAxiosRequestConfig);
+
+  return response.data.result;
 };
