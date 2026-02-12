@@ -67,7 +67,7 @@ interface UseSpeechRecognitionReturn {
   /** 에러 메시지 */
   error: string | null;
   /** 서버 응답 (모바일에서 음성 파일 전송 후) */
-  aiResponse: { answerText?: string; questionText: string; base64Audio: string } | null;
+  aiResponse: { answerText?: string; questionText: string; base64Audio: string; messageType: 'MAIN' | 'FOLLOW' | 'CLOSING' } | null;
 }
 
 /**
@@ -101,6 +101,7 @@ export const useSpeechRecognition = ({
     answerText?: string;
     questionText: string;
     base64Audio: string;
+    messageType: 'MAIN' | 'FOLLOW' | 'CLOSING';
   } | null>(null);
 
   // 누적된 최종 결과를 저장 (interim 업데이트 시 기준점)
@@ -432,6 +433,7 @@ export const useSpeechRecognition = ({
             answerText: response.answerText,
             questionText: response.questionText,
             base64Audio: response.base64Audio,
+            messageType: response.messageType,
           });
           setIsListening(false);
 

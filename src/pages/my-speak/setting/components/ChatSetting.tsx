@@ -24,8 +24,12 @@ const ChatSetting = () => {
       // console.log('sessionId:', sessionId);
       alert('대화 세션이 생성되었습니다.');
 
+      const selectedGoal = goalData.find((goal) => goal.id === selectedGoalId);
       navigateTo(`/my-speak/interview/${sessionId}`, {
-        state: { myRoleId: selectedAIId },
+        state: {
+          myRoleId: selectedAIId,
+          targetQuestionCount: selectedGoal?.targetQuestionCount,
+        },
       });
     },
   });

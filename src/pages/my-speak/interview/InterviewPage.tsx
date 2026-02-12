@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
 import { getSessionOpener, sendConversationTurnText } from "@/api/myspeak";
@@ -43,8 +43,9 @@ const InterviewPage = () => {
   const location = useLocation();
   const sessionIdNumber = sessionIdFromUrl ? Number(sessionIdFromUrl) : null;
 
-  // state에서 myRoleId 가져오기
-  const myRoleIdFromState = (location.state as { myRoleId?: number })?.myRoleId;
+  // state에서 myRoleId, targetQuestionCount 가져오기
+  const myRoleIdFromState = (location.state as { myRoleId?: number; targetQuestionCount?: number })?.myRoleId;
+  const targetQuestionCount = (location.state as { myRoleId?: number; targetQuestionCount?: number })?.targetQuestionCount;
 
   // Role Profile 조회 (interviewer 정보 가져오기)
   const { profiles, isLoading: isLoadingProfiles } = useRoleProfile();
@@ -80,6 +81,15 @@ const InterviewPage = () => {
 
   // 처리된 AI 응답 추적 (중복 메시지 방지)
   const lastProcessedResponseRef = useRef<typeof aiResponse>(null);
+
+  // 타이머 제한 도달 여부 추적 (15분 경과 시 1회만 실행)
+  const hasTriggeredTimeLimit = useRef(false);
+
+  // 질문 수 제한 도달 여부 추적 (설정한 질문 수 도달 시 1회만 실행)
+  const hasTriggeredQuestionLimit = useRef(false);
+
+  // 마무리 처리 중 여부 추적 (동시성 제어 - handleFinish와 CLOSING 경로 충돌 방지)
+  const isFinishing = useRef(false);
 
   // 면접관 데이터 (API로부터 가져오기)
   const interviewer = useMemo(() => {
@@ -150,6 +160,97 @@ const InterviewPage = () => {
   }, [messages]);
 
   /**
+   * 마무리하기 핸들러
+   * - 플로우: 알림(1초) → API 호출 → 마무리 멘트 + TTS(2초) → 로딩(0.5초) → 결과 페이지
+   */
+  const handleFinish = useCallback(async () => {
+    // 동시성 가드: 이미 마무리 처리 중이면 스킵
+    if (isFinishing.current) {
+      console.log('[handleFinish] Already finishing - skipping duplicate call');
+      return;
+    }
+    isFinishing.current = true;
+
+    try {
+      // 0. 타이머 중지
+      pause();
+
+      // 1. 알림 표시: "AI의 마무리 멘트가 한 턴 추가됩니다." (1초)
+      setFinishStep('notification');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 2. API 호출하여 마무리 멘트 가져오기 (오버레이 없이)
+      setFinishStep('idle');
+      console.log('[handleFinish] Step 2: Calling completeSession API...');
+      const result = await completeSession(seconds);
+
+      if (!result) {
+        throw new Error("Session completion failed: no result");
+      }
+
+      console.log('[handleFinish] Full API Response:', result);
+      console.log('[handleFinish] API Response Summary:', {
+        closingText: result.closingText,
+        hasClosingTts: !!result.closingTtsBase64,
+        closingTtsLength: result.closingTtsBase64?.length || 0,
+        allFields: Object.keys(result),
+      });
+
+      // 3. 마무리 메시지 추가 및 TTS 재생 (2초 동안 표시)
+      const closingText = result.closingText || "Great job! The interview is complete.";
+      const closingMessage: ChatMessage = {
+        id: `closing-${Date.now()}`,
+        type: "AI",
+        content: closingText,
+        timestamp: new Date(),
+        messageType: "CLOSING",
+      };
+      addMessage(closingMessage);
+      setFinishStep('ai_message');
+      console.log('[handleFinish] Step 3: Added closing message and set finishStep to ai_message');
+
+      // TTS 재생 (재생이 완료될 때까지 대기)
+      if (result.closingTtsBase64) {
+        console.log('[handleFinish] Starting TTS playback...');
+        try {
+          await playAudio(result.closingTtsBase64);
+          console.log('[handleFinish] TTS playback completed successfully');
+        } catch (audioError) {
+          console.error('[handleFinish] TTS playback failed:', audioError);
+          // TTS 실패해도 계속 진행
+        }
+      } else {
+        console.warn('[handleFinish] No closingTtsBase64 - skipping TTS playback');
+        // TTS가 없으면 최소 2초 대기 (메시지를 읽을 시간 제공)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      console.log('[handleFinish] Step 3 completed (TTS playback finished)');
+
+      // 4. 결과 로딩 표시 (0.5초)
+      setFinishStep('loading');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 5. 결과 페이지로 이동
+      navigateTo('/my-speak/result', {
+        state: {
+          sessionId: result.sessionId,
+          totalTime: result.totalTime,
+          sentenceCount: result.sentenceCount,
+        }
+      });
+    } catch (error: any) {
+      console.error("[InterviewPage] Failed to complete session:", error);
+      console.error("[InterviewPage] Error response:", error.response?.data);
+      isFinishing.current = false; // 에러 발생 시 ref 초기화 (재시도 가능하도록)
+      setFinishStep('idle'); // 로딩 상태 해제
+      const errorMessage = error.response?.data?.message || "세션 종료 중 오류가 발생했습니다.";
+      alert(`${errorMessage}\n\n다시 시도해주세요.`);
+    } finally {
+      setFinishStep('idle'); // 로딩 상태 초기화
+    }
+  }, [pause, completeSession, seconds, addMessage, playAudio, navigateTo]);
+
+  /**
    * 컴포넌트 마운트 시 세션 초기화 및 AI 오프너 로드
    * ChatSetting에서 생성된 세션을 사용
    */
@@ -183,6 +284,7 @@ const InterviewPage = () => {
           type: "AI",
           content: opener.questionText,
           timestamp: new Date(),
+          messageType: "OPENING",
         };
         addMessage(firstMessage);
 
@@ -243,6 +345,7 @@ const InterviewPage = () => {
         type: 'AI',
         content: aiResponse.questionText,
         timestamp: new Date(),
+        messageType: aiResponse.messageType,
       };
       addMessage(aiMessage);
 
@@ -252,8 +355,44 @@ const InterviewPage = () => {
           console.warn('[InterviewPage] Mobile TTS playback failed:', err);
         });
       }
+
+      // 3. 백엔드가 CLOSING 응답을 보낸 경우 자동 종료 (모바일 환경)
+      // 이미 마무리 멘트가 추가되었으므로 handleFinish 대신 직접 처리
+      if (aiResponse.messageType === 'CLOSING') {
+        // 동시성 가드: 이미 마무리 처리 중이면 스킵
+        if (isFinishing.current) {
+          console.log('[InterviewPage] Already finishing - skipping CLOSING handler (mobile)');
+          return;
+        }
+        isFinishing.current = true;
+
+        console.log('[InterviewPage] Backend sent CLOSING messageType (mobile) - completing session');
+        pause(); // 타이머 중지
+
+        setTimeout(async () => {
+          try {
+            setFinishStep('loading');
+            const result = await completeSession(seconds);
+
+            if (result) {
+              navigateTo('/my-speak/result', {
+                state: {
+                  sessionId: result.sessionId,
+                  totalTime: result.totalTime,
+                  sentenceCount: result.sentenceCount,
+                }
+              });
+            }
+          } catch (error: any) {
+            console.error('[InterviewPage] Failed to complete session after CLOSING (mobile):', error);
+            isFinishing.current = false; // 에러 발생 시 ref 초기화
+            setFinishStep('idle');
+            alert('세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
+          }
+        }, 2000); // TTS 재생 시간 확보
+      }
     }
-  }, [aiResponse, addMessage, playAudio]);
+  }, [aiResponse, addMessage, playAudio, pause, completeSession, seconds, navigateTo]);
 
   // 음성 인식 에러 감지 (모바일 환경에서 음성 전송 실패 시)
   useEffect(() => {
@@ -262,6 +401,38 @@ const InterviewPage = () => {
       console.error('[InterviewPage] Speech recognition error:', speechError);
     }
   }, [speechError]);
+
+  /**
+   * 타이머 15분 경과 시 자동 마무리 (1회만 실행)
+   */
+  useEffect(() => {
+    if (seconds >= 900 && !hasTriggeredTimeLimit.current && finishStep === 'idle' && !isAIResponding) {
+      hasTriggeredTimeLimit.current = true; // 중복 실행 방지
+      console.log('[InterviewPage] 15 minutes elapsed - auto finishing');
+      pause();
+      alert('시간이 만료되어 마무리 합니다.');
+      handleFinish();
+    }
+  }, [seconds, finishStep, isAIResponding, pause, handleFinish]);
+
+  /**
+   * 설정한 질문 수 도달 시 자동 마무리 (1회만 실행)
+   */
+  useEffect(() => {
+    if (!targetQuestionCount || finishStep !== 'idle' || isAIResponding || hasTriggeredQuestionLimit.current) return;
+
+    // MAIN 타입 메시지만 카운팅 (OPENING, FOLLOW, CLOSING 제외)
+    const mainQuestionCount = messages.filter(
+      m => m.type === 'AI' && m.messageType === 'MAIN'
+    ).length;
+
+    if (mainQuestionCount >= targetQuestionCount) {
+      hasTriggeredQuestionLimit.current = true; // 중복 실행 방지
+      console.log(`[InterviewPage] Reached MAIN question count (${mainQuestionCount}/${targetQuestionCount}) - auto finishing`);
+      alert('설정한 질문 수에 도달하여 마무리 합니다.');
+      handleFinish();
+    }
+  }, [messages, targetQuestionCount, finishStep, isAIResponding, handleFinish]);
 
   /**
    * 사용자 응답 처리 (텍스트 → AI 응답 → TTS 재생)
@@ -302,6 +473,7 @@ const InterviewPage = () => {
         type: "AI",
         content: response.questionText,
         timestamp: new Date(),
+        messageType: response.messageType,
       };
       addMessage(aiMessage);
 
@@ -313,6 +485,42 @@ const InterviewPage = () => {
         playAudio(response.base64Audio).catch((audioError) => {
           console.warn("[InterviewPage] TTS playback failed:", audioError);
         });
+      }
+
+      // 7. 백엔드가 CLOSING 응답을 보낸 경우 자동 종료
+      // 이미 마무리 멘트가 추가되었으므로 handleFinish 대신 직접 처리
+      if (response.messageType === 'CLOSING') {
+        // 동시성 가드: 이미 마무리 처리 중이면 스킵
+        if (isFinishing.current) {
+          console.log('[InterviewPage] Already finishing - skipping CLOSING handler');
+          return;
+        }
+        isFinishing.current = true;
+
+        console.log('[InterviewPage] Backend sent CLOSING messageType - completing session');
+        pause(); // 타이머 중지
+
+        setTimeout(async () => {
+          try {
+            setFinishStep('loading');
+            const result = await completeSession(seconds);
+
+            if (result) {
+              navigateTo('/my-speak/result', {
+                state: {
+                  sessionId: result.sessionId,
+                  totalTime: result.totalTime,
+                  sentenceCount: result.sentenceCount,
+                }
+              });
+            }
+          } catch (error: any) {
+            console.error('[InterviewPage] Failed to complete session after CLOSING:', error);
+            isFinishing.current = false; // 에러 발생 시 ref 초기화
+            setFinishStep('idle');
+            alert('세션 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
+          }
+        }, 2000); // TTS 재생 시간 확보
       }
     } catch (error: any) {
       console.error("[InterviewPage] Failed to send turn:", error);
@@ -402,88 +610,6 @@ const InterviewPage = () => {
     setViewMode((prev) => (prev === 'video' ? 'chat' : 'video'));
     setChatInput(''); // 입력창 초기화
     clearTranscript(); // transcript 초기화
-  };
-
-  /**
-   * 마무리하기 핸들러
-   * - 플로우: 알림(1초) → API 호출 → 마무리 멘트 + TTS(2초) → 로딩(0.5초) → 결과 페이지
-   */
-  const handleFinish = async () => {
-    try {
-      // 0. 타이머 중지
-      pause();
-
-      // 1. 알림 표시: "AI의 마무리 멘트가 한 턴 추가됩니다." (1초)
-      setFinishStep('notification');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // 2. API 호출하여 마무리 멘트 가져오기 (오버레이 없이)
-      setFinishStep('idle');
-      console.log('[handleFinish] Step 2: Calling completeSession API...');
-      const result = await completeSession(seconds);
-
-      if (!result) {
-        throw new Error("Session completion failed: no result");
-      }
-
-      console.log('[handleFinish] Full API Response:', result);
-      console.log('[handleFinish] API Response Summary:', {
-        closingText: result.closingText,
-        hasClosingTts: !!result.closingTtsBase64,
-        closingTtsLength: result.closingTtsBase64?.length || 0,
-        allFields: Object.keys(result),
-      });
-
-      // 3. 마무리 메시지 추가 및 TTS 재생 (2초 동안 표시)
-      const closingText = result.closingText || "Great job! The interview is complete.";
-      const closingMessage: ChatMessage = {
-        id: `closing-${Date.now()}`,
-        type: "AI",
-        content: closingText,
-        timestamp: new Date(),
-      };
-      addMessage(closingMessage);
-      setFinishStep('ai_message');
-      console.log('[handleFinish] Step 3: Added closing message and set finishStep to ai_message');
-
-      // TTS 재생 (재생이 완료될 때까지 대기)
-      if (result.closingTtsBase64) {
-        console.log('[handleFinish] Starting TTS playback...');
-        try {
-          await playAudio(result.closingTtsBase64);
-          console.log('[handleFinish] TTS playback completed successfully');
-        } catch (audioError) {
-          console.error('[handleFinish] TTS playback failed:', audioError);
-          // TTS 실패해도 계속 진행
-        }
-      } else {
-        console.warn('[handleFinish] No closingTtsBase64 - skipping TTS playback');
-        // TTS가 없으면 최소 2초 대기 (메시지를 읽을 시간 제공)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-      console.log('[handleFinish] Step 3 completed (TTS playback finished)');
-
-      // 4. 결과 로딩 표시 (0.5초)
-      setFinishStep('loading');
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // 5. 결과 페이지로 이동
-      navigateTo('/my-speak/result', {
-        state: {
-          sessionId: result.sessionId,
-          totalTime: result.totalTime,
-          sentenceCount: result.sentenceCount,
-        }
-      });
-    } catch (error: any) {
-      console.error("[InterviewPage] Failed to complete session:", error);
-      console.error("[InterviewPage] Error response:", error.response?.data);
-      setFinishStep('idle'); // 로딩 상태 해제
-      const errorMessage = error.response?.data?.message || "세션 종료 중 오류가 발생했습니다.";
-      alert(`${errorMessage}\n\n다시 시도해주세요.`);
-    } finally {
-      setFinishStep('idle'); // 로딩 상태 초기화
-    }
   };
 
   // 초기 로딩 중 (세션 초기화 또는 프로필 로딩)
