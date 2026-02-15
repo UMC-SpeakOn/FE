@@ -29,6 +29,7 @@ const Step5 = () => {
           isActive={true}
           mp4WidthClass="w-[75%]"
           webmWidthClass="w-[76%]"
+          fallbackWidthClass="w-[76%]"
         />
         <div className="w-full px-[4rem]">
           <button
