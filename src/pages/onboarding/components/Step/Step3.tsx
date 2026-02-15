@@ -36,7 +36,8 @@ const Step3 = ({ onNext }: Step3Props) => {
             mp4Src={step3Video}
             fallbackSrc={step3Default}
             isActive={true}
-            widthClass="w-full"
+            mp4WidthClass="w-full"
+            webmWidthClass="w-full"
           />
         </div>
 

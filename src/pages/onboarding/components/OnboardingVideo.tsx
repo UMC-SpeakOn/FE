@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type OnboardingVideoProps = {
   webmSrc?: string;
   mp4Src?: string;
   fallbackSrc: string;
   isActive: boolean;
-  widthClass?: string;
+
+  webmWidthClass?: string;
+  mp4WidthClass?: string;
   fallbackWidthClass?: string;
 };
 
@@ -14,11 +16,22 @@ const OnboardingVideo = ({
   mp4Src,
   fallbackSrc,
   isActive,
-  widthClass = 'w-full',
-  fallbackWidthClass,
+  webmWidthClass = 'w-full',
+  mp4WidthClass = 'w-full',
+  fallbackWidthClass = 'w-full',
 }: OnboardingVideoProps) => {
   const ref = useRef<HTMLVideoElement>(null);
   const [hasError, setHasError] = useState(false);
+
+  const isMobile = useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    return (
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
+  }, []);
+
+  const usingWebm = !isMobile && !!webmSrc;
 
   useEffect(() => {
     const video = ref.current;
@@ -26,12 +39,9 @@ const OnboardingVideo = ({
 
     if (isActive) {
       video.currentTime = 0;
-      video
-        .play()
-        .then(() => {})
-        .catch(() => {
-          setHasError(true);
-        });
+      video.play().catch(() => {
+        setHasError(true);
+      });
     } else {
       video.pause();
     }
@@ -42,7 +52,7 @@ const OnboardingVideo = ({
       <img
         src={fallbackSrc}
         alt="fallback"
-        className={`${fallbackWidthClass ?? widthClass} h-auto`}
+        className={`${fallbackWidthClass} h-auto`}
       />
     );
   }
@@ -59,12 +69,12 @@ const OnboardingVideo = ({
       controls={false}
       disablePictureInPicture
       controlsList="nodownload nofullscreen noremoteplayback"
-      className={`${widthClass} h-auto`}
+      className={`${usingWebm ? webmWidthClass : mp4WidthClass} h-auto`}
       onError={() => setHasError(true)}
     >
-      {webmSrc && <source src={webmSrc} type="video/webm" />}
+      {!isMobile && webmSrc && <source src={webmSrc} type="video/webm" />}
+
       {mp4Src && <source src={mp4Src} type="video/mp4" />}
-      <img src={fallbackSrc} alt="fallback" />
     </video>
   );
 };
