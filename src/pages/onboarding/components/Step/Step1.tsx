@@ -19,7 +19,8 @@ const Step1 = ({ onNext }: Step1Props) => {
           mp4Src={step1Video}
           fallbackSrc={step1Default}
           isActive={true}
-          widthClass="w-[100%]"
+          mp4WidthClass="w-[75%]"
+          webmWidthClass="w-full"
           fallbackWidthClass="w-[80%]"
         />
       </div>
