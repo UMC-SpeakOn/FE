@@ -25,7 +25,10 @@ const OnboardingVideo = ({
 
   const isMobile = useMemo(() => {
     if (typeof navigator === 'undefined') return false;
-    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    return (
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
   }, []);
 
   const usingWebm = !isMobile && !!webmSrc;
